@@ -7677,6 +7677,7 @@ function submitOrder(){
     const savedId    = pendingOrderId;
     const savedTotal = total;
     const affRef     = getAffiliateRef() || (user && user.affiliate) || null;
+    const isPayingNow = !!checkoutData.wantsVIP; // captured before checkoutData is cleared below
 
     // If customer opted into VIP, reserve it as pending and send them to payment.
     // VIP only activates when the processor postback confirms the charge
@@ -7686,6 +7687,7 @@ function submitOrder(){
         db.collection('users').doc(user.uid).set({ isVIP: false, vipSignupPending: true, vipCheckoutAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
           .catch(e=>console.warn('[IS] VIP pending write failed:', e));
       }
+      showRedirectingToPayment();
       startVIPPayment({
         email:     checkoutData.email     || (user && user.email) || '',
         firstName: checkoutData.firstName || '',
@@ -7756,7 +7758,7 @@ function submitOrder(){
     activePromo   = null;
     checkoutData  = {};
     pendingOrderId = null;
-    showOrderSuccess(savedId, savedTotal);
+    if(!isPayingNow) showOrderSuccess(savedId, savedTotal);
   };
 
   if(db){
@@ -7781,6 +7783,32 @@ function submitOrder(){
     localStorage.setItem('is_orders', JSON.stringify(stored));
     onSuccess();
   }
+}
+
+/* Renders an honest "sending you to payment" state -- shown instead of a false
+   order-confirmed screen while a real charge is still pending at CCBill. */
+function showRedirectingToPayment(){
+  const cho = document.getElementById('cho');
+  if(cho) cho.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  const titleEl = document.getElementById('ch-title');
+  const stepEl  = document.getElementById('ch-step');
+  const progEl  = document.getElementById('ch-prog');
+  if(titleEl) titleEl.textContent = 'One moment…';
+  if(stepEl)  stepEl.textContent  = '';
+  if(progEl)  progEl.style.width  = '100%';
+
+  const body = document.getElementById('ch-body');
+  if(!body) return;
+  body.innerHTML = `
+    <div class="ch-suc">
+      <div class="spinner" style="width:40px;height:40px;border:3px solid var(--gray);border-top-color:var(--plum);border-radius:50%;margin:0 auto 20px;animation:spin .8s linear infinite"></div>
+      <h2 style="font-size:20px">Taking you to secure payment</h2>
+      <p>Nothing has been charged yet. You'll complete your card details on the next screen.</p>
+    </div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+  `;
 }
 
 /* Renders the order success screen inside the checkout panel */
