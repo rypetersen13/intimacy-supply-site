@@ -7627,6 +7627,7 @@ function submitOrder(){
       size:       item.size,
       colorIndex: item.color,
       colorName:  (p.colors[item.color]||p.colors[0]||{name:'Standard'}).name,
+      image:      p.image || '',
       unitPrice:  +unitPrice.toFixed(2),
       unitOrig:   +p.orig.toFixed(2),
       lineTotal:  +(unitPrice * item.qty).toFixed(2),
