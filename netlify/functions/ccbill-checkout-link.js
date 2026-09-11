@@ -87,8 +87,13 @@ exports.handler = async function (event) {
       customer_fname: firstName || "",
       customer_lname: lastName || "",
       email: email || "",
-      "X-userId": userId,
-      "X-orderId": orderId || "",
+      // NOTE: X-userId / X-orderId custom passthrough params were removed here.
+      // CCBill requires passthrough parameter names to be pre-registered with
+      // Merchant Support before use -- sending an unregistered one appears to
+      // trigger their edge firewall (503, "requested URL was rejected").
+      // User/order correlation on the webhook side currently falls back to
+      // matching by email. Once a passthrough parameter is registered with
+      // CCBill support, add it back here under its approved name.
     });
 
     const url = `https://api.ccbill.com/wap-frontflex/flexforms/${FLEX_ID}?${params.toString()}`;
