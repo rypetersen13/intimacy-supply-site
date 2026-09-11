@@ -7108,31 +7108,13 @@ function renderCheckout(){
         </label>
       </div>
 
-      <!-- VIP vs Retail choice (Fabletics-style) -->
+      <!-- VIP enrollment confirmation (no choice — VIP is the only checkout path) -->
       ${!isVIP ? `
       <div style="margin:20px 0">
-        <div style="font-family:var(--fb);font-size:15px;font-weight:700;color:#111;margin-bottom:10px">Choose how to check out</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div onclick="setCheckoutVIP(true)" style="border:2px solid ${checkoutData.wantsVIP?'var(--plum)':'var(--gray)'};border-radius:12px;padding:16px;background:${checkoutData.wantsVIP?'#F7F3F5':'#fff'};cursor:pointer;position:relative">
-            <div style="position:absolute;top:-9px;right:14px;background:var(--plum);color:#fff;font-family:var(--fd);font-size:10px;font-weight:900;letter-spacing:.08em;padding:3px 8px;border-radius:4px">RECOMMENDED</div>
-            <div style="display:flex;align-items:flex-start;gap:12px">
-              <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${checkoutData.wantsVIP?'var(--plum)':'#ccc'};flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center">${checkoutData.wantsVIP?'<div style="width:10px;height:10px;border-radius:50%;background:var(--plum)"></div>':''}</div>
-              <div style="flex:1">
-                <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:var(--plum);margin-bottom:4px">Join VIP — save up to 34% today</div>
-                <div style="font-size:12px;color:#555;line-height:1.65;margin-bottom:6px">Pay VIP pricing on this order and start your $39.95/mo membership. Get a Member Token each month worth up to $50. Skip or cancel anytime.</div>
-                <div style="font-size:11px;color:#999">Billed as DHARMA*INTIMACYSUP</div>
-              </div>
-            </div>
-          </div>
-          <div onclick="setCheckoutVIP(false)" style="border:2px solid ${!checkoutData.wantsVIP && checkoutData.vipChoiceMade?'#111':'var(--gray)'};border-radius:12px;padding:16px;background:#fff;cursor:pointer">
-            <div style="display:flex;align-items:flex-start;gap:12px">
-              <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${!checkoutData.wantsVIP && checkoutData.vipChoiceMade?'#111':'#ccc'};flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center">${!checkoutData.wantsVIP && checkoutData.vipChoiceMade?'<div style="width:10px;height:10px;border-radius:50%;background:#111"></div>':''}</div>
-              <div style="flex:1">
-                <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:#111;margin-bottom:4px">One-time purchase — full retail</div>
-                <div style="font-size:12px;color:#777;line-height:1.65">Pay full retail on this order — no membership, no monthly billing. You'll still check out under your account.</div>
-              </div>
-            </div>
-          </div>
+        <div style="border:2px solid var(--plum);border-radius:12px;padding:16px;background:#F7F3F5">
+          <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:var(--plum);margin-bottom:4px">Your order includes VIP membership</div>
+          <div style="font-size:12px;color:#555;line-height:1.65;margin-bottom:6px">You'll pay VIP pricing on this order and your $39.95/mo membership starts today. Get a Member Token each month worth up to $50. Skip or cancel anytime.</div>
+          <div style="font-size:11px;color:#999">Billed as DHARMA*INTIMACYSUP</div>
         </div>
       </div>
       ` : ''}
@@ -7299,8 +7281,8 @@ function goCheckout(step){
     const city=document.getElementById('ch-city')?.value.trim();
     const state=document.getElementById('ch-state')?.value.trim();
     if(!fn||!ln||!addr||!zip||!city||!state){ toast('Please fill in all required shipping fields.'); return; }
-    // Force the VIP-vs-retail choice for non-members
-    if(!user?.isVIP && !checkoutData.vipChoiceMade){ toast('Please choose Join VIP or One-Time Purchase to continue.'); return; }
+    // Everyone who isn't already a VIP member enrolls in VIP at checkout — there is no separate choice to make.
+    if(!user?.isVIP){ checkoutData.wantsVIP = true; }
     checkoutData.firstName=fn; checkoutData.lastName=ln;
     checkoutData.address=addr;
     checkoutData.address2=document.getElementById('ch-addr2')?.value.trim()||'';
