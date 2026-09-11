@@ -7111,8 +7111,8 @@ function renderCheckout(){
       <!-- VIP membership checkbox — checked applies VIP pricing + enrollment, unchecked continues at regular price -->
       ${!isVIP ? `
       <div style="margin:20px 0">
-        <label style="display:flex;align-items:flex-start;gap:12px;border:2px solid ${checkoutData.wantsVIP!==false?'var(--plum)':'var(--gray)'};border-radius:12px;padding:16px;background:${checkoutData.wantsVIP!==false?'#F7F3F5':'#fff'};cursor:pointer">
-          <input type="checkbox" id="vip-checkout-check" ${checkoutData.wantsVIP!==false?'checked':''} onchange="setCheckoutVIP(this.checked)" style="accent-color:var(--plum);width:20px;height:20px;flex-shrink:0;margin-top:2px">
+        <label style="display:flex;align-items:flex-start;gap:12px;border:2px solid ${checkoutData.wantsVIP?'var(--plum)':'var(--gray)'};border-radius:12px;padding:16px;background:${checkoutData.wantsVIP?'#F7F3F5':'#fff'};cursor:pointer">
+          <input type="checkbox" id="vip-checkout-check" ${checkoutData.wantsVIP?'checked':''} onchange="setCheckoutVIP(this.checked)" style="accent-color:var(--plum);width:20px;height:20px;flex-shrink:0;margin-top:2px">
           <div style="flex:1">
             <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:var(--plum);margin-bottom:4px">Join VIP — save up to 34% today</div>
             <div style="font-size:12px;color:#555;line-height:1.65;margin-bottom:6px">Pay VIP pricing on this order and start your $39.95/mo membership. Get a Member Token each month worth up to $50. Skip or cancel anytime. Uncheck to continue at regular price with no membership.</div>
@@ -7284,8 +7284,7 @@ function goCheckout(step){
     const city=document.getElementById('ch-city')?.value.trim();
     const state=document.getElementById('ch-state')?.value.trim();
     if(!fn||!ln||!addr||!zip||!city||!state){ toast('Please fill in all required shipping fields.'); return; }
-    // VIP is pre-checked by default; only override if the checkbox hasn't been touched yet.
-    if(!user?.isVIP && checkoutData.wantsVIP === undefined){ checkoutData.wantsVIP = true; }
+    // VIP starts unchecked -- requires an active opt-in, not a pre-selected default.
     checkoutData.firstName=fn; checkoutData.lastName=ln;
     checkoutData.address=addr;
     checkoutData.address2=document.getElementById('ch-addr2')?.value.trim()||'';
