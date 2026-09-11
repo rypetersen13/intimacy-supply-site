@@ -67,6 +67,14 @@
   --radius:10px;--radius-lg:16px;--radius-xl:24px;
   --transition:all .22s cubic-bezier(.25,.46,.45,.94);
 }
+/* Secondary product-page actions (Save/Share) read as quiet text links next
+   to the primary Add to Bag button, not as equally-weighted CTA blocks.
+   !important overrides the multiple responsive .pd-wl-btn block-button
+   definitions found elsewhere in this stylesheet, without needing to hunt
+   down and edit each breakpoint variant individually. */
+.pd-secondary-row{display:flex;justify-content:center;gap:28px;margin-top:6px}
+.pd-secondary-row .pd-wl-btn{display:inline-flex!important;align-items:center;gap:6px;width:auto!important;background:none!important;border:none!important;box-shadow:none!important;color:var(--muted)!important;text-transform:none!important;font-family:var(--fb)!important;font-weight:600!important;font-size:13px!important;letter-spacing:0!important;padding:6px 2px!important;margin-bottom:0!important}
+.pd-secondary-row .pd-wl-btn:hover{color:var(--plum)!important}
 /* ig: glyph-icon SVG sprite system. Inherits currentColor. v2.9e. */
 .ig{display:inline-block;width:1em;height:1em;vertical-align:-.125em;background-color:currentColor;-webkit-mask:center/contain no-repeat;mask:center/contain no-repeat}
 .ig-hf{-webkit-mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 21s-7-4.5-9.5-9.5C.5 7 4 3 8 3c2 0 3 1 4 2.5C13 4 14 3 16 3c4 0 7.5 4 5.5 8.5C19 16.5 12 21 12 21z'/></svg>");mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 21s-7-4.5-9.5-9.5C.5 7 4 3 8 3c2 0 3 1 4 2.5C13 4 14 3 16 3c4 0 7.5 4 5.5 8.5C19 16.5 12 21 12 21z'/></svg>")}
@@ -6261,7 +6269,7 @@ function renderPD(){
         <button class="pd-atc-btn" onclick="addToCartFromDetail()" id="pd-atc">Add to Bag &mdash; $${p.price.toFixed(2)}</button>
         <button class="pd-token-btn" onclick="addToCartFromDetailRedeem()">Redeem with ${tokensFor(p.price)} token${tokensFor(p.price)>1?'s':''}</button>
       ` : `
-        ${(p.orig>p.price&&(1-p.price/p.orig)>=0.05)?'<div class="pd-lto">VIP Savings: '+Math.round((1-p.price/p.orig)*100)+'% Off</div>':''}
+        ${(p.orig>p.price&&(1-p.price/p.orig)>=0.05)?'<div class="pd-lto">VIP savings: '+Math.round((1-p.price/p.orig)*100)+'% off</div>':''}
         <div style="background:#F7F3F5;border-radius:8px;padding:14px 14px 16px;margin-bottom:10px">
           <button class="pd-atc-btn" style="margin-bottom:12px" onclick="addToCartVIP()" id="pd-atc">VIP Add to Bag &mdash; $${p.price.toFixed(2)}</button>
           <div style="font-size:12px;color:#555;line-height:1.6">After your first order you will be charged $39.95 each month for a Member Token, unless you Skip between the 1st and the 5th. Each token covers any item up to $50. Skip or cancel anytime.</div>
@@ -6271,8 +6279,10 @@ function renderPD(){
       `) : `
         <button class="pd-atc-btn" onclick="notifyMeRestock(${p.id},'${p.name.replace(/'/g,'\\\'')}')">${p.label==='Coming Soon'?'Notify Me at Launch':'Notify Me When Back In Stock'}</button>
       `}
-      <button class="pd-wl-btn" onclick="toggleWL(${p.id}, null)">&#9825; &nbsp; Save to Wishlist</button>
-      <button class="pd-wl-btn" onclick="sharePD('${p.id}', this)" style="margin-top:8px">&#8599;&#65038; &nbsp; Share This Product</button>
+      <div class="pd-secondary-row">
+        <button class="pd-wl-btn" onclick="toggleWL(${p.id}, null)">&#9825; Save</button>
+        <button class="pd-wl-btn" onclick="sharePD('${p.id}', this)">&#8599;&#65038; Share</button>
+      </div>
     </div>
 
     <!-- Body -->
@@ -7101,14 +7111,14 @@ function renderCheckout(){
       <!-- VIP vs Retail choice (Fabletics-style) -->
       ${!isVIP ? `
       <div style="margin:20px 0">
-        <div style="font-family:var(--fd);font-size:14px;font-weight:900;text-transform:uppercase;color:#111;letter-spacing:.05em;margin-bottom:10px">Choose How to Check Out</div>
+        <div style="font-family:var(--fb);font-size:15px;font-weight:700;color:#111;margin-bottom:10px">Choose how to check out</div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <div onclick="setCheckoutVIP(true)" style="border:2px solid ${checkoutData.wantsVIP?'var(--plum)':'var(--gray)'};border-radius:12px;padding:16px;background:${checkoutData.wantsVIP?'#F7F3F5':'#fff'};cursor:pointer;position:relative">
             <div style="position:absolute;top:-9px;right:14px;background:var(--plum);color:#fff;font-family:var(--fd);font-size:10px;font-weight:900;letter-spacing:.08em;padding:3px 8px;border-radius:4px">RECOMMENDED</div>
             <div style="display:flex;align-items:flex-start;gap:12px">
               <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${checkoutData.wantsVIP?'var(--plum)':'#ccc'};flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center">${checkoutData.wantsVIP?'<div style="width:10px;height:10px;border-radius:50%;background:var(--plum)"></div>':''}</div>
               <div style="flex:1">
-                <div style="font-family:var(--fd);font-size:15px;font-weight:900;text-transform:uppercase;color:var(--plum);letter-spacing:.04em;margin-bottom:4px">Join VIP &mdash; Save Up To 34% Today</div>
+                <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:var(--plum);margin-bottom:4px">Join VIP — save up to 34% today</div>
                 <div style="font-size:12px;color:#555;line-height:1.65;margin-bottom:6px">Pay VIP pricing on this order and start your $39.95/mo membership. Get a Member Token each month worth up to $50. Skip or cancel anytime.</div>
                 <div style="font-size:11px;color:#999">Billed as DHARMA*INTIMACYSUP</div>
               </div>
@@ -7118,7 +7128,7 @@ function renderCheckout(){
             <div style="display:flex;align-items:flex-start;gap:12px">
               <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${!checkoutData.wantsVIP && checkoutData.vipChoiceMade?'#111':'#ccc'};flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center">${!checkoutData.wantsVIP && checkoutData.vipChoiceMade?'<div style="width:10px;height:10px;border-radius:50%;background:#111"></div>':''}</div>
               <div style="flex:1">
-                <div style="font-family:var(--fd);font-size:15px;font-weight:900;text-transform:uppercase;color:#111;letter-spacing:.04em;margin-bottom:4px">One-Time Purchase &mdash; Full Retail</div>
+                <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:#111;margin-bottom:4px">One-time purchase — full retail</div>
                 <div style="font-size:12px;color:#777;line-height:1.65">Pay full retail on this order. No membership, no monthly billing.</div>
               </div>
             </div>
