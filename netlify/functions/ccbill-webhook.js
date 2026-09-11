@@ -165,6 +165,7 @@ exports.handler = async function (event) {
     const subscriptionId = String(all.subscriptionId || "");
     const email = all.email || "";
     const passthroughUserId = all["X-userId"] || all.x_userid || "";
+    const passthroughOrderId = all["X-orderId"] || all.x_orderid || "";
     const price = num(all.price);
 
     const ACTIVATE = ["NewSaleSuccess", "RenewalSuccess", "UserReactivation", "ManualAdd"];
@@ -204,6 +205,17 @@ exports.handler = async function (event) {
       if (subscriptionId) fields.ccbillSubscriptionId = { stringValue: subscriptionId };
       if (eventType === "NewSaleSuccess") fields.vipActivatedAt = { timestampValue: nowIso };
       await patchDoc(token, "users/" + userId, fields);
+
+      // NewSaleSuccess is the cart purchase itself (item total charged today,
+      // per the Fabletics-style pricing model) -- mark that specific order paid.
+      if (eventType === "NewSaleSuccess" && passthroughOrderId) {
+        await patchDoc(token, "orders/" + passthroughOrderId, {
+          paymentStatus: { stringValue: "paid" },
+          paymentMethod: { stringValue: "ccbill" },
+          paymentRef: { stringValue: subscriptionId || "" },
+          paidAt: { timestampValue: nowIso },
+        }).catch(err => console.error("ccbill-webhook: failed to mark order paid", passthroughOrderId, err.message));
+      }
 
       if (process.env.GA4_API_SECRET) {
         fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${process.env.GA4_API_SECRET}`, {
