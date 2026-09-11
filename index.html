@@ -8649,7 +8649,7 @@ if(auth) auth.onAuthStateChanged(firebaseUser=>{
     db.collection('users').doc(firebaseUser.uid).get()
       .then(snap=>{
         if(snap.exists){
-          user  = { uid: firebaseUser.uid, ...snap.data() };
+          user  = { uid: firebaseUser.uid, ...snap.data(), email: firebaseUser.email || snap.data().email || '' };
           isVIP = !!user.isVIP;
           loadWLFromProfile(user.wishlist);
         } else {
