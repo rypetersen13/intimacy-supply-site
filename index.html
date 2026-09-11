@@ -6783,11 +6783,9 @@ function renderSignInForm(msg){
   document.getElementById('si-modal-body').innerHTML=`
     <p style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:16px">Sign in to access your VIP discount and saved items.</p>
     ${msg?`<p style="background:#fff5f5;color:var(--red);font-size:12px;font-weight:600;padding:9px 12px;border-radius:6px;margin-bottom:12px">${msg}</p>`:''}
-    <form onsubmit="doSignIn();return false" autocomplete="on">
-      <input id="si-email" name="email" type="email" placeholder="Email Address *" style="display:block;width:100%;border:1px solid #ddd;border-radius:6px;padding:12px 13px;font-size:13px;margin-bottom:9px;outline:none;font-family:var(--fb)" autocomplete="username" required>
-      <input id="si-pass" name="password" type="password" placeholder="Password *" style="display:block;width:100%;border:1px solid #ddd;border-radius:6px;padding:12px 13px;font-size:13px;margin-bottom:14px;outline:none;font-family:var(--fb)" autocomplete="current-password" required>
-      <button type="submit" id="si-go-btn" style="display:block;width:100%;background:var(--plum);color:#fff;border:none;padding:13px;font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;border-radius:4px;cursor:pointer;margin-bottom:10px">SIGN IN</button>
-    </form>
+    <input id="si-email" type="email" placeholder="Email Address *" style="display:block;width:100%;border:1px solid #ddd;border-radius:6px;padding:12px 13px;font-size:13px;margin-bottom:9px;outline:none;font-family:var(--fb)" autocomplete="email">
+    <input id="si-pass" type="password" placeholder="Password *" style="display:block;width:100%;border:1px solid #ddd;border-radius:6px;padding:12px 13px;font-size:13px;margin-bottom:14px;outline:none;font-family:var(--fb)" autocomplete="current-password">
+    <button id="si-go-btn" onclick="doSignIn()" style="display:block;width:100%;background:var(--plum);color:#fff;border:none;padding:13px;font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;border-radius:4px;cursor:pointer;margin-bottom:10px">SIGN IN</button>
     <p style="text-align:center;font-size:12px;color:var(--muted)">Forgot password? <a href="#" onclick="doPasswordReset();return false" style="color:var(--plum);font-weight:700">Reset it</a></p>
     <p style="text-align:center;font-size:12px;margin-top:10px">New here? <a href="#" onclick="closeSignInModal();openQuiz('signin_modal');return false" style="color:var(--plum);font-weight:700">Create a VIP account</a></p>
   `;
@@ -7110,14 +7108,17 @@ function renderCheckout(){
         </label>
       </div>
 
-      <!-- VIP enrollment confirmation (no choice — VIP is the only checkout path) -->
+      <!-- VIP membership checkbox — checked applies VIP pricing + enrollment, unchecked continues at regular price -->
       ${!isVIP ? `
       <div style="margin:20px 0">
-        <div style="border:2px solid var(--plum);border-radius:12px;padding:16px;background:#F7F3F5">
-          <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:var(--plum);margin-bottom:4px">Your order includes VIP membership</div>
-          <div style="font-size:12px;color:#555;line-height:1.65;margin-bottom:6px">You'll pay VIP pricing on this order and your $39.95/mo membership starts today. Get a Member Token each month worth up to $50. Skip or cancel anytime.</div>
-          <div style="font-size:11px;color:#999">Billed as DHARMA*INTIMACYSUP</div>
-        </div>
+        <label style="display:flex;align-items:flex-start;gap:12px;border:2px solid ${checkoutData.wantsVIP!==false?'var(--plum)':'var(--gray)'};border-radius:12px;padding:16px;background:${checkoutData.wantsVIP!==false?'#F7F3F5':'#fff'};cursor:pointer">
+          <input type="checkbox" id="vip-checkout-check" ${checkoutData.wantsVIP!==false?'checked':''} onchange="setCheckoutVIP(this.checked)" style="accent-color:var(--plum);width:20px;height:20px;flex-shrink:0;margin-top:2px">
+          <div style="flex:1">
+            <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:var(--plum);margin-bottom:4px">Join VIP — save up to 34% today</div>
+            <div style="font-size:12px;color:#555;line-height:1.65;margin-bottom:6px">Pay VIP pricing on this order and start your $39.95/mo membership. Get a Member Token each month worth up to $50. Skip or cancel anytime. Uncheck to continue at regular price with no membership.</div>
+            <div style="font-size:11px;color:#999">Billed as DHARMA*INTIMACYSUP</div>
+          </div>
+        </label>
       </div>
       ` : ''}
 
@@ -7283,8 +7284,8 @@ function goCheckout(step){
     const city=document.getElementById('ch-city')?.value.trim();
     const state=document.getElementById('ch-state')?.value.trim();
     if(!fn||!ln||!addr||!zip||!city||!state){ toast('Please fill in all required shipping fields.'); return; }
-    // Everyone who isn't already a VIP member enrolls in VIP at checkout — there is no separate choice to make.
-    if(!user?.isVIP){ checkoutData.wantsVIP = true; }
+    // VIP is pre-checked by default; only override if the checkbox hasn't been touched yet.
+    if(!user?.isVIP && checkoutData.wantsVIP === undefined){ checkoutData.wantsVIP = true; }
     checkoutData.firstName=fn; checkoutData.lastName=ln;
     checkoutData.address=addr;
     checkoutData.address2=document.getElementById('ch-addr2')?.value.trim()||'';
@@ -7300,10 +7301,9 @@ function goCheckout(step){
   if(chb) chb.scrollTop=0;
 }
 
-// Fabletics-style VIP choice at checkout. Persisted and flips price display.
+// VIP checkbox at checkout — checked applies VIP pricing and starts the $39.95/mo membership; unchecked continues at regular price.
 function setCheckoutVIP(wants){
   checkoutData.wantsVIP = !!wants;
-  checkoutData.vipChoiceMade = true;
   isVIP = !!wants || !!user?.isVIP;
   renderCheckout();
 }
