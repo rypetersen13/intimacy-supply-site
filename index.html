@@ -7360,7 +7360,7 @@ function startCCBillVIPSubscription(customer){
       firstName:     customer.firstName || '',
       lastName:      customer.lastName  || '',
       orderId:       customer.orderId   || '',
-      overageAmount: customer.overageAmount || 0,
+      itemTotal: customer.itemTotal || 0,
     }),
   })
     .then(function(res){ return res.json().then(function(data){ return { ok: res.ok, data: data }; }); })
@@ -7697,7 +7697,7 @@ function submitOrder(){
         lastName:  checkoutData.lastName  || '',
         userId:    user?.uid              || null,
         orderId:   pendingOrderId,
-        overageAmount: savedTotal || 0,
+        itemTotal: savedTotal || 0,
       });
     }
 
