@@ -381,49 +381,71 @@
   </footer>
 
   <script>
-    // Populate real order items when available. Wire this up to whatever your checkout
-    // passes through — e.g. window.orderItems set before this script runs, or parsed
-    // from a query param / sessionStorage cart snapshot at CCBill's redirect.
-    // Fallback below shows VIP Membership alone if no item data is present.
-    const orderItems = (window.orderItems && window.orderItems.length)
-      ? window.orderItems
-      : [
-          { name: 'Lace Trim Bralette Set', qty: 1, size: 'M', price: 34.95, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=200&h=200&fit=crop' },
-          { name: 'Satin Wrap Robe', qty: 1, size: 'S/M', price: 42.00, image: 'https://images.unsplash.com/photo-1616763355603-9755a640a287?w=200&h=200&fit=crop' }
-        ];
-
     const listEl = document.getElementById('orderList');
     const breakdownEl = document.getElementById('orderBreakdown');
-    let subtotal = 0;
-    listEl.innerHTML = orderItems.map(item => {
-      subtotal += item.price;
-      const details = [item.size ? `Size ${item.size}` : null, item.qty ? `Qty ${item.qty}` : null]
-        .filter(Boolean).join(' · ');
-      const meta = details ? `<span class="qty">${details}</span>` : '';
-      const img = item.image ? `<img class="order-thumb" src="${item.image}" alt="">` : `<div class="order-thumb"></div>`;
-      return `<div class="order-row">
-        ${img}
-        <div class="order-info">
-          <span class="order-name">${item.name}${meta}</span>
-          <span class="order-price">$${item.price.toFixed(2)}</span>
-        </div>
-      </div>`;
-    }).join('');
+    const orderNumberEl = document.getElementById('orderNumber');
 
-    const shipping = 0;
-    const tax = Math.round(subtotal * 0.0725 * 100) / 100;
-    const total = subtotal + shipping + tax;
-    breakdownEl.innerHTML = `
-      <div class="breakdown-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
-      <div class="breakdown-row"><span>Shipping</span><span>${shipping === 0 ? 'Free' : '$' + shipping.toFixed(2)}</span></div>
-      <div class="breakdown-row"><span>Tax</span><span>$${tax.toFixed(2)}</span></div>
-      <div class="breakdown-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>
-    `;
+    function renderItems(items){
+      listEl.innerHTML = items.map(item => {
+        const details = [item.size ? `Size ${item.size}` : null, item.colorName ? item.colorName : null, item.qty ? `Qty ${item.qty}` : null]
+          .filter(Boolean).join(' · ');
+        const meta = details ? `<span class="qty">${details}</span>` : '';
+        const img = item.image ? `<img class="order-thumb" src="${item.image}" alt="">` : `<div class="order-thumb"></div>`;
+        const price = (item.lineTotal != null ? item.lineTotal : item.price) || 0;
+        return `<div class="order-row">
+          ${img}
+          <div class="order-info">
+            <span class="order-name">${item.name}${meta}</span>
+            <span class="order-price">$${Number(price).toFixed(2)}</span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function renderBreakdown(pricing){
+      const subtotal = pricing.afterDiscounts != null ? pricing.afterDiscounts : pricing.subtotal || 0;
+      const shipping = pricing.shipping || 0;
+      const tax = pricing.tax || 0;
+      const total = pricing.total != null ? pricing.total : (subtotal + shipping + tax);
+      breakdownEl.innerHTML = `
+        <div class="breakdown-row"><span>Subtotal</span><span>$${Number(subtotal).toFixed(2)}</span></div>
+        <div class="breakdown-row"><span>Shipping</span><span>${shipping === 0 ? 'Free' : '$' + Number(shipping).toFixed(2)}</span></div>
+        <div class="breakdown-row"><span>Tax</span><span>$${Number(tax).toFixed(2)}</span></div>
+        <div class="breakdown-row total"><span>Total</span><span>$${Number(total).toFixed(2)}</span></div>
+      `;
+    }
+
+    // Fallback content shown only if no real order can be loaded (e.g. someone
+    // opens this page directly without an orderId, or the lookup fails).
+    function renderFallback(){
+      renderItems([{ name: 'Your order', qty: 1, price: 0 }]);
+      renderBreakdown({ subtotal: 0, shipping: 0, tax: 0, total: 0 });
+      document.getElementById('confText').textContent = 'A receipt and welcome details are headed to your inbox now.';
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('X-orderId') || params.get('orderId');
+    const txnId = params.get('subscriptionId') || params.get('transactionId');
 
     document.getElementById('orderDate').textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-    const params = new URLSearchParams(window.location.search);
-    const txnId = params.get('subscriptionId') || params.get('transactionId');
+    if (orderId) {
+      orderNumberEl.textContent = '#' + orderId;
+      fetch('/.netlify/functions/get-order?orderId=' + encodeURIComponent(orderId))
+        .then(res => { if (!res.ok) throw new Error('lookup failed'); return res.json(); })
+        .then(data => {
+          renderItems(data.items && data.items.length ? data.items : [{ name: 'Your order', qty: 1, price: 0 }]);
+          if (data.pricing) renderBreakdown(data.pricing);
+          else renderBreakdown({ subtotal: 0, shipping: 0, tax: 0, total: 0 });
+        })
+        .catch(err => {
+          console.error('[order-confirmation] could not load order:', err);
+          renderFallback();
+        });
+    } else {
+      renderFallback();
+    }
+
     if (txnId) {
       document.getElementById('confText').textContent = 'Confirmation #' + txnId + ' — receipt headed to your inbox now.';
     }
