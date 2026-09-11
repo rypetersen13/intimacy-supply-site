@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creator Partners  -  Intimacy Supply</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,900&family=Barlow:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#4A1D38;--plum-l:#6B2D52;--plum-d:#330F27;
+  --black:#0D0D0D;--white:#fff;--yellow:#FFE600;--red:#D4000F;
+  --off:#F8F5F2;--muted:#666;--body:#333;
+  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+}
+/* ── BRAND WORDMARK (unified v3.72) ── */
+.logo-wordmark{display:flex;flex-direction:column;align-items:center;gap:0;line-height:1;text-decoration:none}
+.logo-intimacy{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);line-height:1}
+.logo-supply{font-family:'Cormorant Garamond',Georgia,serif;font-size:11px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--plum);line-height:1;margin-top:1px}
+.logo-wordmark.dark .logo-intimacy{color:#fff}
+.logo-wordmark.dark .logo-supply{color:rgba(255,255,255,.82)}
+.logo-wordmark.sm .logo-intimacy{font-size:16px;letter-spacing:.16em}
+.logo-wordmark.sm .logo-supply{font-size:8.5px;letter-spacing:.3em}
+.logo-area-tag{font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-left:10px;padding-left:10px;border-left:1px solid rgba(255,255,255,.18)}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);color:var(--black);background:#fff;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#f0f0f0}
+::-webkit-scrollbar-thumb{background:var(--plum);border-radius:2px}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(17,17,17,.97);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.07);
+}
+.nav-logo{
+  font-family:var(--fd);font-size:18px;font-weight:900;
+  text-transform:uppercase;letter-spacing:-.01em;
+  color:#fff;text-decoration:none;display:flex;align-items:center;gap:6px;
+}
+.nav-logo .dot{color:var(--plum);font-size:22px;line-height:1}
+.nav-back{
+  font-size:13px;font-weight:700;color:rgba(255,255,255,.5);
+  text-decoration:none;letter-spacing:.04em;text-transform:uppercase;
+  transition:color .15s;
+}
+.nav-back:hover{color:#fff}
+.nav-cta{
+  background:var(--yellow);color:var(--black);
+  font-family:var(--fd);font-size:14px;font-weight:900;
+  text-transform:uppercase;letter-spacing:.06em;
+  padding:9px 20px;border-radius:3px;text-decoration:none;
+  transition:background .15s,transform .1s;white-space:nowrap;
+}
+.nav-cta:hover{background:#e6d400;transform:translateY(-1px)}
+
+/* HERO */
+.hero{
+  background:linear-gradient(160deg,#0A0308 0%,#1A0A14 40%,#3D1530 75%,#5A2248 100%);
+  min-height:85vh;display:flex;align-items:center;
+  position:relative;overflow:hidden;padding:60px 20px 80px;
+}
+.hero-pattern{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(ellipse 60% 50% at 80% 40%,rgba(107,45,82,.2),transparent),
+    radial-gradient(ellipse 40% 60% at 10% 80%,rgba(74,29,56,.25),transparent),
+    repeating-linear-gradient(45deg,rgba(255,255,255,.008) 0,rgba(255,255,255,.008) 1px,transparent 1px,transparent 28px);
+}
+.hero-glyph{
+  position:absolute;right:-40px;top:-60px;
+  font-size:420px;color:rgba(255,255,255,.025);
+  line-height:1;pointer-events:none;user-select:none;
+  font-family:var(--fd);font-weight:900;
+}
+.hero-inner{position:relative;z-index:2;max-width:680px;margin:0 auto;text-align:center}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  border-radius:99px;padding:6px 16px;margin-bottom:24px;
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.6);
+}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--yellow);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+h1{
+  font-family:var(--fd);font-size:clamp(52px,14vw,96px);
+  font-weight:900;text-transform:uppercase;letter-spacing:-.04em;
+  line-height:.88;color:#fff;margin-bottom:20px;
+}
+h1 em{font-style:italic;color:var(--yellow)}
+.hero-sub{
+  font-size:16px;color:rgba(255,255,255,.55);line-height:1.7;
+  max-width:480px;margin:0 auto 36px;
+}
+.hero-ctas{display:flex;flex-direction:column;gap:12px;align-items:center;max-width:340px;margin:0 auto 48px}
+.btn-primary{
+  display:block;width:100%;background:var(--yellow);color:var(--black);
+  font-family:var(--fd);font-size:19px;font-weight:900;text-transform:uppercase;
+  letter-spacing:.06em;padding:16px 24px;border-radius:4px;text-decoration:none;
+  text-align:center;border:none;cursor:pointer;
+  transition:background .15s,transform .15s,box-shadow .15s;
+  box-shadow:0 6px 30px rgba(255,237,0,.2);
+}
+.btn-primary:hover{background:#e6d400;transform:translateY(-2px);box-shadow:0 10px 40px rgba(255,237,0,.3)}
+.btn-secondary{
+  display:block;width:100%;background:transparent;color:rgba(255,255,255,.8);
+  font-family:var(--fd);font-size:17px;font-weight:900;text-transform:uppercase;
+  letter-spacing:.06em;padding:14px 24px;border-radius:4px;text-decoration:none;
+  text-align:center;border:1.5px solid rgba(255,255,255,.2);cursor:pointer;
+  transition:border-color .15s,color .15s;
+}
+.btn-secondary:hover{border-color:rgba(255,255,255,.5);color:#fff}
+.hero-stats{
+  display:flex;justify-content:center;gap:40px;flex-wrap:wrap;
+  padding-top:40px;border-top:1px solid rgba(255,255,255,.08);
+}
+.hstat-val{font-family:var(--fd);font-size:clamp(28px,7vw,44px);font-weight:900;color:#fff;line-height:1;margin-bottom:4px}
+.hstat-val span{color:var(--yellow)}
+.hstat-lbl{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+
+/* HOW IT WORKS */
+.section{padding:64px 20px;max-width:720px;margin:0 auto}
+.section-eyebrow{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;
+  color:var(--plum);margin-bottom:10px;
+}
+.section-title{
+  font-family:var(--fd);font-size:clamp(28px,7vw,48px);font-weight:900;
+  text-transform:uppercase;letter-spacing:-.02em;line-height:.95;
+  color:var(--black);margin-bottom:12px;
+}
+.section-sub{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:40px;max-width:520px}
+
+/* STEP CARDS */
+.steps{display:grid;gap:16px;margin-bottom:20px}
+.step-card{
+  display:flex;align-items:flex-start;gap:20px;
+  background:var(--off);border-radius:14px;padding:24px 22px;
+  border:1px solid #EBEBEB;transition:border-color .2s,box-shadow .2s;
+}
+.step-card:hover{border-color:var(--plum);box-shadow:0 4px 20px rgba(74,29,56,.1)}
+.step-num{
+  flex-shrink:0;width:44px;height:44px;border-radius:50%;
+  background:var(--plum);color:#fff;
+  font-family:var(--fd);font-size:22px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;margin-top:2px;
+}
+.step-body strong{display:block;font-family:var(--fd);font-size:19px;font-weight:900;text-transform:uppercase;letter-spacing:.02em;margin-bottom:5px}
+.step-body p{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* COMMISSION BANNER */
+.commission-banner{
+  background:linear-gradient(135deg,#0D0509,#2D1020,#4A1D38);
+  border-radius:18px;padding:36px 28px;text-align:center;
+  color:#fff;margin:40px 0;position:relative;overflow:hidden;
+}
+.commission-banner::before{
+  content:'$';position:absolute;right:-20px;bottom:-40px;
+  font-family:var(--fd);font-size:260px;font-weight:900;
+  color:rgba(255,255,255,.03);line-height:1;pointer-events:none;
+}
+.cb-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.5);margin-bottom:12px}
+.cb-amount{font-family:var(--fd);font-size:clamp(52px,14vw,88px);font-weight:900;line-height:1;letter-spacing:-.04em;margin-bottom:6px}
+.cb-amount em{font-style:normal;color:var(--yellow)}
+.cb-label{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:28px;line-height:1.6}
+.cb-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden}
+.cb-cell{background:#1A0A14;padding:18px 12px;text-align:center}
+.cb-cell-val{font-family:var(--fd);font-size:24px;font-weight:900;color:#fff;margin-bottom:3px}
+.cb-cell-lbl{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em}
+
+/* EARNINGS SCENARIOS */
+.scenarios{display:grid;gap:12px;margin-bottom:40px}
+.scenario{
+  border:1px solid #EBEBEB;border-radius:12px;padding:18px 20px;
+  display:flex;justify-content:space-between;align-items:center;
+  transition:border-color .2s;
+}
+.scenario:hover{border-color:var(--plum)}
+.scenario-left strong{display:block;font-size:14px;font-weight:700;color:var(--black);margin-bottom:2px}
+.scenario-left span{font-size:12px;color:var(--muted)}
+.scenario-earn{font-family:var(--fd);font-size:26px;font-weight:900;color:var(--plum)}
+
+/* WHAT YOU GET */
+.perks{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:40px}
+.perk{background:var(--off);border-radius:12px;padding:20px 18px}
+.perk-icon{font-size:24px;margin-bottom:10px}
+.perk strong{display:block;font-family:var(--fd);font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px}
+.perk span{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* DARK STRIP */
+.dark-strip{background:var(--black);padding:56px 20px;text-align:center}
+.dark-strip h2{font-family:var(--fd);font-size:clamp(28px,7vw,52px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;color:#fff;margin-bottom:10px;line-height:1}
+.dark-strip h2 em{font-style:normal;color:var(--yellow)}
+.dark-strip p{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:28px;line-height:1.65;max-width:460px;margin-left:auto;margin-right:auto}
+
+/* APPLICATION FORM */
+.form-wrap{max-width:640px;margin:0 auto;padding:64px 20px;background:#fff}
+.form-title{font-family:var(--fd);font-size:clamp(28px,7vw,44px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;margin-bottom:6px}
+.form-sub{font-size:14px;color:var(--muted);margin-bottom:36px;line-height:1.65}
+.field-group{margin-bottom:18px}
+.field-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--black);margin-bottom:6px}
+.field-input{
+  display:block;width:100%;border:1.5px solid #DCDCDC;border-radius:8px;
+  padding:13px 15px;font-family:var(--fb);font-size:14px;color:var(--black);
+  background:#fff;transition:border-color .15s,box-shadow .15s;outline:none;
+}
+.field-input:focus{border-color:var(--plum);box-shadow:0 0 0 3px rgba(74,29,56,.08)}
+.field-input::placeholder{color:#bbb}
+textarea.field-input{resize:vertical;min-height:100px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.platform-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.platform-pill{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  border:1.5px solid #DCDCDC;border-radius:8px;cursor:pointer;
+  transition:border-color .15s,background .15s;user-select:none;
+}
+.platform-pill:hover{border-color:var(--plum)}
+.platform-pill input{display:none}
+.platform-pill.sel{border-color:var(--plum);background:#FAF6F9}
+.platform-pill .pp-icon{font-size:16px;flex-shrink:0}
+.platform-pill .pp-name{font-size:13px;font-weight:600;color:var(--black)}
+.size-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.size-pill{
+  padding:10px;text-align:center;border:1.5px solid #DCDCDC;
+  border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;
+  transition:all .15s;user-select:none;
+}
+.size-pill:hover,.size-pill.sel{border-color:var(--plum);background:var(--plum);color:#fff}
+.form-divider{border:none;border-top:1px solid #EBEBEB;margin:28px 0}
+.form-note{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:24px}
+.btn-submit{
+  display:block;width:100%;background:var(--plum);color:#fff;
+  font-family:var(--fd);font-size:19px;font-weight:900;text-transform:uppercase;
+  letter-spacing:.06em;padding:16px;border-radius:6px;border:none;cursor:pointer;
+  transition:background .15s,transform .15s,box-shadow .15s;
+  box-shadow:0 6px 24px rgba(74,29,56,.3);
+}
+.btn-submit:hover{background:var(--plum-d);transform:translateY(-2px);box-shadow:0 10px 32px rgba(74,29,56,.45)}
+.btn-submit:active{transform:translateY(0)}
+
+/* SUCCESS STATE */
+.success-state{display:none;text-align:center;padding:48px 24px}
+.success-icon{font-size:56px;margin-bottom:16px}
+.success-title{font-family:var(--fd);font-size:clamp(28px,8vw,44px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;margin-bottom:10px}
+.success-sub{font-size:14px;color:var(--muted);line-height:1.7;max-width:400px;margin:0 auto 28px}
+
+/* FOOTER */
+footer{background:var(--black);padding:32px 20px;text-align:center}
+footer p{font-size:11px;color:rgba(255,255,255,.3);line-height:1.8}
+footer a{color:rgba(255,255,255,.4);text-decoration:none}
+footer a:hover{color:rgba(255,255,255,.7)}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--black);color:#fff;padding:13px 22px;border-radius:10px;
+  font-size:13px;font-weight:600;z-index:9999;
+  transition:transform .3s,opacity .3s;opacity:0;white-space:nowrap;
+  box-shadow:0 8px 30px rgba(0,0,0,.3);
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+@media(max-width:520px){
+  .field-row{grid-template-columns:1fr}
+  .perks{grid-template-columns:1fr}
+  .hero-stats{gap:24px}
+  .cb-grid{grid-template-columns:1fr}
+  .platform-grid{grid-template-columns:1fr}
+  .size-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">
+    <span class="logo-wordmark dark"><span class="logo-intimacy">Intimacy</span><span class="logo-supply">Supply</span></span>
+  </a>
+  <a href="#apply" class="nav-cta">Apply Now</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-pattern"></div>
+  <div class="hero-glyph"><span class="ig ig-hf"></span></div>
+  <div class="hero-inner">
+    <div class="hero-badge">Creator Partner Program</div>
+    <h1>Get Paid to<br><em>Share</em> What<br>You Love</h1>
+    <p class="hero-sub">Earn 5% of every order your referrals place, plus recurring monthly commissions every month they stay active. Your audience trusts you. Turn that trust into income.</p>
+    <div class="hero-ctas">
+      <a href="#apply" class="btn-primary">Apply to Partner</a>
+      <a href="#how-it-works" class="btn-secondary">See How It Works</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hstat-val"><span>50</span>K+</div>
+        <div class="hstat-lbl">Community Members</div>
+      </div>
+      <div>
+        <div class="hstat-val"><span>5</span>M</div>
+        <div class="hstat-lbl">Monthly Visits</div>
+      </div>
+      <div>
+        <div class="hstat-val"><span>40</span>%</div>
+        <div class="hstat-lbl">VIP Savings</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" style="background:var(--off);padding:64px 20px">
+  <div style="max-width:720px;margin:0 auto">
+    <div class="section-eyebrow">Simple by design</div>
+    <div class="section-title">How It Works</div>
+    <p class="section-sub">Four steps from application to your first commission payment. No complicated dashboards, no minimum traffic requirements.</p>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Apply Below</strong>
+          <p>Fill out the short form. We review every application within 48 hours and approve based on audience fit, not follower count. Micro-creators welcome.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Get Your Unique Link</strong>
+          <p>Once approved you receive a personal referral link and promo code. Share it anywhere  -  Reddit posts, bio links, DMs, content, wherever your audience is.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Your Audience Joins VIP</strong>
+          <p>When someone clicks your link and becomes a VIP member, we track it automatically. They get up to 34% off everything. You get paid. Everyone wins.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Collect Monthly</strong>
+          <p>Commissions are calculated on the 1st of each month and paid within 7 days. Direct deposit or PayPal - your choice.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMISSION -->
+<section style="padding:64px 20px;background:#fff">
+  <div style="max-width:720px;margin:0 auto">
+    <div class="section-eyebrow">Commission structure</div>
+    <div class="section-title">What You Earn</div>
+    <p class="section-sub">Flat upfront commission on every signup plus recurring income while your referrals stay members. The longer they stay, the more you earn.</p>
+
+    <div class="commission-banner">
+      <div class="cb-eyebrow">Commission Rate</div>
+      <div class="cb-amount"><em>5%</em></div>
+      <div class="cb-label">On every order your referrals place - first order and every order after.<br>Plus 5% of their $69.95 monthly membership every month they stay active.</div>
+      <div class="cb-grid">
+        <div class="cb-cell">
+          <div class="cb-cell-val">5%</div>
+          <div class="cb-cell-lbl">Per Order</div>
+        </div>
+        <div class="cb-cell">
+          <div class="cb-cell-val">$3.50</div>
+          <div class="cb-cell-lbl">Per Month Per Member</div>
+        </div>
+        <div class="cb-cell">
+          <div class="cb-cell-val">Forever</div>
+          <div class="cb-cell-lbl">While They Stay Active</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-eyebrow">Earnings scenarios</div>
+    <div class="scenarios">
+      <div class="scenario">
+        <div class="scenario-left">
+          <strong>10 active members referred</strong>
+          <span>Micro-creator, 1-2 posts per week</span>
+        </div>
+        <div class="scenario-earn">$35+/mo</div>
+      </div>
+      <div class="scenario">
+        <div class="scenario-left">
+          <strong>50 active members referred</strong>
+          <span>Active creator with engaged audience</span>
+        </div>
+        <div class="scenario-earn">$175+/mo</div>
+      </div>
+      <div class="scenario">
+        <div class="scenario-left">
+          <strong>200 active members referred</strong>
+          <span>High-volume creator or community</span>
+        </div>
+        <div class="scenario-earn">$700+/mo</div>
+      </div>
+      <div class="scenario" style="border-color:var(--plum);background:#FAF6F9">
+        <div class="scenario-left">
+          <strong>1,000 active members referred</strong>
+          <span>Top-tier partner with large reach</span>
+        </div>
+        <div class="scenario-earn" style="color:var(--plum)">$3,500+/mo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERKS -->
+<section style="background:var(--black);padding:64px 20px">
+  <div style="max-width:720px;margin:0 auto">
+    <div class="section-eyebrow" style="color:rgba(255,255,255,.4)">Partner benefits</div>
+    <div class="section-title" style="color:#fff">What Partners Get</div>
+    <p class="section-sub" style="color:rgba(255,255,255,.45)">Beyond commissions, approved partners get full access to our product catalog and creator resources.</p>
+    <div class="perks">
+      <div class="perk">
+        <div class="perk-icon"></div>
+        <strong>Tracked Link</strong>
+        <span>Unique URL with 90-day cookie window. If they come back later, you still get credit.</span>
+      </div>
+      <div class="perk">
+        <div class="perk-icon"></div>
+        <strong>Free Products</strong>
+        <span>Approved partners receive complimentary products to review, photograph, or feature in content.</span>
+      </div>
+      <div class="perk">
+        <div class="perk-icon"></div>
+        <strong>Real-Time Stats</strong>
+        <span>Live dashboard showing clicks, signups, active referrals, and commission balance.</span>
+      </div>
+      <div class="perk">
+        <div class="perk-icon"></div>
+        <strong>Custom Landing Pages</strong>
+        <span>Top partners get a branded landing page personalized to their audience. Higher conversions, your name on it.</span>
+      </div>
+      <div class="perk">
+        <div class="perk-icon"></div>
+        <strong>Direct Support</strong>
+        <span>Text and email access to the partner team. Not a ticket queue. Actual humans who respond same day.</span>
+      </div>
+      <div class="perk">
+        <div class="perk-icon"></div>
+        <strong>No Minimum</strong>
+        <span>No follower minimum, no traffic threshold. If your audience is engaged, you qualify.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APPLICATION FORM -->
+<section id="apply" class="form-wrap">
+  <div class="section-eyebrow">Partner application</div>
+  <div class="form-title">Apply to Partner</div>
+  <p class="form-sub">Takes about 3 minutes. We review every application personally and respond within 48 hours. No automated rejections.</p>
+
+  <div id="application-form">
+    <!-- Personal Info -->
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label" for="f-fname">First Name *</label>
+        <input class="field-input" id="f-fname" type="text" placeholder="Your first name" autocomplete="given-name">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="f-lname">Last Name *</label>
+        <input class="field-input" id="f-lname" type="text" placeholder="Your last name" autocomplete="family-name">
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="f-email">Email Address *</label>
+      <input class="field-input" id="f-email" type="email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="f-handle">Primary Handle / Username *</label>
+      <input class="field-input" id="f-handle" type="text" placeholder="u/yourname or @yourhandle">
+    </div>
+
+    <hr class="form-divider">
+
+    <!-- Platforms -->
+    <div class="field-group">
+      <label class="field-label">Where is your primary audience? *</label>
+      <div class="platform-grid" id="platform-grid">
+        <div class="platform-pill sel" onclick="togglePlatform(this,'Reddit')">
+          <span class="pp-icon"></span><span class="pp-name">Reddit</span>
+        </div>
+        <div class="platform-pill" onclick="togglePlatform(this,'OnlyFans')">
+          <span class="pp-icon"></span><span class="pp-name">OnlyFans</span>
+        </div>
+        <div class="platform-pill" onclick="togglePlatform(this,'Twitter/X')">
+          <span class="pp-icon"></span><span class="pp-name">Twitter / X</span>
+        </div>
+        <div class="platform-pill" onclick="togglePlatform(this,'TikTok')">
+          <span class="pp-icon"></span><span class="pp-name">TikTok</span>
+        </div>
+        <div class="platform-pill" onclick="togglePlatform(this,'Instagram')">
+          <span class="pp-icon"></span><span class="pp-name">Instagram</span>
+        </div>
+        <div class="platform-pill" onclick="togglePlatform(this,'Other')">
+          <span class="pp-icon"></span><span class="pp-name">Other / Blog</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="f-reach">Approximate Monthly Reach *</label>
+      <select class="field-input" id="f-reach">
+        <option value="">Select your reach</option>
+        <option value="under-1k">Under 1,000</option>
+        <option value="1k-5k">1,000 – 5,000</option>
+        <option value="5k-25k">5,000 – 25,000</option>
+        <option value="25k-100k">25,000 – 100,000</option>
+        <option value="100k-500k">100,000 – 500,000</option>
+        <option value="500k+">500,000+</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="f-link">Link to Your Profile or Content *</label>
+      <input class="field-input" id="f-link" type="url" placeholder="https://reddit.com/u/yourname">
+    </div>
+
+    <hr class="form-divider">
+
+    <!-- Content -->
+    <div class="field-group">
+      <label class="field-label">Content niche  -  check all that apply</label>
+      <div class="platform-grid">
+        <div class="platform-pill sel" onclick="togglePlatform(this,'Adult Lifestyle')">
+          <span class="pp-icon"></span><span class="pp-name">Adult Lifestyle</span>
+        </div>
+        <div class="platform-pill" onclick="togglePlatform(this,'Lingerie / Fashion')">
+          <span class="pp-icon"></span><span class="pp-name">Lingerie / Fashion</span>
+        </div>
+        <div class="platform-pill" onclick="togglePlatform(this,'Couples / Relationship')">
+          <span class="pp-icon"></span><span class="pp-name">Couples</span>
+        </div>
+        <div class="platform-pill" onclick="togglePlatform(this,'Wellness / Health')">
+          <span class="pp-icon"></span><span class="pp-name">Wellness</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="f-why">Tell us about your audience and why you'd be a good partner *</label>
+      <textarea class="field-input" id="f-why" placeholder="Who follows you, what they care about, and how you'd promote Intimacy Supply authentically..."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="f-promo">How do you plan to promote us?</label>
+      <textarea class="field-input" id="f-promo" placeholder="Posts, reviews, pinned links, stories, DMs to your community  -  anything helps us understand how we'd work together..."></textarea>
+    </div>
+
+    <hr class="form-divider">
+
+    <p class="form-note">By applying you confirm you are 18 or older and your audience is primarily 18+. All partner content must comply with platform terms of service and FTC disclosure guidelines. Commission payments require a valid payment method and may be subject to a $50 minimum payout threshold.</p>
+
+    <button class="btn-submit" onclick="submitApplication()">Submit Application</button>
+  </div>
+
+  <!-- Success State -->
+  <div class="success-state" id="success-state">
+    <div class="success-icon"></div>
+    <div class="success-title">Application Received</div>
+    <p class="success-sub">We review every application personally. Expect to hear from us within 48 hours at the email you provided. Check your spam folder just in case.</p>
+    <a href="/" class="btn-primary" style="display:inline-block;width:auto;padding:14px 32px">Back to Shopping</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    <a href="/">intimacysupply.com</a> &bull;
+    <a href="/legal?type=terms">Terms</a> &bull;
+    <a href="/legal?type=privacy">Privacy</a>
+  </p>
+  <p style="margin-top:6px">Dharma Media & Technology LLC &bull; 18+ Only &bull; Partner commissions are paid monthly with a $50 minimum threshold.</p>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+var selectedPlatforms = ['Reddit', 'Adult Lifestyle'];
+
+// Klaviyo notification (same account as the rest of the site). Set up a Klaviyo
+// flow triggered by the "Partner Application Submitted" metric to email yourself.
+var KL = { enabled: true, companyId: 'UFRYNs' };
+function klaviyoIdentify(email, props){
+  if(!KL.enabled || !email) return;
+  fetch('https://a.klaviyo.com/client/profiles/?company_id=' + KL.companyId, {
+    method:'POST', headers:{'Content-Type':'application/json','revision':'2023-02-22'},
+    body: JSON.stringify({ data:{ type:'profile', attributes:{ email: email, properties: props || {} } } })
+  }).catch(function(){});
+}
+function klaviyoTrack(metric, email, props){
+  if(!KL.enabled || !email) return;
+  fetch('https://a.klaviyo.com/client/events/?company_id=' + KL.companyId, {
+    method:'POST', headers:{'Content-Type':'application/json','revision':'2023-02-22'},
+    body: JSON.stringify({ data:{ type:'event', attributes:{ metric:{data:{type:'metric',attributes:{name:metric}}}, profile:{data:{type:'profile',attributes:{email:email}}}, properties: props || {}, time:new Date().toISOString() } } })
+  }).catch(function(){});
+}
+
+function togglePlatform(el, name){
+  el.classList.toggle('sel');
+  var idx = selectedPlatforms.indexOf(name);
+  if(idx > -1){
+    selectedPlatforms.splice(idx,1);
+  } else {
+    selectedPlatforms.push(name);
+  }
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+function submitApplication(){
+  var fname    = document.getElementById('f-fname').value.trim();
+  var lname    = document.getElementById('f-lname').value.trim();
+  var email    = document.getElementById('f-email').value.trim();
+  var handle   = document.getElementById('f-handle').value.trim();
+  var reach    = document.getElementById('f-reach').value;
+  var link     = document.getElementById('f-link').value.trim();
+  var why      = document.getElementById('f-why').value.trim();
+  var promo    = document.getElementById('f-promo').value.trim();
+
+  if(!fname || !lname){ showToast('Please enter your full name.'); return; }
+  if(!email || !email.includes('@')){ showToast('Please enter a valid email address.'); return; }
+  if(!handle){ showToast('Please enter your primary handle or username.'); return; }
+  if(!reach){ showToast('Please select your approximate monthly reach.'); return; }
+  if(!link){ showToast('Please include a link to your profile or content.'); return; }
+  if(!why){ showToast('Please tell us about your audience.'); return; }
+  if(selectedPlatforms.length === 0){ showToast('Please select at least one platform.'); return; }
+
+  var appData = {
+    name:      fname + ' ' + lname,
+    firstName: fname,
+    lastName:  lname,
+    email:     email,
+    handle:    handle,
+    reach:     reach,
+    link:      link,
+    why:       why,
+    promo:     promo,
+    platforms: selectedPlatforms,
+    status:    'pending',
+    submittedAt: new Date().toISOString(),
+  };
+
+  var btn = document.querySelector('.btn-submit');
+  btn.textContent = 'Submitting...';
+  btn.disabled = true;
+
+  if(window.db){
+    window.db.collection('partner_applications').add(
+      Object.assign(appData, { serverTs: firebase.firestore.FieldValue.serverTimestamp() })
+    ).then(function(){
+      klaviyoIdentify(email, { partner_handle: handle, partner_reach: reach, partner_platforms: (selectedPlatforms||[]).join(', '), source: 'partner_application' });
+      klaviyoTrack('Partner Application Submitted', email, { name: fname + ' ' + lname, handle: handle, reach: reach, link: link });
+      document.getElementById('application-form').style.display = 'none';
+      document.getElementById('success-state').style.display = 'block';
+      window.scrollTo({ top: document.getElementById('apply').offsetTop - 80, behavior: 'smooth' });
+    }).catch(function(e){
+      console.error('[IS] Application save failed:', e);
+      showToast('Something went wrong. Please try again or email hello@intimacysupply.com');
+      btn.textContent = 'Submit Application';
+      btn.disabled = false;
+    });
+  } else {
+    // Firebase unavailable: do NOT show a fake success screen. Send them to email.
+    showToast('We could not reach our servers. Please email hello@intimacysupply.com and we will get you set up.');
+    btn.textContent = 'Submit Application';
+    btn.disabled = false;
+  }
+}
+</script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  var config = {
+    apiKey:    'AIzaSyBQfmhqROjix1vGv_l1f-AxGGdPwCGVGzQ',
+    projectId: 'intimacy-supply',
+  };
+  try {
+    if(!firebase.apps.length) firebase.initializeApp(config);
+    window.db = firebase.firestore();
+  } catch(e){ console.warn('[IS] Firebase init failed on partners page:', e); }
+})();
+</script>
+
+</body>
+</html>

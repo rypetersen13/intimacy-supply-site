@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IS Admin  -  Order Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#4A1D38;--plum-l:#6B2D52;--black:#0D0D0D;--white:#fff;
+  --yellow:#FFE600;--red:#D4000F;--green:#16A34A;--off:#F8F5F2;
+  --muted:#666;--border:#E5E5E5;
+  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+}
+/* ── BRAND WORDMARK (unified v3.72) ── */
+.logo-wordmark{display:flex;flex-direction:column;align-items:center;gap:0;line-height:1;text-decoration:none}
+.logo-intimacy{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);line-height:1}
+.logo-supply{font-family:'Cormorant Garamond',Georgia,serif;font-size:11px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--plum);line-height:1;margin-top:1px}
+.logo-wordmark.dark .logo-intimacy{color:#fff}
+.logo-wordmark.dark .logo-supply{color:rgba(255,255,255,.82)}
+.logo-wordmark.sm .logo-intimacy{font-size:16px;letter-spacing:.16em}
+.logo-wordmark.sm .logo-supply{font-size:8.5px;letter-spacing:.3em}
+.logo-area-tag{font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-left:10px;padding-left:10px;border-left:1px solid rgba(255,255,255,.18)}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--fb);background:#F4F4F6;color:var(--black);min-height:100vh}
+button,input,select,textarea{font-family:var(--fb)}
+
+/* LOGIN */
+#login-screen{
+  position:fixed;inset:0;background:linear-gradient(135deg,#0D0509,#2D1020,#4A1D38);
+  display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;
+}
+.login-box{background:#fff;border-radius:16px;padding:36px 28px;width:100%;max-width:360px;text-align:center}
+.login-logo{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;color:var(--plum);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:28px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.login-input{
+  display:block;width:100%;border:1.5px solid var(--border);border-radius:8px;
+  padding:13px 15px;font-size:15px;margin-bottom:14px;outline:none;
+  transition:border-color .15s;
+}
+.login-input:focus{border-color:var(--plum)}
+.login-btn{
+  display:block;width:100%;background:var(--plum);color:#fff;
+  font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;
+  letter-spacing:.06em;padding:14px;border-radius:6px;border:none;cursor:pointer;
+  transition:background .15s;
+}
+.login-btn:hover{background:var(--plum-l)}
+.login-err{font-size:12px;color:var(--red);margin-top:10px;display:none}
+
+/* LAYOUT */
+/* ── LAYOUT ── */
+#app{display:none}
+
+/* Desktop sidebar */
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:220px;
+  background:var(--black);overflow-y:auto;z-index:10;
+}
+.sb-logo{
+  padding:20px 18px 16px;
+  font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;
+  color:#fff;border-bottom:1px solid rgba(255,255,255,.07);
+}
+.sb-logo span{color:var(--plum)}
+.sb-section{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.3);padding:18px 18px 6px}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:11px 18px;
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.55);
+  cursor:pointer;transition:background .15s,color .15s;text-decoration:none;
+}
+.sb-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.sb-item.active{background:rgba(74,29,56,.4);color:#fff;border-right:3px solid var(--plum)}
+.sb-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sb-logout{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:14px 18px;border-top:1px solid rgba(255,255,255,.07);
+  font-size:12px;font-weight:700;color:rgba(255,255,255,.3);cursor:pointer;
+  text-transform:uppercase;letter-spacing:.06em;transition:color .15s;
+}
+.sb-logout:hover{color:var(--red)}
+.main{margin-left:220px;padding:28px 24px;min-height:100vh}
+
+/* Mobile bottom nav */
+.mob-nav{display:none}
+
+/* ── STATS ── */
+.page-title{font-family:var(--fd);font-size:32px;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:#fff;border-radius:12px;padding:20px 18px;border:1px solid var(--border)}
+.stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.stat-val{font-family:var(--fd);font-size:32px;font-weight:900;color:var(--black);line-height:1;margin-bottom:2px}
+.stat-val.green{color:var(--green)}
+.stat-val.plum{color:var(--plum)}
+.stat-change{font-size:11px;color:var(--muted)}
+
+/* ── FILTERS ── */
+.filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-btn{
+  padding:7px 16px;border-radius:99px;font-size:12px;font-weight:700;
+  border:1.5px solid var(--border);background:#fff;cursor:pointer;
+  text-transform:uppercase;letter-spacing:.04em;transition:all .15s;
+}
+.filter-btn.active{background:var(--plum);color:#fff;border-color:var(--plum)}
+.search-input{
+  padding:8px 14px;border:1.5px solid var(--border);
+  border-radius:8px;font-size:13px;outline:none;width:100%;
+  transition:border-color .15s;margin-top:8px;
+}
+.search-input:focus{border-color:var(--plum)}
+
+/* ── TABLE ── */
+.table-wrap{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden}
+.table-hdr{
+  display:grid;grid-template-columns:140px 1fr 100px 80px 90px 120px 100px;
+  gap:12px;padding:12px 16px;background:var(--off);
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+  border-bottom:1px solid var(--border);
+}
+.table-row{
+  display:grid;grid-template-columns:140px 1fr 100px 80px 90px 120px 100px;
+  gap:12px;padding:14px 16px;border-bottom:1px solid #F4F4F4;
+  align-items:center;transition:background .1s;
+}
+.table-row:last-child{border-bottom:none}
+.table-row:hover{background:#FAFAFA}
+.order-id{font-family:var(--fd);font-size:14px;font-weight:900;color:var(--plum)}
+.order-customer{font-size:13px;font-weight:600;color:var(--black)}
+.order-email{font-size:11px;color:var(--muted)}
+.order-total{font-family:var(--fd);font-size:16px;font-weight:900;color:var(--black)}
+.order-items{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-pill{
+  display:inline-block;padding:3px 10px;border-radius:99px;
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;
+}
+.status-pill.pending{background:#FEF3C7;color:#92400E}
+.status-pill.confirmed{background:#DCFCE7;color:#166534}
+.status-pill.shipped{background:#E0E7FF;color:#3730A3}
+.status-pill.cancelled{background:#FEE2E2;color:#DC2626}
+.aff-tag{
+  display:inline-block;background:#F0E6EC;color:var(--plum);
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;
+  font-family:var(--fd);letter-spacing:.03em;
+}
+.action-btn{
+  background:none;border:1.5px solid var(--border);border-radius:6px;
+  padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;
+  text-transform:uppercase;letter-spacing:.04em;transition:all .15s;
+}
+.action-btn:hover{border-color:var(--plum);color:var(--plum)}
+.action-btn.confirm-btn{border-color:var(--green);color:var(--green)}
+.action-btn.confirm-btn:hover{background:var(--green);color:#fff}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;margin-bottom:6px;color:var(--black)}
+.empty-sub{font-size:13px;line-height:1.6}
+
+/* ── ORDER MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:flex-end;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;padding:24px}
+@media(min-width:640px){.modal{border-radius:16px;margin-bottom:auto}}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}
+.detail-section{margin-bottom:18px}
+.detail-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.detail-val{font-size:14px;color:var(--black);line-height:1.6}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.status-select{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-weight:600;outline:none;transition:border-color .15s;cursor:pointer}
+.status-select:focus{border-color:var(--plum)}
+.save-btn{display:block;width:100%;background:var(--plum);color:#fff;font-family:var(--fd);font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:13px;border-radius:6px;border:none;cursor:pointer;margin-top:16px;transition:background .15s}
+.save-btn:hover{background:var(--plum-l)}
+
+/* ── PARTNERS ── */
+.partner-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.partner-name{font-size:15px;font-weight:700;color:var(--black);margin-bottom:3px}
+.partner-handle{font-size:12px;color:var(--muted);margin-bottom:6px}
+.partner-meta{font-size:11px;color:var(--muted);line-height:1.6}
+.partner-actions{display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.approve-btn{background:var(--green);color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transition:background .15s;white-space:nowrap}
+.approve-btn:hover{background:#15803D}
+.reject-btn{background:none;border:1.5px solid #FCA5A5;color:var(--red);padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transition:all .15s;white-space:nowrap}
+.reject-btn:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.delete-btn{background:none;border:1.5px solid var(--border,#E5E5E5);color:var(--muted);padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transition:all .15s;white-space:nowrap}
+.delete-btn:hover{background:#7A1010;color:#fff;border-color:#7A1010}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:80px;right:16px;background:var(--black);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transform:translateY(10px);transition:opacity .25s,transform .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px}
+.tab{padding:12px 20px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s}
+.tab.active{color:var(--plum);border-color:var(--plum)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:16px;padding-bottom:80px;min-height:100vh}
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px}
+  .stat-card{padding:14px 12px}
+  .stat-val{font-size:24px}
+  .page-title{font-size:24px}
+  .table-wrap{overflow-x:auto}
+  .table-hdr,.table-row{grid-template-columns:110px 1fr 80px 80px;min-width:400px}
+  .table-hdr :nth-child(5),.table-row :nth-child(5),
+  .table-hdr :nth-child(6),.table-row :nth-child(6),
+  .table-hdr :nth-child(7),.table-row :nth-child(7){display:none}
+  .filter-row{gap:6px}
+  .filter-btn{padding:6px 12px;font-size:11px}
+  .partner-card{flex-direction:column}
+  .partner-actions{flex-direction:row}
+
+  /* Mobile bottom nav */
+  .mob-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;
+    background:var(--black);border-top:1px solid rgba(255,255,255,.1);
+    z-index:100;
+  }
+  .mob-nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;
+    padding:10px 4px;cursor:pointer;color:rgba(255,255,255,.4);
+    font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+    gap:4px;transition:color .15s;
+  }
+  .mob-nav-item.active{color:var(--yellow)}
+  .mob-nav-item svg{width:20px;height:20px}
+}
+
+@media(min-width:769px) and (max-width:900px){
+  .sidebar{width:60px}
+  .sb-logo,.sb-section,.sb-item span,.sb-logout span{display:none}
+  .main{margin-left:60px}
+  .stats-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo"><span class="logo-wordmark"><span class="logo-intimacy">Intimacy</span><span class="logo-supply">Supply</span></span><span style="font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--muted,#999);display:block;margin-top:6px">Admin Panel</span></div>
+    <div class="login-sub">Order Management</div>
+    <input class="login-input" id="admin-email" type="email" placeholder="Admin email" autocomplete="username" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')adminLogin()">
+    <input class="login-input" id="admin-pass" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="login-btn" onclick="adminLogin()">Sign In</button>
+    <div class="login-err" id="login-err">Incorrect email or password.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-logo" style="display:flex;align-items:center"><span class="logo-wordmark dark sm"><span class="logo-intimacy">Intimacy</span><span class="logo-supply">Supply</span></span><span class="logo-area-tag">Admin</span></div>
+    <div class="sb-section"><span>Management</span></div>
+    <div class="sb-item active" onclick="showView('orders')">
+      <span class="sb-icon"></span><span>Orders</span>
+    </div>
+    <div class="sb-item" onclick="showView('partners')">
+      <span class="sb-icon"></span><span>Partners</span>
+    </div>
+    <div class="sb-item" onclick="showView('members')">
+      <span class="sb-icon"></span><span>Members</span>
+    </div>
+    <div class="sb-item" onclick="showView('reviews')">
+      <span class="sb-icon"></span><span>Reviews</span>
+    </div>
+    <div class="sb-item" onclick="showView('cancellations')">
+      <span class="sb-icon"></span><span>Cancellations</span>
+    </div>
+    <div class="sb-item" onclick="showView('affiliates')">
+      <span class="sb-icon"></span><span>Affiliates</span>
+    </div>
+    <div class="sb-section"><span>Settings</span></div>
+    <div class="sb-item" onclick="showView('settings')">
+      <span class="sb-icon"></span><span>Settings</span>
+    </div>
+    <div class="sb-logout" onclick="adminLogout()"><span>Sign Out</span></div>
+  </div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mob-nav">
+    <div class="mob-nav-item active" id="mn-orders" onclick="showView('orders')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+      Orders
+    </div>
+    <div class="mob-nav-item" id="mn-partners" onclick="showView('partners')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Partners
+    </div>
+    <div class="mob-nav-item" id="mn-members" onclick="showView('members')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Members
+    </div>
+    <div class="mob-nav-item" id="mn-affiliates" onclick="showView('affiliates')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Payouts
+    </div>
+    <div class="mob-nav-item" id="mn-settings" onclick="showView('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </div>
+  </nav>
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ORDERS VIEW -->
+    <div id="view-orders" class="tab-panel active">
+      <div class="page-title">Orders</div>
+      <div class="page-sub" id="orders-sub">Loading orders...</div>
+
+      <!-- Revenue summary -->
+      <div id="revenue-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px"></div>
+
+      <div class="stats-row" id="order-stats"></div>
+
+      <input class="search-input" id="order-search" type="text" placeholder="Search order ID or name..." oninput="renderOrderTable()" style="margin-bottom:10px">
+
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterOrders('all',this)">All</button>
+        <button class="filter-btn" onclick="filterOrders('pending_payment',this)">Pending</button>
+        <button class="filter-btn" onclick="filterOrders('confirmed',this)">Confirmed</button>
+        <button class="filter-btn" onclick="filterOrders('shipped',this)">Shipped</button>
+        <button class="filter-btn" onclick="exportCSV()" style="margin-left:auto;background:var(--plum);color:#fff;border-color:var(--plum)">Export CSV</button>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-hdr">
+          <div>Order ID</div>
+          <div>Customer</div>
+          <div>Total</div>
+          <div>Items</div>
+          <div>Status</div>
+          <div>Affiliate</div>
+          <div>Actions</div>
+        </div>
+        <div id="order-table-body"></div>
+      </div>
+    </div>
+
+    <!-- PARTNERS VIEW -->
+    <div id="view-partners" class="tab-panel">
+      <div class="page-title">Partner Applications <span id="partner-badge" style="display:inline-block;background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle"></span></div>
+      <div class="page-sub">Review and approve creator partner applications.</div>
+      <div id="partner-list"></div>
+    </div>
+
+    <!-- MEMBERS VIEW -->
+    <div id="view-members" class="tab-panel">
+      <div class="page-title">Members</div>
+      <div class="page-sub" id="members-sub">Loading members...</div>
+
+      <!-- Member stats -->
+      <div id="member-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px"></div>
+
+      <!-- Segment breakdown -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+        <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:20px">
+          <div class="stat-label" style="margin-bottom:14px">Top Categories</div>
+          <div id="seg-categories"></div>
+        </div>
+        <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:20px">
+          <div class="stat-label" style="margin-bottom:14px">Intensity Split</div>
+          <div id="seg-intensity"></div>
+        </div>
+        <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:20px">
+          <div class="stat-label" style="margin-bottom:14px">Style Preferences</div>
+          <div id="seg-style"></div>
+        </div>
+        <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:20px">
+          <div class="stat-label" style="margin-bottom:14px">Traffic Sources</div>
+          <div id="seg-source"></div>
+        </div>
+      </div>
+
+      <!-- Search + filters -->
+      <div class="filter-row" style="margin-bottom:10px">
+        <input class="search-input" id="member-search" type="text" placeholder="Search by name or email..." oninput="renderMemberTable()" style="margin-top:0;max-width:320px">
+        <button class="filter-btn active" onclick="filterMembers('all',this)">All</button>
+        <button class="filter-btn" onclick="filterMembers('vip',this)">VIP</button>
+        <button class="filter-btn" onclick="filterMembers('standard',this)">Standard</button>
+        <button class="filter-btn" onclick="exportMembersCSV()" style="margin-left:auto;background:var(--plum);color:#fff;border-color:var(--plum)">Export CSV</button>
+      </div>
+
+      <!-- Member table -->
+      <div class="table-wrap">
+        <div style="display:grid;grid-template-columns:200px 1fr 80px 120px 110px 120px;gap:12px;padding:12px 16px;background:var(--off);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border)">
+          <div>Member</div>
+          <div>Preferences</div>
+          <div>VIP</div>
+          <div>Location</div>
+          <div>Source</div>
+          <div>Joined</div>
+        </div>
+        <div id="member-table-body"></div>
+      </div>
+
+      <!-- Member detail modal -->
+      <div class="modal-overlay" id="member-modal" onclick="if(event.target===this)closeMemberModal()">
+        <div class="modal">
+          <div class="modal-hdr">
+            <div class="modal-title" id="member-modal-title">Member Profile</div>
+            <button class="modal-close" onclick="closeMemberModal()">&#x2715;</button>
+          </div>
+          <div id="member-modal-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANCELLATIONS VIEW -->
+    <div id="view-cancellations" class="tab-panel">
+      <div class="page-title">Cancellation Requests</div>
+      <div class="page-sub">Members who have cancelled VIP. Action these with your payment processor.</div>
+      <div class="filter-row" style="margin-bottom:16px">
+        <button class="filter-btn active" onclick="filterCancellations('pending_processor',this)">Pending</button>
+        <button class="filter-btn" onclick="filterCancellations('actioned',this)">Actioned</button>
+        <button class="filter-btn" onclick="filterCancellations('all',this)">All</button>
+      </div>
+      <div id="cancellation-list"></div>
+    </div>
+
+    <!-- REVIEWS VIEW -->
+    <div id="view-reviews" class="tab-panel">
+      <div class="page-title">Reviews</div>
+      <div class="page-sub">Approve or reject customer submitted reviews before they go live.</div>
+      <div class="filter-row" style="margin-bottom:16px">
+        <button class="filter-btn active" onclick="filterReviews('pending',this)">Pending</button>
+        <button class="filter-btn" onclick="filterReviews('approved',this)">Approved</button>
+        <button class="filter-btn" onclick="filterReviews('rejected',this)">Rejected</button>
+      </div>
+      <div id="review-list"></div>
+    </div>
+
+    <!-- AFFILIATES VIEW -->
+    <div id="view-affiliates" class="tab-panel">
+      <div class="page-title">Affiliate Performance</div>
+      <div class="page-sub">5% of order total. Confirmed after 30 days with no chargeback.</div>
+
+      <!-- Affiliate summary -->
+      <div id="affiliate-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px"></div>
+
+      <div class="page-title" style="font-size:16px">All Approved Affiliates</div>
+      <div class="page-sub" style="margin-bottom:8px">Every approved affiliate and their access code. Click View / Send for their link and a ready-to-paste message.</div>
+      <div id="affiliate-roster" style="margin-bottom:24px"></div>
+
+      <div class="page-title" style="font-size:16px">Performance (affiliates with sales)</div>
+      <div id="affiliate-table"></div>
+
+      <div class="page-title" style="margin-top:28px;font-size:16px">Pending Payout Requests</div>
+      <div id="payout-queue" style="margin-top:8px"></div>
+
+      <div class="page-title" style="margin-top:28px;font-size:16px">Approve New Creator</div>
+      <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:20px;max-width:480px;margin-top:8px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">Generate an access code for an approved creator. They use their handle + this code to log into the Creator Dashboard.</div>
+        <input class="login-input" id="new-creator-handle" type="text" placeholder="Creator handle (e.g. sarah)" style="margin-bottom:10px">
+        <input class="login-input" id="new-creator-email" type="email" placeholder="Creator email (optional)" style="margin-bottom:10px">
+        <button class="save-btn" onclick="approveCreator()">Generate Access Code</button>
+        <div id="new-creator-result" style="margin-top:12px;font-size:13px;font-weight:600;color:var(--green);display:none"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS VIEW -->
+    <div id="view-settings" class="tab-panel">
+      <div class="page-title">Settings</div>
+      <div class="page-sub">Admin configuration.</div>
+
+      <!-- Business info -->
+      <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:24px;max-width:480px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">Business Info</div>
+        <div style="font-size:12px;color:var(--muted);line-height:2">
+          <strong>Entity:</strong> Dharma Media &amp; Technology LLC<br>
+          <strong>EIN:</strong> 42-2700192<br>
+          <strong>Billing Descriptor:</strong> DHARMA*INTIMACYSUP<br>
+          <strong>Support:</strong> (559) 334-0826<br>
+          <strong>Email:</strong> hello@intimacysupply.com
+        </div>
+      </div>
+
+      <!-- Change password -->
+      <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:24px;max-width:480px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">Change Admin Password</div>
+        <input class="login-input" id="new-pass" type="password" placeholder="New password (min 6 chars)" style="margin-bottom:10px">
+        <button class="save-btn" onclick="changePassword()">Update Password</button>
+      </div>
+
+      <!-- Sign out -->
+      <div style="max-width:480px">
+        <button onclick="adminLogout()" style="width:100%;padding:13px;border:1.5px solid #FCA5A5;background:none;color:var(--red);font-family:var(--fd);font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;border-radius:6px;cursor:pointer">Sign Out</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay" id="order-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-order-id">Order Detail</div>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+// Change this password before deploying
+var ADMIN_PASS_KEY = 'is_admin_pass';
+var SESSION_KEY    = 'is_admin_session';
+
+// ── HANDLE SANITIZER ────────────────────────────────────────
+// A Firestore document ID cannot contain a slash. Reddit handles
+// arrive as "u/Name", "/u/Name", "@Name", or a full profile URL,
+// any of which would break db.collection('affiliates').doc(handle).
+// This must stay identical to the cleanHandle used in dashboard.html
+// so approval and login resolve to the same document ID.
+function cleanHandle(raw){
+  return (raw || '')
+    .trim()
+    .replace(/^https?:\/\/(www\.)?reddit\.com/i, '')
+    .replace(/^\/?(u|user)\//i, '')
+    .replace(/^@/, '')
+    .replace(/\s+/g, '')
+    .toLowerCase();
+}
+
+// ── KLAVIYO (client-side, public company_id - same setup as storefront) ──
+var KLAVIYO = { enabled: true, companyId: 'UFRYNs' };
+var SITE_ORIGIN = 'https://intimacysupply.com';
+
+function affiliateLink(handle){
+  return SITE_ORIGIN + '/?ref=' + encodeURIComponent(handle);
+}
+
+function klaviyoIdentifyAffiliate(profile){
+  if(!KLAVIYO.enabled) return Promise.resolve();
+  return fetch('https://a.klaviyo.com/client/profiles/?company_id=' + KLAVIYO.companyId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'revision': '2023-02-22' },
+    body: JSON.stringify({
+      data: {
+        type: 'profile',
+        attributes: {
+          email: profile.email || '',
+          properties: {
+            affiliateHandle: profile.handle || '',
+            isAffiliate: true,
+            source: 'affiliate_program',
+          }
+        }
+      }
+    })
+  }).catch(function(err){ console.warn('[IS Admin] Klaviyo identify error:', err); });
+}
+
+// Fires an event that triggers the Klaviyo affiliate Welcome/Approval flow.
+// The flow must be built and live in Klaviyo for an email to actually send.
+function klaviyoAffiliateApproved(profile){
+  if(!KLAVIYO.enabled || !profile.email) return Promise.resolve();
+  return fetch('https://a.klaviyo.com/client/events/?company_id=' + KLAVIYO.companyId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'revision': '2023-02-22' },
+    body: JSON.stringify({
+      data: {
+        type: 'event',
+        attributes: {
+          metric: { data: { type: 'metric', attributes: { name: 'Affiliate Approved' } } },
+          properties: {
+            affiliateHandle: profile.handle || '',
+            accessCode: profile.accessCode || '',
+            referralLink: affiliateLink(profile.handle || ''),
+            dashboardUrl: SITE_ORIGIN + '/dashboard.html',
+          },
+          profile: { data: { type: 'profile', attributes: { email: profile.email } } }
+        }
+      }
+    })
+  }).catch(function(err){ console.warn('[IS Admin] Klaviyo event error:', err); });
+}
+
+// Builds a paste-ready Reddit DM with the affiliate's credentials.
+function affiliateDMText(handle, code){
+  return 'Welcome to the Intimacy Supply affiliate program.\n\n' +
+    'Your access code: ' + code + '\n' +
+    'Your referral link: ' + affiliateLink(handle) + '\n' +
+    'Dashboard login: ' + SITE_ORIGIN + '/dashboard.html\n\n' +
+    'Sign in at the dashboard with your handle (' + handle + ') and the access code above to track your referrals and commissions. Every sale from your link earns you 5%. Reach out any time.';
+}
+
+// Shows a persistent credentials panel (does not vanish like a toast).
+function showAffiliateCredentials(handle, code, email){
+  var link = affiliateLink(handle);
+  var dm = affiliateDMText(handle, code);
+  var overlay = document.createElement('div');
+  overlay.id = 'aff-cred-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,13,13,.6);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px';
+  var esc = function(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+  overlay.innerHTML =
+    '<div style="background:#fff;border-radius:14px;max-width:520px;width:100%;padding:26px 26px 22px;font-family:var(--fb,sans-serif);max-height:90vh;overflow:auto">' +
+      '<div style="font-family:var(--fd,sans-serif);font-size:20px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:var(--plum,#4A1D38);margin-bottom:4px">Affiliate Approved</div>' +
+      '<div style="font-size:13px;color:#666;margin-bottom:18px">@' + esc(handle) + (email ? ' &middot; ' + esc(email) : '') + '</div>' +
+      '<div style="background:#F7F3F5;border-radius:10px;padding:14px 16px;margin-bottom:14px">' +
+        '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#999;margin-bottom:4px">Access Code</div>' +
+        '<div style="font-family:monospace;font-size:18px;letter-spacing:.12em;color:#111;margin-bottom:12px">' + esc(code) + '</div>' +
+        '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#999;margin-bottom:4px">Referral Link</div>' +
+        '<div style="font-size:13px;color:#111;word-break:break-all">' + esc(link) + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">' +
+        '<button id="aff-copy-dm" style="flex:1;min-width:150px;background:var(--plum,#4A1D38);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">Copy Reddit DM</button>' +
+        '<button id="aff-copy-code" style="flex:1;min-width:120px;background:#eee;color:#111;border:none;padding:12px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">Copy Code</button>' +
+        '<button id="aff-copy-link" style="flex:1;min-width:120px;background:#eee;color:#111;border:none;padding:12px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">Copy Link</button>' +
+      '</div>' +
+      '<div id="aff-email-status" style="font-size:12px;color:#16A34A;min-height:16px;margin-bottom:12px"></div>' +
+      '<button id="aff-cred-close" style="width:100%;background:transparent;color:#666;border:1px solid #ddd;padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">Close</button>' +
+    '</div>';
+  document.body.appendChild(overlay);
+
+  function copy(text, btn, label){
+    navigator.clipboard.writeText(text).then(function(){
+      var orig = btn.textContent; btn.textContent = 'Copied';
+      setTimeout(function(){ btn.textContent = orig; }, 1400);
+    }).catch(function(){ alert(label + ':\n\n' + text); });
+  }
+  document.getElementById('aff-copy-dm').onclick   = function(){ copy(dm, this, 'DM text'); };
+  document.getElementById('aff-copy-code').onclick = function(){ copy(code, this, 'Access code'); };
+  document.getElementById('aff-copy-link').onclick = function(){ copy(link, this, 'Referral link'); };
+  document.getElementById('aff-cred-close').onclick = function(){ overlay.remove(); };
+  overlay.onclick = function(e){ if(e.target === overlay) overlay.remove(); };
+
+  if(email){
+    var statusEl = document.getElementById('aff-email-status');
+    statusEl.textContent = 'Sending approval email via Klaviyo...';
+    klaviyoIdentifyAffiliate({ email: email, handle: handle }).then(function(){
+      return klaviyoAffiliateApproved({ email: email, handle: handle, accessCode: code });
+    }).then(function(){
+      statusEl.textContent = 'Approval event sent to Klaviyo. Email sends if the affiliate flow is live.';
+    }).catch(function(){
+      statusEl.style.color = '#D4000F';
+      statusEl.textContent = 'Klaviyo event failed to send. Use Copy Reddit DM to deliver manually.';
+    });
+  } else {
+    document.getElementById('aff-email-status').textContent = 'No email on file. Use Copy Reddit DM to deliver credentials.';
+    document.getElementById('aff-email-status').style.color = '#999';
+  }
+}
+
+// ── AUTH (real Firebase Auth) ───────────────────────────────
+var adminStarted = false;
+
+function adminLogin(){
+  var email = (document.getElementById('admin-email').value || '').trim();
+  var pass  = document.getElementById('admin-pass').value;
+  var err   = document.getElementById('login-err');
+  if(typeof firebase === 'undefined' || !firebase.auth){
+    if(err){ err.textContent = 'Still loading. Give it a second and try again.'; err.style.display = 'block'; }
+    return;
+  }
+  firebase.auth().signInWithEmailAndPassword(email, pass)
+    .catch(function(e){
+      if(err){ err.textContent = 'Incorrect email or password.'; err.style.display = 'block'; }
+      document.getElementById('admin-pass').value = '';
+      console.warn('[IS Admin] login failed:', e.code);
+    });
+  // The auth-state listener below handles showing the app on success.
+}
+
+function adminLogout(){
+  if(typeof firebase !== 'undefined' && firebase.auth){
+    firebase.auth().signOut().then(function(){ location.reload(); });
+  } else {
+    location.reload();
+  }
+}
+
+function changePassword(){
+  var np = document.getElementById('new-pass').value.trim();
+  if(np.length < 6){ showToast('Password must be at least 6 characters.'); return; }
+  var user = firebase.auth().currentUser;
+  if(!user){ showToast('Not signed in.'); return; }
+  user.updatePassword(np)
+    .then(function(){ document.getElementById('new-pass').value = ''; showToast('Password updated.'); })
+    .catch(function(e){
+      showToast(e.code === 'auth/requires-recent-login'
+        ? 'Sign out and back in, then change it.'
+        : 'Could not update: ' + e.message);
+    });
+}
+
+// Only this Firebase Auth account may open the admin panel.
+var ADMIN_UID = 'CAssJZ6lGGXfCeukLIZwaOouDjR2';
+
+// Gate the whole app on Firebase Auth state (retries until the SDK has loaded)
+function gateOnAuth(){
+  if(typeof firebase === 'undefined' || !firebase.auth){ setTimeout(gateOnAuth, 150); return; }
+  firebase.auth().onAuthStateChanged(function(user){
+    if(user && user.uid === ADMIN_UID){
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      if(!adminStarted){ adminStarted = true; initAdmin(); }
+    } else {
+      if(user){
+        // A non-admin account (e.g. a customer) is signed in on this origin. Reject it.
+        firebase.auth().signOut();
+        var err = document.getElementById('login-err');
+        if(err){ err.textContent = 'That account is not authorized for the admin panel.'; err.style.display = 'block'; }
+      }
+      document.getElementById('login-screen').style.display = '';
+      document.getElementById('app').style.display = 'none';
+    }
+  });
+}
+gateOnAuth();
+
+// ── STATE ───────────────────────────────────────────────────
+var allOrders   = [];
+var db          = null;
+var activeFilter= 'all';
+
+// ── INIT ────────────────────────────────────────────────────
+function initAdmin(){
+  var stored = localStorage.getItem(ADMIN_PASS_KEY);
+  if(!stored){ console.warn('[IS Admin] Using default password. Change it immediately in Settings > Change Admin Password.'); }
+  loadOrders();
+  renderPartners();
+  renderAffiliates();
+  loadPartnerBadge();
+}
+
+function loadPartnerBadge(){
+  if(!db) return;
+  db.collection('partner_applications').where('status','==','pending').get()
+    .then(function(snap){
+      var badge = document.getElementById('partner-badge');
+      var mobBadge = document.getElementById('mn-partners');
+      if(!badge) return;
+      if(snap.size > 0){
+        badge.textContent = snap.size;
+        badge.style.display = 'inline-block';
+        if(mobBadge) mobBadge.setAttribute('data-badge', snap.size);
+      } else {
+        badge.style.display = 'none';
+      }
+    }).catch(function(){});
+}
+
+function loadOrders(){
+  if(db){
+    db.collection('orders').orderBy('timestamp','desc').limit(200).get()
+      .then(function(snap){
+        allOrders = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+        renderOrderStats();
+        renderRevenueSummary();
+        renderOrderTable();
+        var sub = document.getElementById('orders-sub');
+        if(sub) sub.textContent = allOrders.length + ' total orders' + (allOrders.length === 0 ? ' - orders will appear here once customers complete checkout' : '');
+      }).catch(function(e){
+        allOrders = [];
+        renderOrderStats();
+        renderOrderTable();
+      });
+  } else {
+    try {
+      allOrders = JSON.parse(localStorage.getItem('is_orders') || '[]');
+      allOrders.sort(function(a,b){
+        var ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+        var tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        return tb - ta;
+      });
+    } catch(e){ allOrders = []; }
+    renderOrderStats();
+    renderRevenueSummary();
+    renderOrderTable();
+    var sub = document.getElementById('orders-sub');
+    if(sub) sub.textContent = allOrders.length + ' total orders';
+  }
+}
+
+function renderRevenueSummary(){
+  var el = document.getElementById('revenue-summary');
+  if(!el) return;
+  var now = new Date();
+
+  var today = allOrders.filter(function(o){
+    var d = o.timestamp && o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp||0);
+    return d.toDateString() === now.toDateString();
+  });
+
+  var thisWeek = allOrders.filter(function(o){
+    var d = o.timestamp && o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp||0);
+    return (now - d) < 7 * 24 * 60 * 60 * 1000;
+  });
+
+  var thisMonth = allOrders.filter(function(o){
+    var d = o.timestamp && o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp||0);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+
+  function rev(orders){ return orders.reduce(function(s,o){ return s + (o.pricing ? o.pricing.total : 0); }, 0); }
+
+  el.innerHTML = [
+    '<div class="stat-card"><div class="stat-label">Today</div><div class="stat-val green">$' + rev(today).toFixed(2) + '</div><div class="stat-change">' + today.length + ' orders</div></div>',
+    '<div class="stat-card"><div class="stat-label">This Week</div><div class="stat-val green">$' + rev(thisWeek).toFixed(2) + '</div><div class="stat-change">' + thisWeek.length + ' orders</div></div>',
+    '<div class="stat-card"><div class="stat-label">This Month</div><div class="stat-val green">$' + rev(thisMonth).toFixed(2) + '</div><div class="stat-change">' + thisMonth.length + ' orders</div></div>',
+  ].join('');
+}
+
+function exportCSV(){
+  if(allOrders.length === 0){ showToast('No orders to export.'); return; }
+  var rows = [['Order ID','Date','Customer','Email','Total','Items','Status','Affiliate']];
+  allOrders.forEach(function(o){
+    var d = o.timestamp && o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp||0);
+    var name = o.customer ? (o.customer.firstName + ' ' + o.customer.lastName).trim() : '';
+    var items = (o.items||[]).length;
+    rows.push([
+      o.orderId || o.id || '',
+      d.toLocaleDateString(),
+      name,
+      o.userEmail || o.customer && o.customer.email || '',
+      o.pricing ? o.pricing.total.toFixed(2) : '0.00',
+      items,
+      o.status || '',
+      o.affiliate || ''
+    ]);
+  });
+  var csv = rows.map(function(r){ return r.map(function(c){ return '"' + String(c).replace(/"/g,'""') + '"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'intimacysupply-orders-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV exported.');
+}
+
+function renderOrderStats(){
+  var total    = allOrders.length;
+  var pending  = allOrders.filter(function(o){ return o.status === 'pending_payment'; }).length;
+  var confirmed= allOrders.filter(function(o){ return o.status === 'confirmed'; }).length;
+  var revenue  = allOrders.reduce(function(s,o){ return s + (o.pricing ? o.pricing.total : 0); }, 0);
+
+  var el = document.getElementById('order-stats');
+  if(!el) return;
+  el.innerHTML = [
+    statCard('Total Orders', total, ''),
+    statCard('Pending Payment', pending, '', 'plum'),
+    statCard('Confirmed', confirmed, '', 'green'),
+    statCard('Total Revenue', '$' + revenue.toFixed(2), '', 'green'),
+  ].join('');
+}
+
+function statCard(label, val, change, cls){
+  return '<div class="stat-card"><div class="stat-label">' + label + '</div>' +
+    '<div class="stat-val' + (cls ? ' ' + cls : '') + '">' + val + '</div>' +
+    (change ? '<div class="stat-change">' + change + '</div>' : '') + '</div>';
+}
+
+function filterOrders(status, btn){
+  activeFilter = status;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderOrderTable();
+}
+
+function renderOrderTable(){
+  var search = (document.getElementById('order-search') || {}).value || '';
+  search = search.toLowerCase();
+
+  var filtered = allOrders.filter(function(o){
+    if(activeFilter !== 'all' && o.status !== activeFilter) return false;
+    if(search){
+      var id   = (o.orderId || '').toLowerCase();
+      var name = ((o.customer ? o.customer.firstName + ' ' + o.customer.lastName : '') || '').toLowerCase();
+      var email= (o.userEmail || '').toLowerCase();
+      if(!id.includes(search) && !name.includes(search) && !email.includes(search)) return false;
+    }
+    return true;
+  });
+
+  var body = document.getElementById('order-table-body');
+  if(!body) return;
+
+  if(filtered.length === 0){
+    body.innerHTML = '<div class="empty-state"><div class="empty-icon"></div>' +
+      '<div class="empty-title">No Orders</div>' +
+      '<div class="empty-sub">Orders will appear here once customers complete checkout on the live site.</div></div>';
+    return;
+  }
+
+  body.innerHTML = filtered.map(function(o){
+    var name = o.customer ? (o.customer.firstName + ' ' + o.customer.lastName).trim() || o.userEmail || 'Guest' : 'Guest';
+    var total = o.pricing ? '$' + o.pricing.total.toFixed(2) : ' - ';
+    var items = o.items ? o.items.length + ' item' + (o.items.length !== 1 ? 's' : '') : ' - ';
+    var status = o.status || 'pending_payment';
+    var aff    = o.affiliate ? '<span class="aff-tag">@' + o.affiliate + '</span>' : '<span style="color:#ccc;font-size:12px"> - </span>';
+    var date   = o.timestamp ? new Date(o.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : ' - ';
+
+    return '<div class="table-row">' +
+      '<div><div class="order-id">' + (o.orderId||' - ') + '</div><div style="font-size:10px;color:var(--muted)">' + date + '</div></div>' +
+      '<div><div class="order-customer">' + name + '</div><div class="order-email">' + (o.userEmail||'') + '</div></div>' +
+      '<div class="order-total">' + total + '</div>' +
+      '<div class="order-items">' + items + '</div>' +
+      '<div><span class="status-pill ' + status + '">' + status.replace('_',' ') + '</span></div>' +
+      '<div>' + aff + '</div>' +
+      '<div style="display:flex;gap:6px">' +
+        (status === 'pending_payment' ? '<button class="action-btn confirm-btn" onclick="confirmOrder(\'' + o.orderId + '\')">Confirm</button>' : '') +
+        '<button class="action-btn" onclick="openOrderModal(\'' + o.orderId + '\')">View</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function confirmOrder(orderId){
+  var idx = allOrders.findIndex(function(o){ return o.orderId === orderId; });
+  if(idx < 0) return;
+  allOrders[idx].status = 'confirmed';
+  saveOrders();
+  renderOrderStats();
+  renderOrderTable();
+  showToast('Order ' + orderId + ' confirmed.');
+}
+
+function saveOrders(){
+  localStorage.setItem('is_orders', JSON.stringify(allOrders));
+}
+
+function openOrderModal(orderId){
+  var o = allOrders.find(function(x){ return x.orderId === orderId; });
+  if(!o) return;
+
+  document.getElementById('modal-order-id').textContent = o.orderId || 'Order';
+  var name = o.customer ? (o.customer.firstName + ' ' + o.customer.lastName).trim() : 'Guest';
+  var addr = o.customer ? [o.customer.address, o.customer.address2, o.customer.city, o.customer.state, o.customer.zip, o.customer.country].filter(Boolean).join(', ') : ' - ';
+  var items = (o.items || []).map(function(i){
+    return '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px">' +
+      '<strong>' + i.name + '</strong> x' + i.qty +
+      ' <span style="color:var(--muted)">(' + (i.size||'') + ' ' + (i.colorName||'') + ')</span>' +
+      ' <span style="float:right;font-weight:700">$' + (i.lineTotal||0).toFixed(2) + '</span></div>';
+  }).join('');
+
+  document.getElementById('modal-body').innerHTML =
+    '<div class="detail-grid" style="margin-bottom:16px">' +
+      '<div class="detail-section"><div class="detail-label">Customer</div><div class="detail-val">' + name + '<br>' + (o.userEmail||'') + '<br>' + (o.customer&&o.customer.phone||'') + '</div></div>' +
+      '<div class="detail-section"><div class="detail-label">Ship To</div><div class="detail-val">' + addr + '</div></div>' +
+    '</div>' +
+    '<div class="detail-section"><div class="detail-label">Items</div>' + (items||'<div style="font-size:13px;color:var(--muted)">No items</div>') + '</div>' +
+    '<div class="detail-grid" style="margin-top:16px">' +
+      '<div><div class="detail-label">Total</div><div class="detail-val" style="font-size:20px;font-weight:900;color:var(--plum)">' + (o.pricing?'$'+o.pricing.total.toFixed(2):' - ') + '</div></div>' +
+      '<div><div class="detail-label">Affiliate</div><div class="detail-val">' + (o.affiliate?'@'+o.affiliate:'None') + '</div></div>' +
+    '</div>' +
+    '<div class="detail-section" style="margin-top:16px"><div class="detail-label">Update Status</div>' +
+      '<select class="status-select" id="modal-status-select">' +
+        ['pending_payment','confirmed','shipped','cancelled'].map(function(s){
+          return '<option value="' + s + '"' + (o.status===s?' selected':'') + '>' + s.replace('_',' ') + '</option>';
+        }).join('') +
+      '</select>' +
+      '<button class="save-btn" onclick="saveOrderStatus(\'' + orderId + '\')">Save Status</button>' +
+    '</div>';
+
+  document.getElementById('order-modal').classList.add('open');
+}
+
+function saveOrderStatus(orderId){
+  var sel = document.getElementById('modal-status-select');
+  if(!sel) return;
+  var idx = allOrders.findIndex(function(o){ return o.orderId === orderId; });
+  if(idx < 0) return;
+  allOrders[idx].status = sel.value;
+  saveOrders();
+  closeModal();
+  renderOrderStats();
+  renderOrderTable();
+  showToast('Status updated to: ' + sel.value.replace('_',' '));
+}
+
+function closeModal(){
+  document.getElementById('order-modal').classList.remove('open');
+}
+
+// ── PARTNERS ────────────────────────────────────────────────
+function renderPartners(){
+  var el = document.getElementById('partner-list');
+  if(!el) return;
+
+  if(!db){
+    el.innerHTML = '<div class="empty-state"><div class="empty-title">Firebase Required</div><div class="empty-sub">Connect Firebase to view partner applications.</div></div>';
+    return;
+  }
+
+  el.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:13px">Loading applications...</div>';
+
+  db.collection('partner_applications')
+    .get()
+    .then(function(snap){
+      if(snap.empty){
+        el.innerHTML = '<div class="empty-state"><div class="empty-title">No Applications Yet</div><div class="empty-sub">Creator applications from partners.html will appear here.</div></div>';
+        return;
+      }
+      // Sort by submittedAt client-side
+      var docs = snap.docs.map(function(doc){ return Object.assign({id: doc.id}, doc.data()); });
+      docs.sort(function(a,b){ return (b.submittedAt||'').localeCompare(a.submittedAt||''); });
+      el.innerHTML = docs.map(function(app){
+        try {
+          var id = app.id;
+          var date = app.submittedAt ? new Date(app.submittedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+          var status = app.status || 'pending';
+          var platforms = Array.isArray(app.platforms) ? app.platforms.join(', ') : (app.platforms || '');
+          return '<div class="partner-card">' +
+            '<div style="flex:1">' +
+              '<div class="partner-name">' + (app.name||'Unknown') + '</div>' +
+              '<div class="partner-handle">' + (app.handle||'') + ' &bull; ' + (app.reach||'') + ' reach</div>' +
+              '<div class="partner-meta">' +
+                'Email: ' + (app.email||'') + '<br>' +
+                'Platforms: ' + platforms + '<br>' +
+                'Profile: <a href="' + (app.link||'#') + '" target="_blank" style="color:var(--plum)">' + (app.link||'-') + '</a><br>' +
+                'Applied: ' + date +
+              '</div>' +
+              (app.why ? '<div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6;max-width:500px">' + app.why + '</div>' : '') +
+            '</div>' +
+            '<div class="partner-actions">' +
+              (status === 'approved' ? '<span style="font-size:12px;font-weight:700;color:var(--green)">Approved</span>' :
+               status === 'rejected' ? '<span style="font-size:12px;font-weight:700;color:var(--red)">Rejected</span>' :
+                '<button class="approve-btn" onclick="approvePartner(\'' + id + '\',\'' + (app.handle||'') + '\',\'' + (app.email||'') + '\')">Approve</button>' +
+                '<button class="reject-btn" onclick="rejectPartner(\'' + id + '\')">Reject</button>') +
+              '<button class="delete-btn" onclick="deletePartner(\'' + id + '\')">Delete</button>' +
+            '</div>' +
+          '</div>';
+        } catch(err) {
+          return '<div class="partner-card"><div style="color:var(--red);font-size:12px">Error rendering application: ' + err.message + '</div></div>';
+        }
+      }).join('');
+    }).catch(function(e){
+      console.error('[IS Admin] renderPartners error:', e);
+      el.innerHTML = '<div class="empty-state"><div class="empty-title">Error Loading</div><div class="empty-sub">' + e.message + '<br><br>Check Firestore rules allow admin reads on partner_applications.</div></div>';
+    });
+}
+
+function approvePartner(docId, handle, email){
+  if(!db) return;
+
+  var cleaned = cleanHandle(handle);
+  if(!cleaned){ alert('This application has no usable handle. Fix the handle field before approving.'); return; }
+
+  if(!confirm('Approve @' + cleaned + '? This will create their affiliate profile and generate an access code.')) return;
+
+  var code = Math.random().toString(36).substring(2,8).toUpperCase();
+
+  // Create the affiliate profile FIRST, then mark the application approved.
+  // If the profile write fails, the application stays un-approved and the
+  // whole action can be safely retried without leaving a half-done state.
+  db.collection('affiliates').doc(cleaned).set({
+    handle:      cleaned,
+    email:       email || null,
+    accessCode:  code,
+    status:      'approved',
+    approvedAt:  firebase.firestore.FieldValue.serverTimestamp(),
+    totalOrders: 0,
+    totalRevenue:0,
+    pendingCommission: 0,
+  }, { merge: true })
+    .then(function(){
+      return db.collection('partner_applications').doc(docId).update({ status: 'approved', approvedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    })
+    .then(function(){
+      showToast('@' + cleaned + ' approved.');
+      showAffiliateCredentials(cleaned, code, email || '');
+      renderPartners();
+    })
+    .catch(function(e){ alert('Error: ' + e.message); });
+}
+
+function rejectPartner(docId){
+  if(!db || !confirm('Reject this application?')) return;
+  db.collection('partner_applications').doc(docId).update({ status: 'rejected' })
+    .then(function(){ renderPartners(); showToast('Application rejected.'); })
+    .catch(function(e){ alert('Error: ' + e.message); });
+}
+
+function deletePartner(docId){
+  if(!db || !confirm('Permanently delete this application? This cannot be undone.')) return;
+  db.collection('partner_applications').doc(docId).delete()
+    .then(function(){ renderPartners(); loadPartnerBadge(); showToast('Application deleted.'); })
+    .catch(function(e){ alert('Error: ' + e.message); });
+}
+
+// ── AFFILIATES ──────────────────────────────────────────────
+var COMMISSION_RATE = 0.05; // 5% of order total
+
+// Lists EVERY approved affiliate (from the affiliates collection) with their
+// access code and referral link, whether or not they have sales yet. This is
+// separate from the orders-based table below, which only shows affiliates who
+// have generated orders.
+function renderAffiliateRoster(){
+  var el = document.getElementById('affiliate-roster');
+  if(!el || !db) return;
+  el.innerHTML = '<div style="padding:14px;color:var(--muted);font-size:13px">Loading affiliates...</div>';
+  db.collection('affiliates').get().then(function(snap){
+    if(snap.empty){
+      el.innerHTML = '<div class="empty-state"><div class="empty-title">No Affiliates Yet</div><div class="empty-sub">Approved affiliates will appear here with their access codes.</div></div>';
+      return;
+    }
+    var docs = [];
+    snap.forEach(function(doc){ docs.push(doc); });
+    docs.sort(function(a, b){
+      var ta = a.data().approvedAt && a.data().approvedAt.toMillis ? a.data().approvedAt.toMillis() : 0;
+      var tb = b.data().approvedAt && b.data().approvedAt.toMillis ? b.data().approvedAt.toMillis() : 0;
+      return tb - ta;
+    });
+    var rows = [];
+    docs.forEach(function(doc){
+      var d = doc.data();
+      var handle = d.handle || doc.id;
+      var code = d.accessCode || '(none)';
+      rows.push(
+        '<div class="table-row" style="grid-template-columns:1fr 130px 130px;align-items:center">' +
+          '<div><span class="aff-tag" style="font-size:13px">@' + handle + '</span>' +
+            (d.email ? '<div style="font-size:11px;color:var(--muted)">' + d.email + '</div>' : '') +
+          '</div>' +
+          '<div style="font-family:monospace;font-size:14px;letter-spacing:.08em">' + code + '</div>' +
+          '<div><button onclick="showAffiliateCredentials(\'' + handle + '\',\'' + code + '\',\'' + (d.email||'') + '\')" style="background:var(--plum);color:#fff;border:none;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer">View / Send</button></div>' +
+        '</div>'
+      );
+    });
+    el.innerHTML = '<div class="table-wrap">' +
+      '<div class="table-hdr" style="grid-template-columns:1fr 130px 130px">' +
+        '<div>Affiliate</div><div>Access Code</div><div>Credentials</div>' +
+      '</div>' + rows.join('') + '</div>';
+  }).catch(function(e){
+    el.innerHTML = '<div class="empty-state"><div class="empty-title">Error Loading</div><div class="empty-sub">' + e.message + '</div></div>';
+  });
+}
+
+function renderAffiliates(){
+  renderAffiliateRoster();
+  var el = document.getElementById('affiliate-table');
+  if(!el) return;
+
+  var affMap = {};
+  var totalPendingComm = 0, totalConfirmedComm = 0, totalPaidComm = 0;
+
+  allOrders.forEach(function(o){
+    if(!o.affiliate) return;
+    var handle = o.affiliate;
+    if(!affMap[handle]) affMap[handle] = { orders:0, revenue:0, pendingComm:0, confirmedComm:0, paidComm:0 };
+    var comm = o.affiliateCommission || +((o.pricing ? o.pricing.total : 0) * COMMISSION_RATE).toFixed(2);
+    var orderDate = o.timestamp && o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp||0);
+    var ageMs = Date.now() - orderDate.getTime();
+    var thirtyDays = 30 * 24 * 60 * 60 * 1000;
+    affMap[handle].orders++;
+    affMap[handle].revenue += o.pricing ? o.pricing.total : 0;
+    if(o.commissionStatus === 'paid'){
+      affMap[handle].paidComm += comm;
+      totalPaidComm += comm;
+    } else if(o.commissionStatus === 'confirmed' || ageMs > thirtyDays){
+      affMap[handle].confirmedComm += comm;
+    } else {
+      affMap[handle].pendingComm += comm;
+      totalPendingComm += comm;
+    }
+  });
+
+  // Render affiliate summary
+  var summaryEl = document.getElementById('affiliate-summary');
+  if(summaryEl){
+    Object.keys(affMap).forEach(function(h){ totalConfirmedComm += affMap[h].confirmedComm; });
+    summaryEl.innerHTML = [
+      statCard('Active Creators', Object.keys(affMap).length, ''),
+      statCard('Confirmed Owed', '$' + totalConfirmedComm.toFixed(2), 'Ready to pay out', 'green'),
+      statCard('Total Paid Out', '$' + totalPaidComm.toFixed(2), 'All time'),
+    ].join('');
+  }
+
+  var refs = Object.keys(affMap);
+  if(refs.length === 0){
+    el.innerHTML = '<div class="empty-state">' +
+      '<div class="empty-title">No Affiliate Data</div>' +
+      '<div class="empty-sub">Affiliate-tracked orders will appear here once creators share their referral links.</div></div>';
+    return;
+  }
+
+  el.innerHTML = '<div class="table-wrap">' +
+    '<div class="table-hdr" style="grid-template-columns:1fr 70px 90px 100px 110px 130px">' +
+      '<div>Creator</div><div>Orders</div><div>Revenue</div><div>Confirmed</div><div>Pending</div><div>Action</div>' +
+    '</div>' +
+    refs.sort(function(a,b){ return affMap[b].orders - affMap[a].orders; }).map(function(handle){
+      var d = affMap[handle];
+      var canPay = d.confirmedComm >= 25;
+      return '<div class="table-row" style="grid-template-columns:1fr 70px 90px 100px 110px 130px;align-items:center">' +
+        '<div><span class="aff-tag" style="font-size:13px">@' + handle + '</span></div>' +
+        '<div style="font-weight:700">' + d.orders + '</div>' +
+        '<div style="font-weight:700">$' + d.revenue.toFixed(2) + '</div>' +
+        '<div style="font-weight:700;color:#16A34A">$' + d.confirmedComm.toFixed(2) + '</div>' +
+        '<div style="color:#D97706;font-weight:600">$' + d.pendingComm.toFixed(2) + '</div>' +
+        '<div>' + (canPay
+          ? '<button onclick="adminMarkPaid(\'' + handle + '\',' + d.confirmedComm.toFixed(2) + ')" style="background:#16A34A;color:#fff;border:none;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer">Mark Paid</button>'
+          : '<span style="font-size:11px;color:var(--muted)">Min $25</span>') + '</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+
+  loadPayoutQueue();
+}
+
+function loadPayoutQueue(){
+  if(!db) return;
+  var el = document.getElementById('payout-queue');
+  if(!el) return;
+  db.collection('payouts').where('status','==','pending').orderBy('createdAt','asc').get()
+    .then(function(snap){
+      var payouts = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      if(!payouts.length){
+        el.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--muted)">No pending payout requests.</div>';
+        return;
+      }
+      el.innerHTML = '<div class="table-wrap">' +
+        '<div class="table-hdr" style="grid-template-columns:1fr 140px 90px 150px">' +
+          '<div>Creator</div><div>PayPal Email</div><div>Amount</div><div>Action</div>' +
+        '</div>' +
+        payouts.map(function(p){
+          return '<div class="table-row" style="grid-template-columns:1fr 140px 90px 150px;align-items:center">' +
+            '<div><span class="aff-tag">@' + p.handle + '</span></div>' +
+            '<div style="font-size:12px;word-break:break-all">' + (p.paypalEmail||'N/A') + '</div>' +
+            '<div style="font-weight:700">$' + (p.amount||0).toFixed(2) + '</div>' +
+            '<div>' +
+              '<button onclick="approvePayoutRequest(\'' + p.id + '\',\'' + p.handle + '\',' + (p.amount||0) + ')" style="background:#16A34A;color:#fff;border:none;padding:6px 12px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;margin-right:5px">Approve</button>' +
+              '<button onclick="denyPayoutRequest(\'' + p.id + '\')" style="background:#DC2626;color:#fff;border:none;padding:6px 12px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer">Deny</button>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+    }).catch(function(){});
+}
+
+function adminMarkPaid(handle, amount){
+  if(!db){ alert('Firebase required.'); return; }
+  if(!confirm('Mark $' + parseFloat(amount).toFixed(2) + ' as paid to @' + handle + '?')) return;
+  db.collection('payouts').add({
+    handle: handle, amount: parseFloat(amount), status: 'paid',
+    paidAt: firebase.firestore.FieldValue.serverTimestamp(),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    createdByAdmin: true,
+  }).then(function(){
+    return db.collection('orders').where('affiliate','==',handle).where('commissionStatus','==','confirmed').get();
+  }).then(function(snap){
+    var batch = db.batch();
+    snap.docs.forEach(function(d){ batch.update(d.ref,{commissionStatus:'paid'}); });
+    return batch.commit();
+  }).then(function(){ alert('Payout recorded.'); renderAffiliates(); })
+  .catch(function(e){ alert('Error: ' + e.message); });
+}
+
+function approvePayoutRequest(payoutId, handle, amount){
+  if(!db) return;
+  if(!confirm('Approve $' + parseFloat(amount).toFixed(2) + ' to @' + handle + '?')) return;
+  db.collection('payouts').doc(payoutId).update({
+    status:'paid', paidAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }).then(function(){
+    return db.collection('orders').where('affiliate','==',handle).where('commissionStatus','==','confirmed').get();
+  }).then(function(snap){
+    var batch = db.batch();
+    snap.docs.forEach(function(d){ batch.update(d.ref,{commissionStatus:'paid'}); });
+    return batch.commit();
+  }).then(function(){ alert('Payout approved.'); renderAffiliates(); })
+  .catch(function(e){ alert('Error: ' + e.message); });
+}
+
+function denyPayoutRequest(payoutId){
+  if(!db || !confirm('Deny this payout request?')) return;
+  db.collection('payouts').doc(payoutId).update({status:'denied'})
+    .then(function(){ renderAffiliates(); });
+}
+
+// ── NAVIGATION ──────────────────────────────────────────────
+function approveCreator(){
+  var handle = cleanHandle(document.getElementById('new-creator-handle').value);
+  var email  = (document.getElementById('new-creator-email').value||'').trim();
+  if(!handle){ alert('Enter a creator handle.'); return; }
+
+  // Generate random 6-char alphanumeric code
+  var code = Math.random().toString(36).substring(2,8).toUpperCase();
+  var resultEl = document.getElementById('new-creator-result');
+
+  if(db){
+    db.collection('affiliates').doc(handle).set({
+      handle:      handle,
+      email:       email || null,
+      accessCode:  code,
+      status:      'approved',
+      approvedAt:  firebase.firestore.FieldValue.serverTimestamp(),
+      totalOrders: 0,
+      totalRevenue:0,
+      pendingCommission: 0,
+    }, { merge: true }).then(function(){
+      resultEl.innerHTML = 'Creator @' + handle + ' approved.<br>Access Code: <strong style="font-family:monospace;letter-spacing:.1em">' + code + '</strong><br><span style="font-size:11px;font-weight:400;color:var(--muted)">Send this code to the creator.</span>';
+      resultEl.style.display = 'block';
+      document.getElementById('new-creator-handle').value = '';
+      document.getElementById('new-creator-email').value = '';
+      showAffiliateCredentials(handle, code, email || '');
+    }).catch(function(e){ alert('Error: ' + e.message); });
+  } else {
+    // localStorage fallback for dev
+    var codes = JSON.parse(localStorage.getItem('is_creator_codes')||'{}');
+    codes[handle] = code;
+    localStorage.setItem('is_creator_codes', JSON.stringify(codes));
+    resultEl.innerHTML = 'Creator @' + handle + ' approved (local mode).<br>Access Code: <strong style="font-family:monospace;letter-spacing:.1em">' + code + '</strong>';
+    resultEl.style.display = 'block';
+  }
+}
+
+function showView(view){
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('active'); });
+  document.querySelectorAll('.mob-nav-item').forEach(function(i){ i.classList.remove('active'); });
+  var panel = document.getElementById('view-' + view);
+  if(panel) panel.classList.add('active');
+  var mobItem = document.getElementById('mn-' + view);
+  if(mobItem) mobItem.classList.add('active');
+  if(event && event.currentTarget) event.currentTarget.classList.add('active');
+  if(view === 'affiliates') renderAffiliates();
+  if(view === 'partners') renderPartners();
+  if(view === 'members') loadMembers();
+  if(view === 'reviews') loadReviews();
+  if(view === 'cancellations') loadCancellations();
+}
+
+// ── TOAST ───────────────────────────────────────────────────
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+// ══════════════════════════════════════════
+// CANCELLATIONS
+// ══════════════════════════════════════════
+var allCancellations = [];
+var cancellationFilter = 'pending_processor';
+
+function loadCancellations(){
+  if(!db){ document.getElementById('cancellation-list').innerHTML = '<div class="empty-state"><div class="empty-sub">Firebase unavailable.</div></div>'; return; }
+  db.collection('cancellation_requests').orderBy('cancelledAt','desc').limit(100).get()
+    .then(function(snap){
+      allCancellations = [];
+      snap.forEach(function(doc){ var d = doc.data(); d._id = doc.id; allCancellations.push(d); });
+      renderCancellationList();
+    }).catch(function(){
+      db.collection('cancellation_requests').get().then(function(snap){
+        allCancellations = [];
+        snap.forEach(function(doc){ var d = doc.data(); d._id = doc.id; allCancellations.push(d); });
+        renderCancellationList();
+      });
+    });
+}
+
+function filterCancellations(status, btn){
+  cancellationFilter = status;
+  document.querySelectorAll('#view-cancellations .filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderCancellationList();
+}
+
+function renderCancellationList(){
+  var filtered = allCancellations.filter(function(c){
+    if(cancellationFilter === 'all') return true;
+    return c.status === cancellationFilter;
+  });
+  var el = document.getElementById('cancellation-list');
+  if(!filtered.length){
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#10003;</div><div class="empty-title">No ' + (cancellationFilter === 'pending_processor' ? 'pending' : cancellationFilter) + ' cancellations</div></div>';
+    return;
+  }
+  el.innerHTML = filtered.map(function(c){
+    var date = c.cancelledAt ? new Date(c.cancelledAt.seconds*1000).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Unknown';
+    var isPending = c.status === 'pending_processor';
+    return '<div class="partner-card">'
+      + '<div style="flex:1">'
+      + '<div style="font-size:14px;font-weight:700;margin-bottom:3px">' + (c.email||'Unknown') + '</div>'
+      + '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Cancelled: ' + date + ' &nbsp;&middot;&nbsp; Reason: ' + (c.reason||'self_service') + '</div>'
+      + '<div style="font-size:11px;font-family:monospace;color:var(--muted)">UID: ' + (c.userId||'-') + '</div>'
+      + '</div>'
+      + '<div class="partner-actions">'
+      + (isPending
+          ? '<button class="approve-btn" onclick="actionCancellation(\'' + c._id + '\')">Mark Actioned</button>'
+          : '<span style="color:var(--green);font-size:12px;font-weight:700">Actioned</span>')
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function actionCancellation(id){
+  if(!db) return;
+  db.collection('cancellation_requests').doc(id).update({
+    status: 'actioned',
+    actionedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }).then(function(){
+    var c = allCancellations.find(function(x){ return x._id === id; });
+    if(c) c.status = 'actioned';
+    renderCancellationList();
+    showToast('Marked as actioned. Cancel in your processor dashboard.');
+  }).catch(function(){ showToast('Error updating cancellation.'); });
+}
+
+// ══════════════════════════════════════════
+// REVIEWS
+// ══════════════════════════════════════════
+var allReviews = [];
+var reviewStatusFilter = 'pending';
+
+function loadReviews(){
+  if(!db){ document.getElementById('review-list').innerHTML = '<div class="empty-state"><div class="empty-sub">Firebase unavailable.</div></div>'; return; }
+  db.collection('reviews').orderBy('createdAt','desc').limit(100).get()
+    .then(function(snap){
+      allReviews = [];
+      snap.forEach(function(doc){ var d = doc.data(); d._id = doc.id; allReviews.push(d); });
+      renderReviewList();
+    }).catch(function(){ renderReviewList(); });
+}
+
+function filterReviews(status, btn){
+  reviewStatusFilter = status;
+  document.querySelectorAll('#view-reviews .filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderReviewList();
+}
+
+function renderReviewList(){
+  var filtered = allReviews.filter(function(r){
+    if(reviewStatusFilter === 'pending')  return !r.approved && !r.rejected;
+    if(reviewStatusFilter === 'approved') return !!r.approved;
+    if(reviewStatusFilter === 'rejected') return !!r.rejected;
+    return true;
+  });
+  var el = document.getElementById('review-list');
+  if(!filtered.length){
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#11088;</div><div class="empty-title">No ' + reviewStatusFilter + ' reviews</div></div>';
+    return;
+  }
+  el.innerHTML = filtered.map(function(r){
+    var stars = '&#9733;'.repeat(r.stars||5) + '&#9734;'.repeat(5-(r.stars||5));
+    var date = r.createdAt ? new Date(r.createdAt.seconds*1000).toLocaleDateString() : '';
+    var actions = r.approved ? '<span style="color:var(--green);font-size:12px;font-weight:700">Approved</span>' :
+      r.rejected ? '<span style="color:var(--red);font-size:12px;font-weight:700">Rejected</span>' :
+      '<button class="approve-btn" onclick="moderateReview(\'' + r._id + '\',true)" style="margin-right:8px">Approve</button>' +
+      '<button class="reject-btn" onclick="moderateReview(\'' + r._id + '\',false)">Reject</button>';
+    return '<div class="partner-card">' +
+      '<div style="flex:1">' +
+        '<div style="font-size:14px;font-weight:700;margin-bottom:2px">' + (r.name||'Anonymous') + ' <span style="color:var(--muted);font-size:12px">on ' + (r.productName||'Product') + '</span></div>' +
+        '<div style="color:#F59E0B;font-size:14px;margin-bottom:6px">' + stars + '</div>' +
+        '<div style="font-size:13px;color:#444;line-height:1.55;margin-bottom:6px">' + (r.text||'') + '</div>' +
+        '<div style="font-size:11px;color:var(--muted)">' + (r.email||'') + ' &nbsp;|&nbsp; ' + date + '</div>' +
+      '</div>' +
+      '<div class="partner-actions">' + actions + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function moderateReview(id, approve){
+  if(!db) return;
+  db.collection('reviews').doc(id).update(approve ? { approved: true, rejected: false } : { rejected: true, approved: false })
+    .then(function(){
+      var r = allReviews.find(function(x){ return x._id === id; });
+      if(r){ r.approved = approve; r.rejected = !approve; }
+      renderReviewList();
+      showToast(approve ? 'Review approved.' : 'Review rejected.');
+    }).catch(function(){ showToast('Error updating review.'); });
+}
+
+// ══════════════════════════════════════════
+// MEMBERS
+// ══════════════════════════════════════════
+var allMembers = [];
+var memberFilter = 'all';
+
+function loadMembers(){
+  if(!db){ document.getElementById('members-sub').textContent = 'Firebase unavailable.'; return; }
+  document.getElementById('members-sub').textContent = 'Loading members...';
+  db.collection('users').orderBy('createdAt','desc').get().then(function(snap){
+    allMembers = [];
+    snap.forEach(function(doc){
+      var d = doc.data();
+      d._uid = doc.id;
+      allMembers.push(d);
+    });
+    document.getElementById('members-sub').textContent = allMembers.length + ' total members';
+    renderMemberStats();
+    renderMemberSegments();
+    renderMemberTable();
+  }).catch(function(e){
+    // Fallback: try without orderBy if index missing
+    db.collection('users').get().then(function(snap){
+      allMembers = [];
+      snap.forEach(function(doc){
+        var d = doc.data();
+        d._uid = doc.id;
+        allMembers.push(d);
+      });
+      document.getElementById('members-sub').textContent = allMembers.length + ' total members';
+      renderMemberStats();
+      renderMemberSegments();
+      renderMemberTable();
+    }).catch(function(e2){
+      document.getElementById('members-sub').textContent = 'Error loading members.';
+    });
+  });
+}
+
+function renderMemberStats(){
+  var total   = allMembers.length;
+  var vip     = allMembers.filter(function(m){ return m.isVIP; }).length;
+  var withPhone = allMembers.filter(function(m){ return m.phone; }).length;
+  var withZip = allMembers.filter(function(m){ return m.zip; }).length;
+  document.getElementById('member-stats').innerHTML =
+    statCard('Total Members', total, '') +
+    statCard('VIP Members', vip, 'plum') +
+    statCard('Phone Collected', withPhone, 'green') +
+    statCard('Zip Collected', withZip, '');
+}
+
+function statCard(label, val, cls){
+  return '<div class="stat-card"><div class="stat-label">' + label + '</div><div class="stat-val ' + cls + '">' + val + '</div></div>';
+}
+
+function countMap(arr, field){
+  var map = {};
+  arr.forEach(function(m){
+    var vals = Array.isArray(m[field]) ? m[field] : (m[field] ? [m[field]] : []);
+    vals.forEach(function(v){
+      if(v) map[v] = (map[v]||0) + 1;
+    });
+  });
+  return map;
+}
+
+function segBar(label, count, total){
+  var pct = total ? Math.round(count / total * 100) : 0;
+  return '<div style="margin-bottom:10px">' +
+    '<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px"><span>' + label + '</span><span style="color:var(--muted)">' + count + ' (' + pct + '%)</span></div>' +
+    '<div style="height:6px;background:#F0F0F0;border-radius:3px"><div style="height:6px;background:var(--plum);border-radius:3px;width:' + pct + '%"></div></div>' +
+    '</div>';
+}
+
+function renderMemberSegments(){
+  var total = allMembers.length;
+  if(!total) return;
+
+  // Categories
+  var cats = countMap(allMembers, 'category');
+  var catHtml = Object.keys(cats).sort(function(a,b){ return cats[b]-cats[a]; }).slice(0,5).map(function(k){ return segBar(k, cats[k], total); }).join('') || '<div style="font-size:12px;color:var(--muted)">No data yet</div>';
+  document.getElementById('seg-categories').innerHTML = catHtml;
+
+  // Intensity
+  var intensity = countMap(allMembers, 'intensity');
+  var intHtml = Object.keys(intensity).sort(function(a,b){ return intensity[b]-intensity[a]; }).map(function(k){ return segBar(k, intensity[k], total); }).join('') || '<div style="font-size:12px;color:var(--muted)">No data yet</div>';
+  document.getElementById('seg-intensity').innerHTML = intHtml;
+
+  // Style
+  var style = countMap(allMembers, 'style');
+  var styleHtml = Object.keys(style).sort(function(a,b){ return style[b]-style[a]; }).map(function(k){ return segBar(k, style[k], total); }).join('') || '<div style="font-size:12px;color:var(--muted)">No data yet</div>';
+  document.getElementById('seg-style').innerHTML = styleHtml;
+
+  // Source
+  var src = countMap(allMembers, 'source');
+  var srcHtml = Object.keys(src).sort(function(a,b){ return src[b]-src[a]; }).map(function(k){ return segBar(k, src[k], total); }).join('') || '<div style="font-size:12px;color:var(--muted)">No data yet</div>';
+  document.getElementById('seg-source').innerHTML = srcHtml;
+}
+
+function filterMembers(f, btn){
+  memberFilter = f;
+  document.querySelectorAll('#view-members .filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderMemberTable();
+}
+
+function renderMemberTable(){
+  var q = (document.getElementById('member-search')?.value || '').toLowerCase();
+  var rows = allMembers.filter(function(m){
+    if(memberFilter === 'vip' && !m.isVIP) return false;
+    if(memberFilter === 'standard' && m.isVIP) return false;
+    if(q && !(
+      (m.email||'').toLowerCase().includes(q) ||
+      (m.firstName||'').toLowerCase().includes(q)
+    )) return false;
+    return true;
+  });
+
+  if(!rows.length){
+    document.getElementById('member-table-body').innerHTML = '<div class="empty-state"><div class="empty-icon">&#128101;</div><div class="empty-title">No Members Found</div></div>';
+    return;
+  }
+
+  document.getElementById('member-table-body').innerHTML = rows.map(function(m){
+    var joined = m.createdAt ? new Date(m.createdAt.seconds ? m.createdAt.seconds * 1000 : m.createdAt).toLocaleDateString() : ' - ';
+    var cats = Array.isArray(m.category) ? m.category.slice(0,2).join(', ') : (m.category||' - ');
+    var interests = Array.isArray(m.interests) ? m.interests.slice(0,2).join(', ') : '';
+    var prefs = [cats, interests].filter(Boolean).join(' | ') || ' - ';
+    var vipBadge = m.isVIP
+      ? '<span class="status-pill confirmed">VIP</span>'
+      : '<span class="status-pill pending">Standard</span>';
+    var loc = [m.zip, m.dobYear ? 'b.' + m.dobYear : ''].filter(Boolean).join(' / ') || ' - ';
+    return '<div class="table-row" style="display:grid;grid-template-columns:200px 1fr 80px 120px 110px 120px;gap:12px;cursor:pointer" onclick="openMemberModal(\'' + m._uid + '\')">' +
+      '<div><div class="order-customer">' + (m.firstName||'Member') + '</div><div class="order-email">' + (m.email||' - ') + '</div></div>' +
+      '<div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + prefs + '</div>' +
+      '<div>' + vipBadge + '</div>' +
+      '<div style="font-size:12px;color:var(--muted)">' + loc + '</div>' +
+      '<div style="font-size:11px;color:var(--muted)">' + (m.source||' - ') + '</div>' +
+      '<div style="font-size:11px;color:var(--muted)">' + joined + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function openMemberModal(uid){
+  var m = allMembers.find(function(x){ return x._uid === uid; });
+  if(!m) return;
+  document.getElementById('member-modal-title').textContent = (m.firstName||'Member') + ' ' + (m.email ? '- ' + m.email : '');
+  var joined = m.createdAt ? new Date(m.createdAt.seconds ? m.createdAt.seconds * 1000 : m.createdAt).toLocaleDateString() : ' - ';
+  document.getElementById('member-modal-body').innerHTML =
+    '<div class="detail-grid" style="margin-bottom:16px">' +
+      '<div class="detail-section"><div class="detail-label">Contact</div><div class="detail-val">' + (m.firstName||' - ') + '<br>' + (m.email||' - ') + '<br>' + (m.phone||'No phone') + '</div></div>' +
+      '<div class="detail-section"><div class="detail-label">Account</div><div class="detail-val">VIP: ' + (m.isVIP ? 'Yes' : 'No') + '<br>Joined: ' + joined + '<br>Zip: ' + (m.zip||' - ') + '</div></div>' +
+    '</div>' +
+    '<div class="detail-grid" style="margin-bottom:16px">' +
+      '<div class="detail-section"><div class="detail-label">Categories</div><div class="detail-val">' + (Array.isArray(m.category) ? m.category.join(', ') : (m.category||' - ')) + '</div></div>' +
+      '<div class="detail-section"><div class="detail-label">Interests</div><div class="detail-val">' + (Array.isArray(m.interests) ? m.interests.join(', ') : (m.interests||' - ')) + '</div></div>' +
+      '<div class="detail-section"><div class="detail-label">Intensity</div><div class="detail-val">' + (m.intensity||' - ') + '</div></div>' +
+      '<div class="detail-section"><div class="detail-label">Style</div><div class="detail-val">' + (m.style||' - ') + '</div></div>' +
+    '</div>' +
+    '<div class="detail-grid">' +
+      '<div class="detail-section"><div class="detail-label">Sizes</div><div class="detail-val">' + (Array.isArray(m.sizes) ? m.sizes.join(', ') : (m.sizes||' - ')) + '</div></div>' +
+      '<div class="detail-section"><div class="detail-label">Traffic Source</div><div class="detail-val">' + (m.source||' - ') + '</div></div>' +
+      '<div class="detail-section"><div class="detail-label">Birth Year</div><div class="detail-val">' + (m.dobYear||' - ') + '</div></div>' +
+      '<div class="detail-section"><div class="detail-label">UID</div><div class="detail-val" style="font-size:10px;word-break:break-all">' + m._uid + '</div></div>' +
+    '</div>';
+  document.getElementById('member-modal').classList.add('open');
+}
+
+function closeMemberModal(){
+  document.getElementById('member-modal').classList.remove('open');
+}
+
+function exportMembersCSV(){
+  if(!allMembers.length){ showToast('No members to export.'); return; }
+  var headers = ['UID','First Name','Email','Phone','VIP','Zip','Birth Year','Categories','Interests','Intensity','Style','Sizes','Source','Joined'];
+  var rows = allMembers.map(function(m){
+    var joined = m.createdAt ? new Date(m.createdAt.seconds ? m.createdAt.seconds * 1000 : m.createdAt).toLocaleDateString() : '';
+    return [
+      m._uid,
+      m.firstName||'',
+      m.email||'',
+      m.phone||'',
+      m.isVIP ? 'Yes' : 'No',
+      m.zip||'',
+      m.dobYear||'',
+      (Array.isArray(m.category) ? m.category.join(';') : (m.category||'')),
+      (Array.isArray(m.interests) ? m.interests.join(';') : (m.interests||'')),
+      m.intensity||'',
+      m.style||'',
+      (Array.isArray(m.sizes) ? m.sizes.join(';') : (m.sizes||'')),
+      m.source||'',
+      joined
+    ].map(function(v){ return '"' + String(v).replace(/"/g,'""') + '"'; }).join(',');
+  });
+  var csv = [headers.join(',')].concat(rows).join('\n');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'members_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported ' + allMembers.length + ' members.');
+}
+</script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+(function(){
+  var config = {
+    apiKey:     'AIzaSyBQfmhqROjix1vGv_l1f-AxGGdPwCGVGzQ',
+    authDomain: 'intimacy-supply.firebaseapp.com',
+    projectId:  'intimacy-supply',
+  };
+  try {
+    if(!firebase.apps.length) firebase.initializeApp(config);
+    db = firebase.firestore();
+  } catch(e){
+    console.warn('[IS Admin] Firebase init failed:', e);
+  }
+})();
+</script>
+
+</body>
+</html>
