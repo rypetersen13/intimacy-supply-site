@@ -5281,8 +5281,9 @@ function toggleRedeem(key){
     if(!p) return;
     var need = tokensFor(p.price) * it.qty;
     var st = cartRedeemState();
+    var remaining = Math.max(0, st.available - st.tokensUsed);
     if(st.tokensUsed + need > st.available){
-      if(typeof toast==='function') toast('Not enough tokens. This item needs ' + need + '.');
+      if(typeof toast==='function') toast('Not enough tokens to purchase. You have ' + remaining + ' of ' + need + ' needed.');
       return;
     }
     it.redeem = true;
