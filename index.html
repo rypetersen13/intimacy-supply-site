@@ -7170,7 +7170,7 @@ function renderCheckout(){
             <div class="ch-bag-info">
               ${isVIP?'<div class="ch-bag-badge">VIP PRICING</div>':''}
               <div class="ch-bag-name">${p.name}</div>
-              <div class="ch-bag-meta">Size: ${item.size} &nbsp;&middot;&nbsp; ${(p.colors[item.color]||p.colors[0]).name}</div>
+              <div class="ch-bag-meta">Size: ${item.size} &nbsp;&middot;&nbsp; ${(p.colors[item.color]||p.colors[0]||{name:'Standard'}).name}</div>
               <div class="ch-bag-price">${(pr*item.qty).toFixed(2)}<span class="ch-bag-orig">${(p.orig*item.qty).toFixed(2)}</span></div>
             </div>
           </div>`;
@@ -7626,7 +7626,7 @@ function submitOrder(){
       qty:        item.qty,
       size:       item.size,
       colorIndex: item.color,
-      colorName:  (p.colors[item.color]||p.colors[0]).name,
+      colorName:  (p.colors[item.color]||p.colors[0]||{name:'Standard'}).name,
       unitPrice:  +unitPrice.toFixed(2),
       unitOrig:   +p.orig.toFixed(2),
       lineTotal:  +(unitPrice * item.qty).toFixed(2),
