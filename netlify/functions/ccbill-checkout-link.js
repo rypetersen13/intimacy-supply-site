@@ -69,10 +69,12 @@ exports.handler = async function (event) {
       return { statusCode: 500, body: JSON.stringify({ error: "Server not configured" }) };
     }
 
-    // Per CCBill's Dynamic Pricing spec, the digest source string is:
-    // initialPrice + initialPeriod + currencyCode + salt, concatenated with no separators.
-    // Recurring fields are NOT part of this hash.
-    const digestSource = `${itemTotal.toFixed(2)}${PERIOD_DAYS}${CURRENCY_CODE}${salt}`;
+    // Per CCBill's actual (confirmed via their support) digest formula for a
+    // subscription with both initial and recurring pricing: concatenate every
+    // pricing field in this exact order, then currencyCode, then the salt --
+    // NOT just initialPrice+initialPeriod+currencyCode+salt as some third-party
+    // docs claim. Verified by reverse-engineering a correct example CCBill sent.
+    const digestSource = `${itemTotal.toFixed(2)}${PERIOD_DAYS}${RECURRING_PRICE.toFixed(2)}${PERIOD_DAYS}${NUM_REBILLS}${CURRENCY_CODE}${salt}`;
     const formDigest = crypto.createHash("md5").update(digestSource).digest("hex");
 
     const params = new URLSearchParams({
