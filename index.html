@@ -6783,9 +6783,11 @@ function renderSignInForm(msg){
   document.getElementById('si-modal-body').innerHTML=`
     <p style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:16px">Sign in to access your VIP discount and saved items.</p>
     ${msg?`<p style="background:#fff5f5;color:var(--red);font-size:12px;font-weight:600;padding:9px 12px;border-radius:6px;margin-bottom:12px">${msg}</p>`:''}
-    <input id="si-email" type="email" placeholder="Email Address *" style="display:block;width:100%;border:1px solid #ddd;border-radius:6px;padding:12px 13px;font-size:13px;margin-bottom:9px;outline:none;font-family:var(--fb)" autocomplete="email">
-    <input id="si-pass" type="password" placeholder="Password *" style="display:block;width:100%;border:1px solid #ddd;border-radius:6px;padding:12px 13px;font-size:13px;margin-bottom:14px;outline:none;font-family:var(--fb)" autocomplete="current-password">
-    <button id="si-go-btn" onclick="doSignIn()" style="display:block;width:100%;background:var(--plum);color:#fff;border:none;padding:13px;font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;border-radius:4px;cursor:pointer;margin-bottom:10px">SIGN IN</button>
+    <form onsubmit="doSignIn();return false" autocomplete="on">
+      <input id="si-email" name="email" type="email" placeholder="Email Address *" style="display:block;width:100%;border:1px solid #ddd;border-radius:6px;padding:12px 13px;font-size:13px;margin-bottom:9px;outline:none;font-family:var(--fb)" autocomplete="username" required>
+      <input id="si-pass" name="password" type="password" placeholder="Password *" style="display:block;width:100%;border:1px solid #ddd;border-radius:6px;padding:12px 13px;font-size:13px;margin-bottom:14px;outline:none;font-family:var(--fb)" autocomplete="current-password" required>
+      <button type="submit" id="si-go-btn" style="display:block;width:100%;background:var(--plum);color:#fff;border:none;padding:13px;font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;border-radius:4px;cursor:pointer;margin-bottom:10px">SIGN IN</button>
+    </form>
     <p style="text-align:center;font-size:12px;color:var(--muted)">Forgot password? <a href="#" onclick="doPasswordReset();return false" style="color:var(--plum);font-weight:700">Reset it</a></p>
     <p style="text-align:center;font-size:12px;margin-top:10px">New here? <a href="#" onclick="closeSignInModal();openQuiz('signin_modal');return false" style="color:var(--plum);font-weight:700">Create a VIP account</a></p>
   `;
