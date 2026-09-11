@@ -7314,17 +7314,11 @@ function setCheckoutVIP(wants){
   renderCheckout();
 }
 
-// CCBill recurring subscription redirect for the $39.95/mo VIP membership.
-// Fill in CCBILL_SUB values from your approved merchant application, then this
-// will redirect the user to CCBill's hosted form to authorize recurring billing.
-// If the account is not approved yet, this logs a warning and does nothing so
-// the order still completes on the product side.
-var CCBILL_SUB = {
-  clientAccnum: '',   // e.g. '900000'
-  clientSubacc: '',   // e.g. '0001'
-  formName:     '',   // e.g. '211cc'
-  currencyCode: '840', // USD
-};
+// CCBill recurring subscription for the $39.95/mo VIP membership.
+// The actual FlexForm URL (including the formDigest, which requires the
+// salt/encryption key) is built server-side by
+// /.netlify/functions/ccbill-checkout-link -- the salt key must never be
+// present in this client-side file, since page source is publicly viewable.
 
 // Segpay hosted payment page for the $39.95/mo VIP membership.
 // Paste the eticket ID (PackageID:PricePointID) from the Segpay merchant
@@ -7336,10 +7330,7 @@ var SEGPAY = {
 
 function startVIPPayment(customer){
   if(SEGPAY.eticketId){ return startSegpayVIPSubscription(customer); }
-  if(CCBILL_SUB.clientAccnum && CCBILL_SUB.formName){ return startCCBillVIPSubscription(customer); }
-  console.warn('[IS] No payment processor configured yet. Order recorded as unpaid; VIP remains pending.');
-  toast('Payments are almost live. Your order is saved and your VIP rate is reserved. You will get an email the moment billing opens.');
-  return false;
+  return startCCBillVIPSubscription(customer);
 }
 
 function startSegpayVIPSubscription(customer){
@@ -7354,23 +7345,38 @@ function startSegpayVIPSubscription(customer){
 }
 
 function startCCBillVIPSubscription(customer){
-  if(!CCBILL_SUB.clientAccnum || !CCBILL_SUB.formName){
-    console.warn('[IS] CCBill VIP subscription not configured yet. Order completed but subscription not started.');
+  if(!customer.userId){
+    console.warn('[IS] Cannot start VIP checkout without a logged-in user id.');
+    toast('Please sign in to continue.');
     return false;
   }
-  var params = new URLSearchParams({
-    clientAccnum: CCBILL_SUB.clientAccnum,
-    clientSubacc: CCBILL_SUB.clientSubacc,
-    formName:     CCBILL_SUB.formName,
-    currencyCode: CCBILL_SUB.currencyCode,
-    customer_fname: customer.firstName || '',
-    customer_lname: customer.lastName  || '',
-    email:          customer.email     || '',
-    customUserId:   customer.userId    || '',
-    customOrderId:  customer.orderId   || '',
-  });
-  // Same-tab redirect: new tabs are frequently blocked by iOS Safari
-  window.location.href = 'https://api.ccbill.com/wap-frontflex/flexforms/' + CCBILL_SUB.formName + '?' + params.toString();
+  toast('Redirecting to secure checkout…');
+  fetch('/.netlify/functions/ccbill-checkout-link', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userId:        customer.userId,
+      email:         customer.email     || '',
+      firstName:     customer.firstName || '',
+      lastName:      customer.lastName  || '',
+      orderId:       customer.orderId   || '',
+      overageAmount: customer.overageAmount || 0,
+    }),
+  })
+    .then(function(res){ return res.json().then(function(data){ return { ok: res.ok, data: data }; }); })
+    .then(function(result){
+      if(!result.ok || !result.data.url){
+        console.error('[IS] CCBill link error:', result.data.error);
+        toast(result.data.error || 'Unable to start checkout. Please try again.');
+        return;
+      }
+      // Same-tab redirect: new tabs are frequently blocked by iOS Safari
+      window.location.href = result.data.url;
+    })
+    .catch(function(err){
+      console.error('[IS] CCBill link request failed:', err);
+      toast('Unable to reach checkout. Please check your connection and try again.');
+    });
   return true;
 }
 
@@ -7691,6 +7697,7 @@ function submitOrder(){
         lastName:  checkoutData.lastName  || '',
         userId:    user?.uid              || null,
         orderId:   pendingOrderId,
+        overageAmount: savedTotal || 0,
       });
     }
 
