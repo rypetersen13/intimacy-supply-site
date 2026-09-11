@@ -5324,8 +5324,13 @@ function renderCart(){
   /* Totals */
   var subtotalOrig = cart.reduce(function(s,i){var p=PRODUCTS.find(function(x){return String(x.id)===String(i.id);});return p?s+p.orig*i.qty:s;},0);
   var subtotalVIP  = cart.reduce(function(s,i){var p=PRODUCTS.find(function(x){return String(x.id)===String(i.id);});return p?s+p.price*i.qty:s;},0);
-  var displaySub   = isVIP ? subtotalVIP : subtotalOrig;
-  var vipSavings   = isVIP ? subtotalOrig - subtotalVIP : 0;
+  // Matches product-page convention: VIP pricing is shown by default sitewide
+  // until someone has explicitly declined VIP at checkout (checkoutData.wantsVIP===false).
+  // Real membership (isVIP) still gates anything that requires an actual paid account,
+  // like token redemption below -- this only controls which price is displayed.
+  var showVIP      = isVIP || (typeof checkoutData!=='undefined' && checkoutData.wantsVIP !== false);
+  var displaySub   = showVIP ? subtotalVIP : subtotalOrig;
+  var vipSavings   = showVIP ? subtotalOrig - subtotalVIP : 0;
   var redeemState  = cartRedeemState();
   var tokensUsed   = redeemState.tokensUsed;
   var coveredValue = redeemState.coveredValue;
@@ -5355,7 +5360,7 @@ function renderCart(){
   document.getElementById('cart-items-list').innerHTML = cart.map(function(item){
     var p   = PRODUCTS.find(function(x){ return String(x.id)===String(item.id); });
     if(!p){ return ''; }
-    var pr  = isVIP ? p.price : p.orig;
+    var pr  = showVIP ? p.price : p.orig;
     var img = p.images && p.images[0]
       ? '<img src="' + p.images[0] + '" alt="' + p.name + '" loading="lazy">'
       : '<span style="font-size:28px;opacity:.3">&#9829;</span>';
@@ -5396,7 +5401,7 @@ function renderCart(){
   if(sumWrap){
     var rows = '';
     rows += '<div class="cart-sum-row"><span class="cart-sum-lbl">Subtotal (' + count + ' item' + (count===1?'':'s') + ')</span><span class="cart-sum-val">$' + subtotalOrig.toFixed(2) + '</span></div>';
-    if(isVIP && vipSavings > 0){
+    if(showVIP && vipSavings > 0){
       rows += '<div class="cart-sum-row savings"><span class="cart-sum-lbl">VIP Member Savings</span><span class="cart-sum-val">&minus;$' + vipSavings.toFixed(2) + '</span></div>';
     }
     if(promoResult.promoAmt > 0){
