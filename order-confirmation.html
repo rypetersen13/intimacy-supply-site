@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to VIP — Intimacy Supply</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:wght@500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #F5F0EC;
+    --plum-mid: #5A1B3D;
+    --plum-dark: #2B0E22;
+    --gold: #D9A94C;
+    --ink: #1A1414;
+    --blush: #F0DCE0;
+    --card-gray: #EFE9E4;
+    --muted: #7A6A64;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    color: var(--ink);
+    font-family:'Poppins', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    background: var(--cream);
+    min-height: 100vh;
+  }
+  /* header */
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 20px;
+    background: var(--cream);
+  }
+  .logo{
+    font-family:'Playfair Display', serif;
+    font-weight:600;
+    text-align:center;
+    line-height:1.05;
+  }
+  .logo .top{ font-size:1.35rem; letter-spacing:0.18em; color: var(--plum-mid); }
+  .logo .bottom{ font-size:0.6rem; letter-spacing:0.35em; color: var(--muted); }
+  .icon-btn{ width:22px; height:22px; }
+
+  /* banner */
+  .banner{
+    background: linear-gradient(135deg, var(--plum-mid) 0%, var(--plum-dark) 100%);
+    padding: 44px 24px 56px;
+    text-align:center;
+  }
+  .eyebrow{
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--blush);
+    opacity:0.8;
+    margin-bottom: 14px;
+  }
+  .headline{
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    line-height: 0.92;
+    font-size: clamp(2.6rem, 11vw, 4.2rem);
+    letter-spacing: 0.01em;
+  }
+  .headline .l1{ color:#fff; display:block; }
+  .headline .l2{ color: var(--gold); display:block; }
+  .banner p{
+    margin-top:18px;
+    color: var(--blush);
+    font-size: 0.98rem;
+    max-width: 34ch;
+    margin-left:auto; margin-right:auto;
+    line-height:1.5;
+  }
+
+  /* stat card */
+  .section{ padding: 32px 20px 8px; background: var(--cream); }
+  .label{
+    font-family:'Poppins', sans-serif;
+    font-weight:700;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  .order-card{
+    background: #fff;
+    border: 1px solid #EFE6E1;
+    border-radius: 16px;
+    overflow:hidden;
+  }
+  .order-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    padding: 20px 22px;
+    background: #FAF6F3;
+    border-bottom: 1px solid #EFE6E1;
+  }
+  .order-header-label{
+    font-size:0.68rem;
+    letter-spacing:0.14em;
+    color: var(--muted);
+    margin-bottom:4px;
+  }
+  .order-header-value{ font-weight:600; font-size:0.98rem; color: var(--ink); }
+  .order-header-date{ font-size:0.82rem; color: var(--muted); padding-top:2px; }
+
+  .order-list{ padding: 4px 22px; }
+  .order-row{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid #F1E9E4;
+  }
+  .order-row:last-child{ border-bottom:none; }
+  .order-thumb{
+    width: 56px; height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink:0;
+    background: #EFE6E1;
+    border: 1px solid #EFE6E1;
+  }
+  .order-info{
+    flex:1;
+    min-width:0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .order-name{ color: var(--ink); font-size:0.92rem; font-weight:500; display:block; }
+  .order-name .qty{ color: var(--muted); font-size:0.78rem; display:block; margin-top:3px; font-weight:400; }
+  .order-price{ color: var(--ink); font-size:0.92rem; font-weight:500; white-space:nowrap; }
+
+  .order-breakdown{
+    padding: 18px 22px 22px;
+    border-top: 1px solid #EFE6E1;
+  }
+  .breakdown-row{
+    display:flex;
+    justify-content:space-between;
+    padding: 6px 0;
+    font-size:0.88rem;
+    color: var(--muted);
+  }
+  .breakdown-row.total{
+    margin-top:8px;
+    padding-top:14px;
+    border-top: 1px solid #EFE6E1;
+    font-size:1rem;
+    font-weight:600;
+    color: var(--ink);
+  }
+
+  .member-note{
+    background: var(--blush);
+    border-radius: 16px;
+    padding: 20px 22px;
+    display:flex;
+    gap:14px;
+    margin-top: 16px;
+  }
+  .member-note h3{ font-size:0.98rem; margin-bottom:6px; color: var(--plum-dark); }
+  .member-note p{ font-size:0.86rem; color:#6B4458; line-height:1.5; }
+
+
+  /* info card */
+  .info-card{
+    background: var(--card-gray);
+    border-radius: 16px;
+    padding: 22px;
+    display:flex;
+    gap:14px;
+    margin-top: 20px;
+  }
+  .check{
+    flex-shrink:0;
+    width:20px; height:20px;
+    margin-top:2px;
+  }
+  .info-card h3{ font-size:1.02rem; margin-bottom:6px; }
+  .info-card p{ font-size:0.9rem; color:#4A3F3B; line-height:1.5; }
+
+  /* steps */
+  .steps{
+    background:#fff;
+    border-radius:16px;
+    border: 1px solid #EFE6E1;
+    margin-top: 12px;
+  }
+  .step{
+    display:flex;
+    gap:16px;
+    padding: 22px;
+    border-bottom: 1px solid #F1E9E4;
+  }
+  .step:last-child{ border-bottom:none; }
+  .step-num{
+    flex-shrink:0;
+    width:34px; height:34px;
+    border-radius:50%;
+    background: var(--plum-mid);
+    color:#fff;
+    font-weight:700;
+    font-size:0.95rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .step h4{ font-size:0.98rem; margin-bottom:4px; }
+  .step p{ font-size:0.88rem; color: var(--muted); line-height:1.5; }
+
+  /* trust grid */
+  .trust-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .trust-card{
+    background: var(--card-gray);
+    border-radius: 14px;
+    padding: 20px 16px;
+  }
+  .trust-icon{
+    width:38px; height:38px;
+    background: var(--blush);
+    border-radius: 8px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom: 12px;
+  }
+  .trust-card h4{ font-size:0.85rem; letter-spacing:0.04em; margin-bottom:5px; }
+  .trust-card p{ font-size:0.78rem; color: var(--muted); line-height:1.4; }
+
+  /* actions */
+  .actions{
+    padding: 28px 20px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    background: var(--cream);
+  }
+  .btn{
+    display:block;
+    text-align:center;
+    padding:16px;
+    border-radius:999px;
+    text-decoration:none;
+    font-weight:600;
+    font-size:0.92rem;
+    letter-spacing:0.02em;
+  }
+  .btn-primary{ background: var(--plum-mid); color:#fff; }
+  .btn-secondary{ background: transparent; color: var(--plum-mid); border: 1px solid #D9CCC5; }
+
+  footer{
+    text-align:center;
+    padding: 8px 24px 48px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    line-height:1.6;
+  }
+  footer{ background: var(--cream); }
+  footer a{ color: var(--plum-mid); text-decoration:none; }
+
+  @media (min-width: 640px){
+    .section, .banner{ max-width: 560px; margin-left:auto; margin-right:auto; }
+    header{ max-width:560px; margin:0 auto; }
+    .actions{ max-width:560px; margin:0 auto; flex-direction:row; }
+    footer{ max-width:560px; margin:0 auto; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <svg class="icon-btn" viewBox="0 0 24 24" fill="none" stroke="#1A1414" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <div class="logo">
+      <div class="top">INTIMACY</div>
+      <div class="bottom">SUPPLY</div>
+    </div>
+    <svg class="icon-btn" viewBox="0 0 24 24" fill="none" stroke="#1A1414" stroke-width="1.6"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+  </header>
+
+  <div class="banner">
+    <div class="eyebrow">ORDER CONFIRMED</div>
+    <div class="headline">
+      <span class="l1">YOU'RE</span>
+      <span class="l2">IN.</span>
+    </div>
+    <p>Welcome to VIP — up to 34% off starts now, and your first token is already loading.</p>
+  </div>
+
+  <div class="section">
+    <div class="order-card">
+      <div class="order-header">
+        <div>
+          <div class="order-header-label">ORDER NUMBER</div>
+          <div class="order-header-value" id="orderNumber">#IS-294817</div>
+        </div>
+        <div class="order-header-date" id="orderDate"></div>
+      </div>
+
+      <div class="order-list" id="orderList"></div>
+
+      <div class="order-breakdown" id="orderBreakdown"></div>
+    </div>
+
+    <div class="member-note">
+      <svg class="check" viewBox="0 0 24 24" fill="none" stroke="var(--plum-mid)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 17 20 6"/></svg>
+      <div>
+        <h3>VIP Membership active</h3>
+        <p>Starting next cycle, you'll be billed $39.95 on the 6th of each month unless you skip between the 1st–5th. Every cycle adds one Member Token, good for up to $50 toward any item.</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <svg class="check" viewBox="0 0 24 24" fill="none" stroke="#D9A94C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 17 20 6"/></svg>
+      <div>
+        <h3>Confirmation on its way</h3>
+        <p id="confText">A receipt and welcome details are headed to your inbox now.</p>
+      </div>
+    </div>
+
+    <div class="label" style="margin-top:32px;">WHAT HAPPENS NEXT</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h4>Check your email</h4>
+          <p>Your receipt and account access details arrive within a few minutes.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h4>Shop with your token</h4>
+          <p>Your first Member Token is ready — use it toward any item up to $50.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h4>Skip anytime you want</h4>
+          <p>Between the 1st–5th of any month, skip your charge from My Account — no questions asked.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="label" style="margin-top:32px;">GOOD TO KNOW</div>
+    <div class="trust-grid">
+      <div class="trust-card">
+        <div class="trust-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5A1B3D" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </div>
+        <h4>PLAIN PACKAGING</h4>
+        <p>Every order ships brown box, zero branding.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5A1B3D" stroke-width="1.8"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4Z"/></svg>
+        </div>
+        <h4>DISCREET BILLING</h4>
+        <p>Statement reads Dharma Media &amp; Technology LLC.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <a class="btn btn-primary" href="/">Start Shopping</a>
+    <a class="btn btn-secondary" href="/account">Go to My Account</a>
+  </div>
+
+  <footer>
+    Questions? Email <a href="mailto:hello@intimacysupply.com">hello@intimacysupply.com</a> or call <a href="tel:+15593340826">(559) 334-0826</a>.
+  </footer>
+
+  <script>
+    // Populate real order items when available. Wire this up to whatever your checkout
+    // passes through — e.g. window.orderItems set before this script runs, or parsed
+    // from a query param / sessionStorage cart snapshot at CCBill's redirect.
+    // Fallback below shows VIP Membership alone if no item data is present.
+    const orderItems = (window.orderItems && window.orderItems.length)
+      ? window.orderItems
+      : [
+          { name: 'Lace Trim Bralette Set', qty: 1, size: 'M', price: 34.95, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=200&h=200&fit=crop' },
+          { name: 'Satin Wrap Robe', qty: 1, size: 'S/M', price: 42.00, image: 'https://images.unsplash.com/photo-1616763355603-9755a640a287?w=200&h=200&fit=crop' }
+        ];
+
+    const listEl = document.getElementById('orderList');
+    const breakdownEl = document.getElementById('orderBreakdown');
+    let subtotal = 0;
+    listEl.innerHTML = orderItems.map(item => {
+      subtotal += item.price;
+      const details = [item.size ? `Size ${item.size}` : null, item.qty ? `Qty ${item.qty}` : null]
+        .filter(Boolean).join(' · ');
+      const meta = details ? `<span class="qty">${details}</span>` : '';
+      const img = item.image ? `<img class="order-thumb" src="${item.image}" alt="">` : `<div class="order-thumb"></div>`;
+      return `<div class="order-row">
+        ${img}
+        <div class="order-info">
+          <span class="order-name">${item.name}${meta}</span>
+          <span class="order-price">$${item.price.toFixed(2)}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    const shipping = 0;
+    const tax = Math.round(subtotal * 0.0725 * 100) / 100;
+    const total = subtotal + shipping + tax;
+    breakdownEl.innerHTML = `
+      <div class="breakdown-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+      <div class="breakdown-row"><span>Shipping</span><span>${shipping === 0 ? 'Free' : '$' + shipping.toFixed(2)}</span></div>
+      <div class="breakdown-row"><span>Tax</span><span>$${tax.toFixed(2)}</span></div>
+      <div class="breakdown-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+    `;
+
+    document.getElementById('orderDate').textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+    const params = new URLSearchParams(window.location.search);
+    const txnId = params.get('subscriptionId') || params.get('transactionId');
+    if (txnId) {
+      document.getElementById('confText').textContent = 'Confirmation #' + txnId + ' — receipt headed to your inbox now.';
+    }
+  </script>
+
+</div>
+</body>
+</html>
