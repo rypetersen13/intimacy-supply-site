@@ -7335,6 +7335,27 @@ function startSegpayVIPSubscription(customer){
   return true;
 }
 
+/* Shown if the redirect to payment fails after the order was already saved
+   (cart/checkoutData have already been cleared by this point) -- gives the
+   customer their order reference instead of leaving them on a dead spinner
+   or a re-rendered empty cart. */
+function showPaymentFailedState(orderId, reason){
+  const body = document.getElementById('ch-body');
+  const titleEl = document.getElementById('ch-title');
+  const stepEl  = document.getElementById('ch-step');
+  if(titleEl) titleEl.textContent = 'Payment didn\'t go through';
+  if(stepEl)  stepEl.textContent  = '';
+  if(!body) { toast('Unable to start payment. Please contact us.'); return; }
+  body.innerHTML = `
+    <div class="ch-suc">
+      <h2 style="font-size:20px;color:var(--red)">We couldn't reach secure payment</h2>
+      <p>${reason ? String(reason) : 'Something went wrong'} while starting your payment. Your order details were saved${orderId ? ` as <strong>#${orderId}</strong>` : ''}, but nothing has been charged.</p>
+      <p style="margin-top:14px">Please try again, or contact us and reference this order number.</p>
+    </div>
+    <button class="ch-place-btn" onclick="closeCheckout();">Return to shopping</button>
+  `;
+}
+
 function startCCBillVIPSubscription(customer){
   if(!customer.userId){
     console.warn('[IS] Cannot start VIP checkout without a logged-in user id.');
@@ -7358,7 +7379,7 @@ function startCCBillVIPSubscription(customer){
     .then(function(result){
       if(!result.ok || !result.data.url){
         console.error('[IS] CCBill link error:', result.data.error);
-        toast(result.data.error || 'Unable to start checkout. Please try again.');
+        showPaymentFailedState(customer.orderId, result.data.error);
         return;
       }
       // Same-tab redirect: new tabs are frequently blocked by iOS Safari
@@ -7366,7 +7387,7 @@ function startCCBillVIPSubscription(customer){
     })
     .catch(function(err){
       console.error('[IS] CCBill link request failed:', err);
-      toast('Unable to reach checkout. Please check your connection and try again.');
+      showPaymentFailedState(customer.orderId, 'a connection problem');
     });
   return true;
 }
