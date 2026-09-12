@@ -7308,6 +7308,19 @@ function goCheckout(step){
 
 // VIP checkbox at checkout — checked applies VIP pricing and starts the $39.95/mo membership; unchecked continues at regular price.
 function setCheckoutVIP(wants){
+  // Save whatever's currently typed before re-rendering, so checking the VIP
+  // box doesn't wipe fields the customer hasn't submitted with Continue yet.
+  if(checkoutStep===1){
+    const g = id => document.getElementById(id)?.value.trim();
+    checkoutData.firstName = g('ch-fn')    ?? checkoutData.firstName;
+    checkoutData.lastName  = g('ch-ln')    ?? checkoutData.lastName;
+    checkoutData.address   = g('ch-addr')  ?? checkoutData.address;
+    checkoutData.address2  = g('ch-addr2') ?? checkoutData.address2;
+    checkoutData.city      = g('ch-city')  ?? checkoutData.city;
+    checkoutData.state     = g('ch-state') ?? checkoutData.state;
+    checkoutData.zip       = g('ch-zip')   ?? checkoutData.zip;
+    checkoutData.phone     = g('ch-phone') ?? checkoutData.phone;
+  }
   checkoutData.wantsVIP = !!wants;
   isVIP = !!wants || !!user?.isVIP;
   renderCheckout();
