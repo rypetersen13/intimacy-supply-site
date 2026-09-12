@@ -3711,13 +3711,26 @@ select.qfi{cursor:pointer;appearance:none;-webkit-appearance:none}
 
 /* Checkout */
 .chb{flex:1;padding:0 18px 48px}
-.chh{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--gray);display:flex;align-items:center;padding:12px 16px;gap:8px;flex-shrink:0}
-.chbk{background:none;border:none;font-size:24px;cursor:pointer;color:var(--black);line-height:1;padding:4px 8px;flex-shrink:0;transition:color .15s}
-.chbk:hover{color:var(--plum)}
-.chbk:hover{color:var(--black)}
+.chh{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--gray);display:flex;align-items:center;padding:14px 16px;gap:8px;flex-shrink:0}
+.chbk{background:#F7F3F5;border:none;border-radius:50%;width:38px;height:38px;font-size:22px;cursor:pointer;color:var(--plum);line-height:1;padding:0;flex-shrink:0;transition:background .15s;display:flex;align-items:center;justify-content:center}
+.chbk:hover{background:#EFE6EA}
 .chpb{height:100%;background:linear-gradient(90deg,var(--plum),var(--plum-l));border-radius:0 99px 99px 0;transition:width .4s}
-.chstep{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.03em}
-.chtt{font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;flex:1;text-align:center}
+.chstep{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.03em}
+.chtt{font-family:var(--fd);font-size:20px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;flex:1;text-align:center}
+
+/* Unified card wrapping the step indicator + order summary, so they read as
+   one connected block instead of two loosely floating strips. */
+.ch-summary-card{
+  background:#F9FAFB;
+  border:1px solid #F0ECE8;
+  border-radius:14px;
+  overflow:hidden;
+  margin:18px 0 22px;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+.ch-summary-card .ch-steps{padding:20px 20px 16px}
+.ch-summary-card .ch-os-bar{background:transparent;border-bottom:none;border-top:1px solid #EFE6E1}
+.ch-summary-card .ch-os-drop{background:#fff}
 
 /* Deals bar */
 .dit{cursor:pointer;transition:opacity .15s}
@@ -4083,10 +4096,10 @@ select.qfi{cursor:pointer;appearance:none;-webkit-appearance:none}
 
 /* CHECKOUT ─────────────────────────────── */
 .ch-form-title{font-family:var(--fd);font-size:20px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--black);padding:22px 20px 12px;margin:0}
-.ch-form{display:flex;flex-direction:column;gap:12px;padding:0 20px 24px}
+.ch-form{display:flex;flex-direction:column;gap:16px;padding:0 20px 24px}
 .ch-name-row{display:flex;gap:10px}
 .ch-name-row .ch-fi{flex:1}
-.ch-fi{width:100%;border:1.5px solid #D1D5DB;border-radius:10px;padding:15px 16px;font-size:15px;outline:none;color:var(--black);font-family:var(--fb);transition:all .2s;box-sizing:border-box;background:#fff}
+.ch-fi{width:100%;border:1.5px solid #D1D5DB;border-radius:10px;padding:16px;font-size:16px;outline:none;color:var(--black);font-family:var(--fb);transition:all .2s;box-sizing:border-box;background:#fff}
 .ch-fi:focus{border-color:var(--plum);box-shadow:0 0 0 3px rgba(74,29,56,.08)}
 .ch-fi::placeholder{color:#9CA3AF}
 .ch-next-btn{display:block;width:100%;margin:0 20px 28px;width:calc(100% - 40px);background:#D4000F;color:#fff;border:none;padding:17px;font-family:var(--fd);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-radius:6px;cursor:pointer;box-shadow:0 3px 10px rgba(13,13,13,.28);transition:var(--transition)}
@@ -7056,21 +7069,21 @@ function renderCheckout(){
   const osSummaryBar = `
     <div class="ch-os-bar" onclick="this.nextElementSibling.classList.toggle('open')">
       <span class="ch-os-lbl">Order Summary (${count} item${count===1?'':'s'})</span>
-      <span class="ch-os-total">${total.toFixed(2)} <span class="ch-os-arrow">&#8964;</span></span>
+      <span class="ch-os-total">$${total.toFixed(2)} <span class="ch-os-arrow">&#8964;</span></span>
     </div>
     <div class="ch-os-drop">
       ${cart.map(item=>{
         const p=PRODUCTS.find(x=>String(x.id)===String(item.id));
         const pr=(isVIP || !!checkoutData.wantsVIP)?p.price:p.orig;
-        return `<div class="ch-os-item"><span>${p.name} &times;${item.qty}</span><span>${(pr*item.qty).toFixed(2)}</span></div>`;
+        return `<div class="ch-os-item"><span>${p.name} &times;${item.qty}</span><span>$${(pr*item.qty).toFixed(2)}</span></div>`;
       }).join('')}
-      <div class="ch-os-row"><span>Subtotal</span><span>${subtotalOrig.toFixed(2)}</span></div>
-      ${discount>0?`<div class="ch-os-row green"><span>VIP Savings</span><span>&minus;${discount.toFixed(2)}</span></div>`:''}
-      ${promoAmt>0?`<div class="ch-os-row green"><span>Promo</span><span>&minus;${promoAmt.toFixed(2)}</span></div>`:''}
-      ${coveredValue>0?`<div class="ch-os-row green"><span>Token Redemption (${tokensUsed})</span><span>&minus;${coveredValue.toFixed(2)}</span></div>`:''}
+      <div class="ch-os-row"><span>Subtotal</span><span>$${subtotalOrig.toFixed(2)}</span></div>
+      ${discount>0?`<div class="ch-os-row green"><span>VIP Savings</span><span>&minus;$${discount.toFixed(2)}</span></div>`:''}
+      ${promoAmt>0?`<div class="ch-os-row green"><span>Promo</span><span>&minus;$${promoAmt.toFixed(2)}</span></div>`:''}
+      ${coveredValue>0?`<div class="ch-os-row green"><span>Token Redemption (${tokensUsed})</span><span>&minus;$${coveredValue.toFixed(2)}</span></div>`:''}
       <div class="ch-os-row"><span>Shipping</span><span>${shipping===0?'<span style="color:#4ADE80">Free</span>':'$'+shipping.toFixed(2)}</span></div>
-      <div class="ch-os-row"><span>Tax</span><span>${tax.toFixed(2)}</span></div>
-      <div class="ch-os-row bold"><span>Total</span><span style="color:var(--plum)">${total.toFixed(2)}</span></div>
+      <div class="ch-os-row"><span>Tax</span><span>$${tax.toFixed(2)}</span></div>
+      <div class="ch-os-row bold"><span>Total</span><span style="color:var(--plum)">$${total.toFixed(2)}</span></div>
     </div>
   `;
 
@@ -7090,8 +7103,10 @@ function renderCheckout(){
     const savedEmail = (user && user.email) || checkoutData.email || '';
     const esc = s => String(s||'').replace(/"/g,'&quot;');
     document.getElementById('ch-body').innerHTML = `
-      ${stepsHTML}
-      ${osSummaryBar}
+      <div class="ch-summary-card">
+        ${stepsHTML}
+        ${osSummaryBar}
+      </div>
       <h2 class="ch-form-title">Shipping Information</h2>
       <div class="ch-form">
         <div class="ch-name-row">
@@ -7149,8 +7164,10 @@ function renderCheckout(){
     const uEmail   = checkoutData.email || user?.email || '';
 
     document.getElementById('ch-body').innerHTML = `
-      ${stepsHTML}
-      ${osSummaryBar}
+      <div class="ch-summary-card">
+        ${stepsHTML}
+        ${osSummaryBar}
+      </div>
       ${shipNudge}
 
       <div class="ch-secure-icons">
@@ -7172,7 +7189,7 @@ function renderCheckout(){
               ${isVIP?'<div class="ch-bag-badge">VIP PRICING</div>':''}
               <div class="ch-bag-name">${p.name}</div>
               <div class="ch-bag-meta">Size: ${item.size} &nbsp;&middot;&nbsp; ${(p.colors[item.color]||p.colors[0]||{name:'Standard'}).name}</div>
-              <div class="ch-bag-price">${(pr*item.qty).toFixed(2)}<span class="ch-bag-orig">${(p.orig*item.qty).toFixed(2)}</span></div>
+              <div class="ch-bag-price">$${(pr*item.qty).toFixed(2)}<span class="ch-bag-orig">$${(p.orig*item.qty).toFixed(2)}</span></div>
             </div>
           </div>`;
         }).join('')}
@@ -7186,13 +7203,13 @@ function renderCheckout(){
 
       <!-- Order totals -->
       <div class="ch-totals">
-        <div class="ch-tot-row"><span>Subtotal (${count} item${count===1?'':'s'})</span><span>${subtotalOrig.toFixed(2)}</span></div>
-        ${discount>0?`<div class="ch-tot-row green"><span>VIP Member Savings</span><span>&minus;${discount.toFixed(2)}</span></div>`:''}
-        ${promoAmt>0?`<div class="ch-tot-row green"><span>Promo Discount</span><span>&minus;${promoAmt.toFixed(2)}</span></div>`:''}
-        ${coveredValue>0?`<div class="ch-tot-row green"><span>Token Redemption (${tokensUsed} token${tokensUsed===1?'':'s'})</span><span>&minus;${coveredValue.toFixed(2)}</span></div>`:''}
+        <div class="ch-tot-row"><span>Subtotal (${count} item${count===1?'':'s'})</span><span>$${subtotalOrig.toFixed(2)}</span></div>
+        ${discount>0?`<div class="ch-tot-row green"><span>VIP Member Savings</span><span>&minus;$${discount.toFixed(2)}</span></div>`:''}
+        ${promoAmt>0?`<div class="ch-tot-row green"><span>Promo Discount</span><span>&minus;$${promoAmt.toFixed(2)}</span></div>`:''}
+        ${coveredValue>0?`<div class="ch-tot-row green"><span>Token Redemption (${tokensUsed} token${tokensUsed===1?'':'s'})</span><span>&minus;$${coveredValue.toFixed(2)}</span></div>`:''}
         <div class="ch-tot-row"><span>Shipping</span><span>${shipping===0?'<span style="color:#4ADE80;font-weight:700">Free</span>':'$'+shipping.toFixed(2)}</span></div>
-        <div class="ch-tot-row"><span>Estimated Tax</span><span>${tax.toFixed(2)}</span></div>
-        <div class="ch-tot-row bold total"><span>Order Total</span><span>${total.toFixed(2)}</span></div>
+        <div class="ch-tot-row"><span>Estimated Tax</span><span>$${tax.toFixed(2)}</span></div>
+        <div class="ch-tot-row bold total"><span>Order Total</span><span>$${total.toFixed(2)}</span></div>
 
       </div>
 
