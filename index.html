@@ -7039,8 +7039,8 @@ function renderCheckout(){
 
   const subtotalOrig = cart.reduce((s,i)=>{ const p=PRODUCTS.find(x=>String(x.id)===String(i.id)); return s+p.orig*i.qty; },0);
   const subtotalVIP  = cart.reduce((s,i)=>{ const p=PRODUCTS.find(x=>String(x.id)===String(i.id)); return s+p.price*i.qty; },0);
-  const displaySub   = (isVIP || !!checkoutData.wantsVIP) ? subtotalVIP : subtotalOrig;
-  const discount     = (isVIP || !!checkoutData.wantsVIP) ? subtotalOrig - subtotalVIP : 0;
+  const displaySub   = (isVIP || checkoutData.wantsVIP !== false) ? subtotalVIP : subtotalOrig;
+  const discount     = (isVIP || checkoutData.wantsVIP !== false) ? subtotalOrig - subtotalVIP : 0;
   const redeemState  = cartRedeemState();
   const tokensUsed   = redeemState.tokensUsed;
   const coveredValue = redeemState.coveredValue;
@@ -7074,7 +7074,7 @@ function renderCheckout(){
     <div class="ch-os-drop">
       ${cart.map(item=>{
         const p=PRODUCTS.find(x=>String(x.id)===String(item.id));
-        const pr=(isVIP || !!checkoutData.wantsVIP)?p.price:p.orig;
+        const pr=(isVIP || checkoutData.wantsVIP !== false)?p.price:p.orig;
         return `<div class="ch-os-item"><span>${p.name} &times;${item.qty}</span><span>$${(pr*item.qty).toFixed(2)}</span></div>`;
       }).join('')}
       <div class="ch-os-row"><span>Subtotal</span><span>$${subtotalOrig.toFixed(2)}</span></div>
@@ -7134,8 +7134,8 @@ function renderCheckout(){
       <!-- VIP membership checkbox — checked applies VIP pricing + enrollment, unchecked continues at regular price -->
       ${!isVIP ? `
       <div style="margin:20px 0">
-        <label style="display:flex;align-items:flex-start;gap:12px;border:2px solid ${checkoutData.wantsVIP?'var(--plum)':'var(--gray)'};border-radius:12px;padding:16px;background:${checkoutData.wantsVIP?'#F7F3F5':'#fff'};cursor:pointer">
-          <input type="checkbox" id="vip-checkout-check" ${checkoutData.wantsVIP?'checked':''} onchange="setCheckoutVIP(this.checked)" style="accent-color:var(--plum);width:20px;height:20px;flex-shrink:0;margin-top:2px">
+        <label style="display:flex;align-items:flex-start;gap:12px;border:2px solid ${checkoutData.wantsVIP!==false?'var(--plum)':'var(--gray)'};border-radius:12px;padding:16px;background:${checkoutData.wantsVIP!==false?'#F7F3F5':'#fff'};cursor:pointer">
+          <input type="checkbox" id="vip-checkout-check" ${checkoutData.wantsVIP!==false?'checked':''} onchange="setCheckoutVIP(this.checked)" style="accent-color:var(--plum);width:20px;height:20px;flex-shrink:0;margin-top:2px">
           <div style="flex:1">
             <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:var(--plum);margin-bottom:4px">Join VIP — save up to 34% today</div>
             <div style="font-size:12px;color:#555;line-height:1.65;margin-bottom:6px">Pay VIP pricing on this order and start your $39.95/mo membership. Get a Member Token each month worth up to $50. Skip or cancel anytime. Uncheck to continue at regular price with no membership.</div>
@@ -7181,7 +7181,7 @@ function renderCheckout(){
         <span class="ch-review-hdr">Shopping Bag</span>
         ${cart.map(item=>{
           const p=PRODUCTS.find(x=>String(x.id)===String(item.id));
-          const pr=(isVIP || !!checkoutData.wantsVIP)?p.price:p.orig;
+          const pr=(isVIP || checkoutData.wantsVIP !== false)?p.price:p.orig;
           const img=p.images&&p.images[0]?p.images[0]:'';
           return `<div class="ch-bag-item">
             <div class="ch-bag-img">${img?`<img src="${img}" alt="${p.name}" loading="lazy">`:'<span style="font-size:22px;opacity:.3">&#9829;</span>'}</div>
@@ -7307,7 +7307,9 @@ function goCheckout(step){
     const city=document.getElementById('ch-city')?.value.trim();
     const state=document.getElementById('ch-state')?.value.trim();
     if(!fn||!ln||!addr||!zip||!city||!state){ toast('Please fill in all required shipping fields.'); return; }
-    // VIP starts unchecked -- requires an active opt-in, not a pre-selected default.
+    // VIP pricing shows by default (matches the bag) unless explicitly declined.
+    // The separate, always-unchecked "I authorize $39.95/month" box on the Review
+    // step is the actual required consent for the recurring membership charge.
     checkoutData.firstName=fn; checkoutData.lastName=ln;
     checkoutData.address=addr;
     checkoutData.address2=document.getElementById('ch-addr2')?.value.trim()||'';
@@ -7653,8 +7655,8 @@ function submitOrder(){
 
   const subtotalOrig = cart.reduce((s,i)=>{const p=PRODUCTS.find(x=>String(x.id)===String(i.id));return s+p.orig*i.qty;},0);
   const subtotalVIP  = cart.reduce((s,i)=>{const p=PRODUCTS.find(x=>String(x.id)===String(i.id));return s+p.price*i.qty;},0);
-  const displaySub   = (isVIP || !!checkoutData.wantsVIP) ? subtotalVIP : subtotalOrig;
-  const vipDiscount  = (isVIP || !!checkoutData.wantsVIP) ? subtotalOrig - subtotalVIP : 0;
+  const displaySub   = (isVIP || checkoutData.wantsVIP !== false) ? subtotalVIP : subtotalOrig;
+  const vipDiscount  = (isVIP || checkoutData.wantsVIP !== false) ? subtotalOrig - subtotalVIP : 0;
   const redeemState  = cartRedeemState();
   const tokensUsed   = redeemState.tokensUsed;
   const coveredValue = redeemState.coveredValue;
