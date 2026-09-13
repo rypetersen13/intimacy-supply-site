@@ -7160,6 +7160,9 @@ function renderCheckout(){
     }
 
   } else if(checkoutStep===2){
+    // Always require fresh consent -- never let a checked state from an earlier
+    // Place Order attempt in this session silently carry over to this render.
+    checkoutData.vipConsent = false;
     const fullName = ((checkoutData.firstName||'')+' '+(checkoutData.lastName||'')).trim();
     const uEmail   = checkoutData.email || user?.email || '';
 
