@@ -7131,20 +7131,6 @@ function renderCheckout(){
         </label>
       </div>
 
-      <!-- VIP membership checkbox — checked applies VIP pricing + enrollment, unchecked continues at regular price -->
-      ${!isVIP ? `
-      <div style="margin:20px 0">
-        <label style="display:flex;align-items:flex-start;gap:12px;border:2px solid ${checkoutData.wantsVIP!==false?'var(--plum)':'var(--gray)'};border-radius:12px;padding:16px;background:${checkoutData.wantsVIP!==false?'#F7F3F5':'#fff'};cursor:pointer">
-          <input type="checkbox" id="vip-checkout-check" ${checkoutData.wantsVIP!==false?'checked':''} onchange="setCheckoutVIP(this.checked)" style="accent-color:var(--plum);width:20px;height:20px;flex-shrink:0;margin-top:2px">
-          <div style="flex:1">
-            <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:var(--plum);margin-bottom:4px">Join VIP — save up to 34% today</div>
-            <div style="font-size:12px;color:#555;line-height:1.65;margin-bottom:6px">Pay VIP pricing on this order and start your $39.95/mo membership. Get a Member Token each month worth up to $50. Skip or cancel anytime. Uncheck to continue at regular price with no membership.</div>
-            <div style="font-size:11px;color:#999">Billed as DHARMA*INTIMACYSUP</div>
-          </div>
-        </label>
-      </div>
-      ` : ''}
-
       <button class="ch-next-btn" onclick="goCheckout(2)">Continue to Review &nbsp;›</button>
     `;
 
@@ -7160,9 +7146,6 @@ function renderCheckout(){
     }
 
   } else if(checkoutStep===2){
-    // Always require fresh consent -- never let a checked state from an earlier
-    // Place Order attempt in this session silently carry over to this render.
-    checkoutData.vipConsent = false;
     const fullName = ((checkoutData.firstName||'')+' '+(checkoutData.lastName||'')).trim();
     const uEmail   = checkoutData.email || user?.email || '';
 
@@ -7271,11 +7254,13 @@ function renderCheckout(){
         </div>
       </div>
 
-      <!-- VIP Membership Disclosure (only shown when customer opted in) -->
-      ${checkoutData.wantsVIP ? `
+      <!-- Single VIP decision point: this is the only place customers choose VIP,
+           combining the pricing choice and the required recurring-charge consent
+           into one checkbox instead of two separate ones on two screens. -->
+      ${!isVIP ? `
       <div class="ch-vip-disclosure">
         <div class="ch-vip-disc-hdr">&#9670; VIP Membership &mdash; Recurring Billing Disclosure</div>
-        <p>By authorizing below, you authorize Dharma Media &amp; Technology LLC to charge your payment method <strong style="color:var(--plum)">$39.95 per month</strong> starting on the 6th of next month and each month thereafter, unless you skip or cancel.</p>
+        <p>By checking below, you'll pay VIP pricing on this order and authorize Dharma Media &amp; Technology LLC to charge your payment method <strong style="color:var(--plum)">$39.95 per month</strong> starting on the 6th of next month and each month thereafter, unless you skip or cancel. Uncheck to pay regular price instead, with no membership.</p>
         <ul class="ch-vip-terms-list">
           <li><strong style="color:#111">Skip:</strong> Log in and select "Skip This Month" between the 1st&ndash;5th of any month at no charge.</li>
           <li><strong style="color:#111">Cancel:</strong> Cancel anytime online under My Account or call (559) 334-0826. Cancel before the 6th to avoid the next charge.</li>
@@ -7283,8 +7268,8 @@ function renderCheckout(){
           <li><strong style="color:#111">Refunds:</strong> Membership charges are non-refundable except as required by law. Contact us within 30 days for billing errors.</li>
         </ul>
         <label class="ch-vip-disc-check">
-          <input type="checkbox" id="vip-consent-review" ${checkoutData.vipConsent?'checked':''} style="accent-color:var(--plum);flex-shrink:0;margin-top:3px;width:18px;height:18px">
-          <span>I authorize the $39.95/month VIP Membership charge described above. I understand I can skip or cancel anytime online or by calling (559) 334-0826.</span>
+          <input type="checkbox" id="vip-consent-review" ${checkoutData.wantsVIP!==false?'checked':''} onchange="toggleReviewVIP(this.checked)" style="accent-color:var(--plum);flex-shrink:0;margin-top:3px;width:18px;height:18px">
+          <span>I want VIP pricing on this order and authorize the $39.95/month VIP Membership charge described above. I understand I can skip or cancel anytime online or by calling (559) 334-0826.</span>
         </label>
       </div>
       ` : ''}
@@ -7628,14 +7613,22 @@ function toggleVIPOptin(){
 
 /* handlePlaceOrder  -  validates consent then submits order */
 function handlePlaceOrder(){
-  if(checkoutData.wantsVIP){
-    const consentBox = document.getElementById('vip-consent-review');
-    if(consentBox && !consentBox.checked){ toast('Please accept the VIP Membership terms.'); return; }
-    checkoutData.vipConsent = true;
-  }
+  // The single VIP checkbox on this page already IS the consent -- checking it
+  // and clicking Place Order together constitute authorization. Nothing further
+  // to validate here; unchecked just means regular pricing, no membership.
+  checkoutData.vipConsent = !!checkoutData.wantsVIP;
   const btns = document.querySelectorAll('.ch-place-btn');
   btns.forEach(b=>{ b.disabled=true; b.textContent='Placing Order...'; });
   submitOrder();
+}
+
+/* Single combined VIP decision on the Review step: toggling this checkbox
+   updates pricing live and IS the recurring-charge consent, replacing what
+   used to be two separate checkboxes across two screens. */
+function toggleReviewVIP(checked){
+  checkoutData.wantsVIP = !!checked;
+  isVIP = !!checked || !!user?.isVIP;
+  renderCheckout();
 }
 
 /* ═══════════════════════════════════════════
