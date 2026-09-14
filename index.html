@@ -7146,6 +7146,12 @@ function renderCheckout(){
     }
 
   } else if(checkoutStep===2){
+    // Critical: the checkbox below renders as checked-by-default when
+    // wantsVIP is undefined, but the underlying value must actually be set
+    // to true here too -- otherwise isPayingNow (!!checkoutData.wantsVIP)
+    // reads false for anyone who never manually touches the checkbox, and
+    // the entire CCBill payment redirect gets silently skipped.
+    if(!isVIP && checkoutData.wantsVIP === undefined){ checkoutData.wantsVIP = true; }
     const fullName = ((checkoutData.firstName||'')+' '+(checkoutData.lastName||'')).trim();
     const uEmail   = checkoutData.email || user?.email || '';
 
