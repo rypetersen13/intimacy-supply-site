@@ -3321,7 +3321,7 @@ select.qfi{cursor:pointer;appearance:none;-webkit-appearance:none}
   font-size:12px;padding:4px 0;
   color:rgba(255,255,255,.45);
 }
-.ch-os-row.green{color:#4ADE80}
+.ch-os-row.green{color:var(--gold)}
 .ch-os-row.bold{
   font-weight:900;font-size:14px;color:#fff;
   border-top:1px solid rgba(255,255,255,.08);
@@ -3532,14 +3532,14 @@ select.qfi{cursor:pointer;appearance:none;-webkit-appearance:none}
   font-size:13px;padding:6px 0;
   color:rgba(255,255,255,.55);
 }
-.ch-tot-row.green{color:#4ADE80;font-weight:700}
+.ch-tot-row.green{color:var(--plum);font-weight:700}
 .ch-tot-row.bold{
   font-weight:900;font-size:17px;
   border-top:1px solid rgba(255,255,255,.1);
   margin-top:8px;padding-top:12px;
   color:#fff;
 }
-.ch-tot-row.total span:last-child{color:#FFE600}
+.ch-tot-row.total span:last-child{color:var(--plum)}
 
 /* VIP disclosure */
 .ch-vip-disclosure{
@@ -4118,11 +4118,13 @@ select.qfi{cursor:pointer;appearance:none;-webkit-appearance:none}
 .ch-bag-orig{font-size:12px;color:var(--muted);text-decoration:line-through;font-family:var(--fb);font-weight:400}
 .ch-totals{padding:16px 20px;border-bottom:1px solid var(--gray)}
 .ch-tot-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;color:var(--body)}
-.ch-tot-row.green{color:#16A34A;font-weight:600}
+.ch-tot-row.green{color:var(--plum);font-weight:600}
 .ch-tot-row.bold{font-weight:900;font-size:16px;color:var(--black);border-top:1px solid var(--gray);margin-top:8px;padding-top:12px}
 .ch-tot-row.total{font-family:var(--fd)}
 .ch-promo-row{display:flex;gap:10px;padding:16px 20px;border-bottom:1px solid var(--gray)}
 .ch-promo-inp{flex:1;border:1.5px solid #D1D5DB;border-radius:10px;padding:13px 16px;font-size:14px;outline:none;color:var(--black);font-family:var(--fb)}
+.ch-promo-inp::placeholder{color:#9CA3AF}
+.ch-promo-btn{background:var(--black);color:#fff;border:none;border-radius:10px;padding:0 20px;font-family:var(--fd);font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;white-space:nowrap}
 .ch-promo-inp:focus{border-color:var(--plum)}
 
 /* ══════════════════════════════════════════════════════════════
@@ -4184,7 +4186,7 @@ select.qfi{cursor:pointer;appearance:none;-webkit-appearance:none}
 .ch-os-drop{background:#fff;border-bottom:1px solid #F3F4F6}
 .ch-os-item{color:#374151;border-bottom:1px solid #F3F4F6}
 .ch-os-row{color:#6B7280}
-.ch-os-row.green{color:#16A34A}
+.ch-os-row.green{color:var(--plum)}
 .ch-os-row.bold{color:#111;border-top:1px solid #E5E7EB}
 
 /* Checkout: free shipping nudge */
@@ -7039,8 +7041,8 @@ function renderCheckout(){
 
   const subtotalOrig = cart.reduce((s,i)=>{ const p=PRODUCTS.find(x=>String(x.id)===String(i.id)); return s+p.orig*i.qty; },0);
   const subtotalVIP  = cart.reduce((s,i)=>{ const p=PRODUCTS.find(x=>String(x.id)===String(i.id)); return s+p.price*i.qty; },0);
-  const displaySub   = (isVIP || checkoutData.wantsVIP !== false) ? subtotalVIP : subtotalOrig;
-  const discount     = (isVIP || checkoutData.wantsVIP !== false) ? subtotalOrig - subtotalVIP : 0;
+  const displaySub   = (isVIP || checkoutData.wantsVIP === true) ? subtotalVIP : subtotalOrig;
+  const discount     = (isVIP || checkoutData.wantsVIP === true) ? subtotalOrig - subtotalVIP : 0;
   const redeemState  = cartRedeemState();
   const tokensUsed   = redeemState.tokensUsed;
   const coveredValue = redeemState.coveredValue;
@@ -7074,7 +7076,7 @@ function renderCheckout(){
     <div class="ch-os-drop">
       ${cart.map(item=>{
         const p=PRODUCTS.find(x=>String(x.id)===String(item.id));
-        const pr=(isVIP || checkoutData.wantsVIP !== false)?p.price:p.orig;
+        const pr=(isVIP || checkoutData.wantsVIP === true)?p.price:p.orig;
         return `<div class="ch-os-item"><span>${p.name} &times;${item.qty}</span><span>$${(pr*item.qty).toFixed(2)}</span></div>`;
       }).join('')}
       <div class="ch-os-row"><span>Subtotal</span><span>$${subtotalOrig.toFixed(2)}</span></div>
@@ -7146,12 +7148,9 @@ function renderCheckout(){
     }
 
   } else if(checkoutStep===2){
-    // Critical: the checkbox below renders as checked-by-default when
-    // wantsVIP is undefined, but the underlying value must actually be set
-    // to true here too -- otherwise isPayingNow (!!checkoutData.wantsVIP)
-    // reads false for anyone who never manually touches the checkbox, and
-    // the entire CCBill payment redirect gets silently skipped.
-    if(!isVIP && checkoutData.wantsVIP === undefined){ checkoutData.wantsVIP = true; }
+    // VIP box now starts unchecked -- requires an active click. wantsVIP
+    // stays undefined until the customer explicitly checks it, and every
+    // price/consent calculation checks for === true, never assuming intent.
     const fullName = ((checkoutData.firstName||'')+' '+(checkoutData.lastName||'')).trim();
     const uEmail   = checkoutData.email || user?.email || '';
 
@@ -7173,7 +7172,7 @@ function renderCheckout(){
         <span class="ch-review-hdr">Shopping Bag</span>
         ${cart.map(item=>{
           const p=PRODUCTS.find(x=>String(x.id)===String(item.id));
-          const pr=(isVIP || checkoutData.wantsVIP !== false)?p.price:p.orig;
+          const pr=(isVIP || checkoutData.wantsVIP === true)?p.price:p.orig;
           const img=p.images&&p.images[0]?p.images[0]:'';
           return `<div class="ch-bag-item">
             <div class="ch-bag-img">${img?`<img src="${img}" alt="${p.name}" loading="lazy">`:'<span style="font-size:22px;opacity:.3">&#9829;</span>'}</div>
@@ -7274,7 +7273,7 @@ function renderCheckout(){
           <li><strong style="color:#111">Refunds:</strong> Membership charges are non-refundable except as required by law. Contact us within 30 days for billing errors.</li>
         </ul>
         <label class="ch-vip-disc-check">
-          <input type="checkbox" id="vip-consent-review" ${checkoutData.wantsVIP!==false?'checked':''} onchange="toggleReviewVIP(this.checked)" style="accent-color:var(--plum);flex-shrink:0;margin-top:3px;width:18px;height:18px">
+          <input type="checkbox" id="vip-consent-review" ${checkoutData.wantsVIP===true?'checked':''} onchange="toggleReviewVIP(this.checked)" style="accent-color:var(--plum);flex-shrink:0;margin-top:3px;width:18px;height:18px">
           <span>I want VIP pricing on this order and authorize the $39.95/month VIP Membership charge described above. I understand I can skip or cancel anytime online or by calling (559) 334-0826.</span>
         </label>
       </div>
@@ -7657,8 +7656,8 @@ function submitOrder(){
 
   const subtotalOrig = cart.reduce((s,i)=>{const p=PRODUCTS.find(x=>String(x.id)===String(i.id));return s+p.orig*i.qty;},0);
   const subtotalVIP  = cart.reduce((s,i)=>{const p=PRODUCTS.find(x=>String(x.id)===String(i.id));return s+p.price*i.qty;},0);
-  const displaySub   = (isVIP || checkoutData.wantsVIP !== false) ? subtotalVIP : subtotalOrig;
-  const vipDiscount  = (isVIP || checkoutData.wantsVIP !== false) ? subtotalOrig - subtotalVIP : 0;
+  const displaySub   = (isVIP || checkoutData.wantsVIP === true) ? subtotalVIP : subtotalOrig;
+  const vipDiscount  = (isVIP || checkoutData.wantsVIP === true) ? subtotalOrig - subtotalVIP : 0;
   const redeemState  = cartRedeemState();
   const tokensUsed   = redeemState.tokensUsed;
   const coveredValue = redeemState.coveredValue;
