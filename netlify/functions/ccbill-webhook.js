@@ -38,7 +38,9 @@ const crypto = require("crypto");
 const PROJECT_ID = "intimacy-supply";
 const GA4_MEASUREMENT_ID = "G-CN0W1J61RL";
 const EXPECTED_CLIENT_ACCNUM = "955607";
-const EXPECTED_CLIENT_SUBACC = "0000";
+const VIP_SUBACC = "0000";     // recurring VIP membership
+const ONETIME_SUBACC = "0001"; // one-time tangible purchases, no membership
+const VALID_SUBACCS = [VIP_SUBACC, ONETIME_SUBACC];
 const DEFAULT_NOTIFY_EMAIL = "hello@intimacysupply.com";
 
 // CCBill's published Webhook source IP ranges (all are x.y.z.1 - x.y.z.254)
@@ -269,11 +271,14 @@ exports.handler = async function (event) {
       return { statusCode: 403, body: "forbidden" };
     }
 
-    // 2. Account/subaccount check
-    if (String(all.clientAccnum) !== EXPECTED_CLIENT_ACCNUM || String(all.clientSubacc) !== EXPECTED_CLIENT_SUBACC) {
+    // 2. Account/subaccount check -- accept either the VIP membership
+    // subaccount or the one-time-purchase subaccount, reject anything else.
+    const subacc = String(all.clientSubacc);
+    if (String(all.clientAccnum) !== EXPECTED_CLIENT_ACCNUM || !VALID_SUBACCS.includes(subacc)) {
       console.error("ccbill-webhook: account mismatch", all.clientAccnum, all.clientSubacc);
       return { statusCode: 403, body: "forbidden" };
     }
+    const isOneTime = subacc === ONETIME_SUBACC;
 
     const eventType = all.eventType || "";
     const subscriptionId = String(all.subscriptionId || "");
@@ -307,7 +312,33 @@ exports.handler = async function (event) {
 
     const nowIso = new Date().toISOString();
 
-    if (ACTIVATE.includes(eventType)) {
+    if (ACTIVATE.includes(eventType) && isOneTime) {
+      // One-time purchase on subaccount 0001: mark the order paid and notify,
+      // but never touch VIP status -- this customer didn't join membership.
+      if (eventType === "NewSaleSuccess") {
+        const order = await findLatestUnpaidOrder(token, userId);
+        if (order) {
+          await patchDoc(token, "orders/" + order.id, {
+            paymentStatus: { stringValue: "paid" },
+            paymentMethod: { stringValue: "ccbill" },
+            paymentRef: { stringValue: subscriptionId || "" },
+            paidAt: { timestampValue: nowIso },
+          }).catch(err => console.error("ccbill-webhook: failed to mark order paid", order.id, err.message));
+          await sendOrderNotification({ ...order.fields, orderId: order.fields.orderId || order.id }, subscriptionId);
+        } else {
+          console.error("ccbill-webhook: one-time NewSaleSuccess but no unpaid order found for user", userId);
+        }
+        if (process.env.GA4_API_SECRET) {
+          fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${process.env.GA4_API_SECRET}`, {
+            method: "POST",
+            body: JSON.stringify({
+              client_id: userId,
+              events: [{ name: "purchase", params: { transaction_id: subscriptionId || userId, currency: "USD", value: price || 0 } }],
+            }),
+          }).catch(() => {});
+        }
+      }
+    } else if (ACTIVATE.includes(eventType)) {
       const fields = {
         isVIP: { booleanValue: true },
         vipProvider: { stringValue: "ccbill" },
@@ -344,7 +375,7 @@ exports.handler = async function (event) {
           }),
         }).catch(() => {});
       }
-    } else if (DEACTIVATE.includes(eventType)) {
+    } else if (DEACTIVATE.includes(eventType) && !isOneTime) {
       await patchDoc(token, "users/" + userId, {
         isVIP: { booleanValue: false },
         vipDeactivatedAt: { timestampValue: nowIso },
