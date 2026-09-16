@@ -7425,6 +7425,43 @@ function startCCBillVIPSubscription(customer){
   return true;
 }
 
+// One-time purchase (no membership, no recurring charge) -- separate CCBill
+// subaccount (0001) from the VIP membership flow above.
+function startOneTimePayment(customer){
+  if(!customer.userId){
+    console.warn('[IS] Cannot start checkout without a logged-in user id.');
+    toast('Please sign in to continue.');
+    return false;
+  }
+  toast('Redirecting to secure checkout…');
+  fetch('/.netlify/functions/ccbill-onetime-link', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userId:        customer.userId,
+      email:         customer.email     || '',
+      firstName:     customer.firstName || '',
+      lastName:      customer.lastName  || '',
+      orderId:       customer.orderId   || '',
+      itemTotal:     customer.itemTotal || 0,
+    }),
+  })
+    .then(function(res){ return res.json().then(function(data){ return { ok: res.ok, data: data }; }); })
+    .then(function(result){
+      if(!result.ok || !result.data.url){
+        console.error('[IS] CCBill one-time link error:', result.data.error);
+        showPaymentFailedState(customer.orderId, result.data.error);
+        return;
+      }
+      window.location.href = result.data.url;
+    })
+    .catch(function(err){
+      console.error('[IS] CCBill one-time link request failed:', err);
+      showPaymentFailedState(customer.orderId, 'a connection problem');
+    });
+  return true;
+}
+
 function applyPromoFromCheckout(){
   const v=document.getElementById('ch-promo')?.value.trim().toUpperCase();
   if(!v){ toast('Enter a promo code first.'); return; }
@@ -7736,12 +7773,13 @@ function submitOrder(){
     const savedId    = pendingOrderId;
     const savedTotal = total;
     const affRef     = getAffiliateRef() || (user && user.affiliate) || null;
-    const isPayingNow = !!checkoutData.wantsVIP; // captured before checkoutData is cleared below
+    // True only when there's an actual charge about to happen -- either the
+    // VIP membership flow, or a one-time purchase with a real total owed.
+    const isPayingNow = !!checkoutData.wantsVIP || savedTotal > 0;
 
-    // If customer opted into VIP, reserve it as pending and send them to payment.
-    // VIP only activates when the processor postback confirms the charge
-    // (handled by /.netlify/functions/segpay-postback).
     if(checkoutData.wantsVIP){
+      // Opted into VIP: reserve it as pending and send them to the membership
+      // payment flow. VIP only activates when the webhook confirms the charge.
       if(db && user?.uid){
         db.collection('users').doc(user.uid).set({ isVIP: false, vipSignupPending: true, vipCheckoutAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
           .catch(e=>console.warn('[IS] VIP pending write failed:', e));
@@ -7754,6 +7792,19 @@ function submitOrder(){
         userId:    user?.uid              || null,
         orderId:   pendingOrderId,
         itemTotal: savedTotal || 0,
+      });
+    } else if(savedTotal > 0){
+      // Declined VIP but still owes money for the order itself: send to the
+      // one-time purchase flow on the separate CCBill subaccount (0001).
+      // No membership, no recurring charge -- just this order.
+      showRedirectingToPayment();
+      startOneTimePayment({
+        email:     checkoutData.email     || (user && user.email) || '',
+        firstName: checkoutData.firstName || '',
+        lastName:  checkoutData.lastName  || '',
+        userId:    user?.uid              || null,
+        orderId:   pendingOrderId,
+        itemTotal: savedTotal,
       });
     }
 
