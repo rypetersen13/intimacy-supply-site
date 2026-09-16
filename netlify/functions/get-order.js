@@ -19,6 +19,9 @@ async function getAccessToken() {
   const now = Math.floor(Date.now() / 1000);
   if (cachedToken && now < cachedExp - 60) return cachedToken;
 
+  if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+    throw new Error("FIREBASE_SERVICE_ACCOUNT environment variable is not set or not available to this function");
+  }
   const sa = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, "base64").toString("utf8"));
   const header = Buffer.from(JSON.stringify({ alg: "RS256", typ: "JWT" })).toString("base64url");
   const claims = Buffer.from(JSON.stringify({
