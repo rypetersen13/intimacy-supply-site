@@ -1,4 +1,8 @@
 // CCBill Webhook handler for Intimacy Supply
+// NOTE: FIREBASE_SERVICE_ACCOUNT was trimmed to only client_email + private_key
+// to fit under AWS Lambda's 4KB combined env var limit (this function runs in
+// Lambda compatibility mode). This comment forces a fresh deploy so the newly
+// updated env var value actually gets picked up.
 // Receives server-to-server subscription event notifications from CCBill and
 // updates Firestore: activates VIP on new sale / renewal / reactivation,
 // deactivates on cancellation / expiration / chargeback / refund / return / void.
