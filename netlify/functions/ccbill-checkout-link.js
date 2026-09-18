@@ -33,7 +33,6 @@ const FLEX_ID = "19f62754-c051-404f-9960-be55ef3fd2f1";
 const CURRENCY_CODE = "840"; // USD
 const RECURRING_PRICE = 39.95; // the VIP fee, starting next cycle
 const MIN_PRICE = 2.95;   // CCBill account-wide minimum
-const MAX_PRICE = 100.00; // CCBill account-wide maximum per transaction
 const PERIOD_DAYS = 30;
 const NUM_REBILLS = 99;   // effectively "until cancelled" -- max allowed by CCBill's field
 
@@ -56,13 +55,6 @@ exports.handler = async function (event) {
         body: JSON.stringify({ error: `Order total must be at least $${MIN_PRICE.toFixed(2)} to check out.` }),
       };
     }
-    if (itemTotal > MAX_PRICE) {
-      return {
-        statusCode: 422,
-        body: JSON.stringify({ error: "Order total exceeds CCBill's $100 single-transaction limit. This order needs manual handling or a split charge." }),
-      };
-    }
-
     const salt = process.env.CCBILL_SALT_KEY;
     if (!salt) {
       console.error("ccbill-checkout-link: CCBILL_SALT_KEY is not set");

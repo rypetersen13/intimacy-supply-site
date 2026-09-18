@@ -22,7 +22,6 @@ const CLIENT_SUBACC = "0001"; // one-time purchases (0000 is the VIP membership 
 const FLEX_ID = "19f62754-c051-404f-9960-be55ef3fd2f1"; // same Flex ID for both subaccounts, per CCBill
 const CURRENCY_CODE = "840"; // USD
 const MIN_PRICE = 2.95;
-const MAX_PRICE = 100.00;
 const PERIOD_DAYS = 30; // required field even for a one-time charge; has no rebill consequence since no recurring fields are sent
 
 exports.handler = async function (event) {
@@ -41,10 +40,6 @@ exports.handler = async function (event) {
     if (itemTotal < MIN_PRICE) {
       return { statusCode: 422, body: JSON.stringify({ error: `Order total must be at least $${MIN_PRICE.toFixed(2)} to check out.` }) };
     }
-    if (itemTotal > MAX_PRICE) {
-      return { statusCode: 422, body: JSON.stringify({ error: "Order total exceeds CCBill's $100 single-transaction limit. This order needs manual handling." }) };
-    }
-
     const salt = process.env.CCBILL_SALT_KEY;
     if (!salt) {
       console.error("ccbill-onetime-link: CCBILL_SALT_KEY is not set");
