@@ -7415,6 +7415,10 @@ function startCCBillVIPSubscription(customer){
         showPaymentFailedState(customer.orderId, result.data.error);
         return;
       }
+      // Remember which order this payment is for. CCBill's redirect back to
+      // order-confirmation.html carries no orderId (custom passthrough params
+      // aren't registered), so the confirmation page reads it from here.
+      try { localStorage.setItem('is_pending_order', customer.orderId || ''); } catch(e){}
       // Same-tab redirect: new tabs are frequently blocked by iOS Safari
       window.location.href = result.data.url;
     })
@@ -7453,6 +7457,7 @@ function startOneTimePayment(customer){
         showPaymentFailedState(customer.orderId, result.data.error);
         return;
       }
+      try { localStorage.setItem('is_pending_order', customer.orderId || ''); } catch(e){}
       window.location.href = result.data.url;
     })
     .catch(function(err){
