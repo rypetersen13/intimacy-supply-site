@@ -7392,7 +7392,9 @@ function showPaymentFailedState(orderId, reason){
 function startCCBillVIPSubscription(customer){
   if(!customer.userId){
     console.warn('[IS] Cannot start VIP checkout without a logged-in user id.');
-    toast('Please sign in to continue.');
+    // The redirect screen is already showing -- clear it, or the customer is
+    // left staring at a spinner that never resolves.
+    showPaymentFailedState(customer.orderId, 'we could not confirm your signed-in account');
     return false;
   }
   toast('Redirecting to secure checkout…');
@@ -7434,7 +7436,7 @@ function startCCBillVIPSubscription(customer){
 function startOneTimePayment(customer){
   if(!customer.userId){
     console.warn('[IS] Cannot start checkout without a logged-in user id.');
-    toast('Please sign in to continue.');
+    showPaymentFailedState(customer.orderId, 'we could not confirm your signed-in account');
     return false;
   }
   toast('Redirecting to secure checkout…');
@@ -7797,7 +7799,7 @@ function submitOrder(){
         email:     checkoutData.email     || (user && user.email) || '',
         firstName: checkoutData.firstName || '',
         lastName:  checkoutData.lastName  || '',
-        userId:    user?.uid              || null,
+        userId:    user?.uid || (typeof auth!=='undefined' && auth.currentUser && auth.currentUser.uid) || null,
         orderId:   pendingOrderId,
         itemTotal: savedTotal || 0,
       });
@@ -7810,7 +7812,7 @@ function submitOrder(){
         email:     checkoutData.email     || (user && user.email) || '',
         firstName: checkoutData.firstName || '',
         lastName:  checkoutData.lastName  || '',
-        userId:    user?.uid              || null,
+        userId:    user?.uid || (typeof auth!=='undefined' && auth.currentUser && auth.currentUser.uid) || null,
         orderId:   pendingOrderId,
         itemTotal: savedTotal,
       });
