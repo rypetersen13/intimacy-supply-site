@@ -8481,6 +8481,9 @@ document.addEventListener('mouseleave',e=>{if(e.clientY<0) maybeShowNLPop();});
 setTimeout(()=>{if(!isVIP&&!nlPopShown) maybeShowNLPop();},60000);
 
 function openLegal(type){
+  // Legal pages are real URLs now (see /privacy, /terms, ...). Fall through to the old modal only for unknown keys.
+  var LEGAL_ROUTES = {"privacy": "/privacy", "terms": "/terms", "shipping": "/shipping-returns", "refund": "/refund-policy", "affiliate": "/affiliate-disclosure", "chargeback": "/recognize-a-charge", "complaints": "/complaints", "donotsell": "/do-not-sell", "gdpr": "/gdpr", "affiliateterms": "/affiliate-terms", "accessibility": "/accessibility", "emailpref": "/email-preferences", "compliance": "/compliance"};
+  if(LEGAL_ROUTES[type]){ window.location.href = LEGAL_ROUTES[type]; return; }
   const S = 'font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;text-transform:uppercase;color:#4A1D38;margin:18px 0 8px';
   const S2= 'font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;text-transform:uppercase;color:#111;margin:14px 0 5px';
   const P = 'font-size:13px;color:#333;line-height:1.75;margin-bottom:10px';
