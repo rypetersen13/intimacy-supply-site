@@ -314,11 +314,15 @@ exports.handler = async function (event) {
     }
     if (!userId && email) {
       userId = await findUserByField(token, "email", email);
+      // Emails can differ in case between signup and the CCBill billing form.
+      if (!userId) userId = await findUserByField(token, "email", email.toLowerCase());
+      if (!userId) userId = await findUserByField(token, "email", email.trim());
     }
 
     if (!userId) {
-      // Can't correlate to a user yet -- log for manual review but acknowledge receipt
-      console.error("ccbill-webhook: could not resolve user for event", eventType, subscriptionId, email);
+      // Can't correlate to a user yet -- log the exact email CCBill sent so the
+      // mismatch against the signup email is visible in the function logs.
+      console.error("ccbill-webhook: could not resolve user for event", eventType, "subscriptionId:", subscriptionId, "email from CCBill:", JSON.stringify(email));
       return { statusCode: 200, body: "OK (unresolved user)" };
     }
 
