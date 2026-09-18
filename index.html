@@ -9031,6 +9031,14 @@ function processCancelMembership(modalEl){
   if(confirmBtn){ confirmBtn.disabled=true; confirmBtn.textContent='Cancelling...'; }
   var uid = user && user.uid;
   var doCancel = function(){
+    // Alert the operator so the subscription is actually cancelled in CCBill.
+    // Flipping isVIP here does NOT stop CCBill's recurring charge on its own.
+    fetch('/.netlify/functions/membership-request', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'cancel', userId: uid, email: user && user.email,
+        firstName: user && user.firstName, lastName: user && user.lastName,
+        subscriptionId: user && user.ccbillSubscriptionId }),
+    }).catch(function(e){ console.error('[IS] cancel alert failed:', e); });
     isVIP = false;
     if(user) user.isVIP = false;
     updateHeader();
@@ -9090,6 +9098,14 @@ function skipThisMonth(btn){
       ['skipMonths.' + monthKey]: true,
       lastSkippedAt: firebase.firestore.FieldValue.serverTimestamp(),
     }).then(function(){
+      // Alert the operator so the rebill is actually suspended in CCBill --
+      // writing skipMonths here does NOT stop CCBill from charging on its own.
+      fetch('/.netlify/functions/membership-request', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'skip', userId: uid, email: user && user.email,
+          firstName: user && user.firstName, lastName: user && user.lastName,
+          subscriptionId: user && user.ccbillSubscriptionId, monthKey: monthKey }),
+      }).catch(function(e){ console.error('[IS] skip alert failed:', e); });
       toast('Skip confirmed  -  no charge this month.');
       klaviyoTrackEvent('Month Skipped', { userId: uid, month: monthKey });
       if(btn){ btn.disabled=true; btn.textContent='Skipped This Month'; btn.style.opacity='.5'; }
