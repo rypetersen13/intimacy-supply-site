@@ -7712,7 +7712,10 @@ function submitOrder(){
 
   const items = cart.map(item=>{
     const p = PRODUCTS.find(x=>String(x.id)===String(item.id));
-    const unitPrice = isVIP ? p.price : p.orig;
+    // Must match the totals above: a customer joining VIP at this checkout
+    // (isVIP still false, wantsVIP true) is charged VIP pricing, so the saved
+    // line items have to record VIP pricing too or the order contradicts itself.
+    const unitPrice = (isVIP || checkoutData.wantsVIP === true) ? p.price : p.orig;
     const lineTokens = item.redeem ? tokensFor(unitPrice) * item.qty : 0;
     return {
       productId:  p.id,
