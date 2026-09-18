@@ -424,7 +424,11 @@
     }
 
     const params = new URLSearchParams(window.location.search);
-    const orderId = params.get('X-orderId') || params.get('orderId');
+    // CCBill's redirect carries no orderId, so fall back to the one saved
+    // to localStorage just before we sent the customer to payment.
+    let savedOrderId = '';
+    try { savedOrderId = localStorage.getItem('is_pending_order') || ''; } catch(e){}
+    const orderId = params.get('X-orderId') || params.get('orderId') || savedOrderId;
     const txnId = params.get('subscriptionId') || params.get('transactionId');
 
     document.getElementById('orderDate').textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
