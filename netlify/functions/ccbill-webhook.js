@@ -363,6 +363,24 @@ exports.handler = async function (event) {
       };
       if (subscriptionId) fields.ccbillSubscriptionId = { stringValue: subscriptionId };
       if (eventType === "NewSaleSuccess") fields.vipActivatedAt = { timestampValue: nowIso };
+
+      // Issue one Member Token per paid billing cycle -- this is the core of the
+      // VIP offer ("one token each billing month, worth up to $50"). Tokens live
+      // in users/{id}.credits, the same field checkout decrements when spent.
+      // Granted on the first sale, every renewal, and reactivation. NOT granted
+      // on ManualAdd (comped access), which involves no billing cycle.
+      if (["NewSaleSuccess", "RenewalSuccess", "UserReactivation"].includes(eventType)) {
+        try {
+          const existing = await getDoc(token, "users/" + userId);
+          const current = Number(existing && existing.credits) || 0;
+          fields.credits = { integerValue: String(current + 1) };
+          fields.lastTokenIssuedAt = { timestampValue: nowIso };
+        } catch (err) {
+          // Never let a token-grant failure block VIP activation itself.
+          console.error("ccbill-webhook: token grant failed for", userId, err.message);
+        }
+      }
+
       await patchDoc(token, "users/" + userId, fields);
 
       // NewSaleSuccess is the cart purchase itself -- find this user's most recent
