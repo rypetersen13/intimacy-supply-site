@@ -9034,14 +9034,36 @@ function processCancelMembership(modalEl){
   if(confirmBtn){ confirmBtn.disabled=true; confirmBtn.textContent='Cancelling...'; }
   var uid = user && user.uid;
   var doCancel = function(){
-    // Alert the operator so the subscription is actually cancelled in CCBill.
-    // Flipping isVIP here does NOT stop CCBill's recurring charge on its own.
-    fetch('/.netlify/functions/membership-request', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'cancel', userId: uid, email: user && user.email,
-        firstName: user && user.firstName, lastName: user && user.lastName,
-        subscriptionId: user && user.ccbillSubscriptionId }),
-    }).catch(function(e){ console.error('[IS] cancel alert failed:', e); });
+    // Actually cancel at CCBill. Flipping isVIP locally does NOT stop the
+    // recurring charge -- without this call the customer keeps getting billed
+    // every month while the site tells them they're cancelled.
+    var subId = user && user.ccbillSubscriptionId;
+    var alertOperator = function(reason){
+      fetch('/.netlify/functions/membership-request', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'cancel', userId: uid, email: user && user.email,
+          firstName: user && user.firstName, lastName: user && user.lastName,
+          subscriptionId: subId, reason: reason }),
+      }).catch(function(e){ console.error('[IS] cancel alert failed:', e); });
+    };
+    if(subId){
+      fetch('/.netlify/functions/ccbill-cancel', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ subscriptionId: subId }),
+      })
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+          // Only fall back to a manual alert if CCBill did NOT confirm success.
+          if(!res || !res.ok) alertOperator('ccbill-cancel returned ' + JSON.stringify(res && res.code));
+        })
+        .catch(function(e){
+          console.error('[IS] ccbill-cancel call failed:', e);
+          alertOperator('ccbill-cancel request threw');
+        });
+    } else {
+      // No subscription id on file -- can't call the API, needs manual handling.
+      alertOperator('no ccbillSubscriptionId on user record');
+    }
     isVIP = false;
     if(user) user.isVIP = false;
     updateHeader();
