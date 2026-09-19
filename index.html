@@ -4543,6 +4543,10 @@ button[onclick*="subNewsletter"],button#nl-ac-btn{background:#fff!important;colo
 /* ── Own identity: plum wordmark and section titles (not the retail-standard black) ── */
 .logo-intimacy,.logo-supply{color:#4A1D38}
 .st,.bs-h,.fp-h{color:#4A1D38}
+
+.pg-empty{padding:48px 16px;text-align:center;color:#555}
+.pg-empty p{font-size:16px;margin:0 0 14px}
+.pg-empty button{background:#1B1B19;color:#fff;border:none;padding:13px 24px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
 /* tags and pills */
 .pd-off-pill,.pd-price-badge,.pd-bdg.sale,.pd-vip-badge,.pd-lto,.pd-vip-pill,.gc-pill-badge,.ac-order-status,.chpb,.ch-vip-header{background:var(--ink);color:#fff}
 .cibdg,.ch-bag-badge{background:var(--brand-red);color:#fff}
@@ -5961,10 +5965,31 @@ var SUBCATS = {
   anal:     ['Plugs','Beads','Dildos','Prostate','Training Sets','Vibrating'],
 };
 
+var SUBCAT_RX = {
+  'Bras':/\bbras?\b|bralette|bandeau/i, 'Panties':/panty|panties|thong|g-string|\bbrief|boyshort|bikini/i,
+  'Bodysuits':/bodysuit/i, 'Teddies':/teddy|teddie/i, 'Corsets':/corset|bustier/i, 'Sets':/\bset\b|\b\d\s?pc\b|piece/i,
+  'Robes':/\brobe|kimono|chemise|negligee/i, 'Hosiery':/stocking|hosiery|thigh[- ]?high|tights|pantyhose|garter|fishnet/i, 'Costumes':/costume/i,
+  'Vibrators':/vibrat/i, 'Dildos':/dildo|\bdong\b/i, 'Wands':/\bwand/i, 'Rabbits':/rabbit/i, 'Bullets':/bullet/i,
+  'Suction':/suction|suck|clitoral stim/i, 'Thrusting':/thrust/i, 'Remote Control':/remote/i,
+  'Kits':/\bkit\b|\bset\b/i, 'Bondage':/bondage|\bbind|tape|rope|cuff|restrain/i, 'Games':/game|dice|cards\b|book/i, 'Strap-Ons':/strap/i,
+  'Double':/double|dual|duo|twin/i, 'Rings':/\bring/i, 'Restraints':/restrain|cuff|shackle|collar/i,
+  'Lubricants':/lube|lubric|glide|slick|gel\b/i, 'Massage':/massage/i, 'Oils':/\boils?\b/i, 'Candles':/candle/i,
+  'Supplements':/supplement|capsule|\bpills?\b/i, 'Sprays':/spray/i,
+  'Plugs':/\bplug/i, 'Beads':/\bbead/i, 'Prostate':/prostate/i, 'Training Sets':/train|\bset\b|\bkit\b/i
+};
+function subcatMatch(p, label){
+  var rx = SUBCAT_RX[label];
+  if (rx) return rx.test(p.name || '');
+  return (p.name || '').toLowerCase().indexOf(String(label).toLowerCase().replace(/s$/, '')) !== -1;
+}
 function renderSubcatChips(cat) {
   var el = document.getElementById('subcat-chips');
   if (!el) return;
   var cats = SUBCATS[cat] || [];
+  if (PRODUCTS_ALL && PRODUCTS_ALL.length) {
+    var inCat = PRODUCTS_ALL.filter(function(p){ return p.cat === cat; });
+    cats = cats.filter(function(c){ return c === activeSubcat || inCat.some(function(p){ return subcatMatch(p, c); }); });
+  }
   if (!cats.length) { el.innerHTML = ''; return; }
   el.innerHTML = cats.map(function(c) {
     return '<button class="fb-chip' + (activeSubcat===c?' active':'') + '" onclick="setSubcat(\'' + c + '\')">' + c + '</button>';
@@ -6010,8 +6035,7 @@ function applyAndRender() {
 
   // Subcat filter
   if (activeSubcat !== 'all') {
-    var kw = activeSubcat.toLowerCase();
-    base = base.filter(function(p){ return p.name.toLowerCase().indexOf(kw) !== -1; });
+    base = base.filter(function(p){ return subcatMatch(p, activeSubcat); });
   }
 
   // Price filter
@@ -6125,6 +6149,13 @@ function variantSwatches(p){
   return { dots: dots.slice(0, MAX), extra: extra };
 }
 
+function clearProdFilters(){
+  activeSubcat = 'all';
+  var pe = document.getElementById('price-sel'); if(pe) pe.value = 'all';
+  var se = document.getElementById('sort-sel'); if(se) se.value = 'default';
+  renderSubcatChips(activeCat);
+  applyFilters();
+}
 var _visibleProdCount = 0;
 function decProdCount(){
   _visibleProdCount = Math.max(0, _visibleProdCount - 1);
@@ -6133,7 +6164,13 @@ function decProdCount(){
 }
 function renderProdGrid(list){
   if(!list || list.length===0){
-    document.getElementById('prod-grid').innerHTML = '<div style="padding:40px;text-align:center;color:#999999;font-family:Barlow,sans-serif">Loading products...</div>';
+    var _g = document.getElementById('prod-grid');
+    if(!PRODUCTS_LOADED){
+      _g.innerHTML = '<div style="padding:40px;text-align:center;color:#999999;font-family:Barlow,sans-serif">Loading products...</div>';
+    } else {
+      _g.innerHTML = '<div class="pg-empty"><p>No products match these filters.</p><button type="button" onclick="clearProdFilters()">Clear filters</button></div>';
+      var _c = document.getElementById('pg-count'); if(_c) _c.textContent = '0 Results';
+    }
     return;
   }
   document.getElementById('prod-grid').innerHTML = list.map(p=>{
