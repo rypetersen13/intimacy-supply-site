@@ -7050,6 +7050,8 @@ function openCheckout(){
 function closeCheckout(){
   document.getElementById('cho').classList.remove('open');
   document.body.style.overflow='';
+  /* The VIP checkbox temporarily flips isVIP for pricing; put it back to real membership on close */
+  if(!(user && user.isVIP)){ isVIP = false; try{ renderCart(); }catch(e){} }
 }
 
 function renderCheckout(){
@@ -7281,7 +7283,7 @@ function renderCheckout(){
       <!-- Single VIP decision point: this is the only place customers choose VIP,
            combining the pricing choice and the required recurring-charge consent
            into one checkbox instead of two separate ones on two screens. -->
-      ${!isVIP ? `
+      ${!(user && user.isVIP) ? `
       <div class="ch-vip-disclosure">
         <div class="ch-vip-disc-hdr">&#9670; VIP Membership &mdash; Recurring Billing Disclosure</div>
         <p>By checking below, you'll pay VIP pricing on this order and authorize Dharma Media &amp; Technology LLC to charge your payment method <strong style="color:var(--plum)">$39.95 per month</strong> starting on the 6th of next month and each month thereafter, unless you skip or cancel. Uncheck to pay regular price instead, with no membership.</p>
