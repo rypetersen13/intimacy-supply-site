@@ -435,7 +435,9 @@
 
     if (orderId) {
       orderNumberEl.textContent = '#' + orderId;
-      fetch('/.netlify/functions/get-order?orderId=' + encodeURIComponent(orderId))
+      let orderKey = '';
+      try { orderKey = localStorage.getItem('is_pending_key') || ''; } catch(e){}
+      fetch('/.netlify/functions/get-order?orderId=' + encodeURIComponent(orderId) + '&k=' + encodeURIComponent(orderKey))
         .then(res => { if (!res.ok) throw new Error('lookup failed'); return res.json(); })
         .then(data => {
           renderItems(data.items && data.items.length ? data.items : [{ name: 'Your order', qty: 1, price: 0 }]);

@@ -1,0 +1,11 @@
+{
+  "name": "intimacy-supply-site",
+  "private": true,
+  "description": "Storefront, catalog build and Netlify functions for intimacysupply.com",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "build:catalog": "python3 tools/build_catalog.py",
+    "build:vip": "python3 tools/build_vip.py"
+  },
+  "engines": { "node": ">=20" }
+}
