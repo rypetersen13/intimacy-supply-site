@@ -3140,8 +3140,7 @@ select.qfi{cursor:pointer;appearance:none;-webkit-appearance:none}
 #age-box{background:linear-gradient(160deg,#1A0A14,#2D1020);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-xl);max-width:340px;width:100%;padding:40px 28px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.7)}
 
 /* ── NEWSLETTER POPUP ── */
-#nl-pop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:5500;align-items:center;justify-content:center;padding:22px;backdrop-filter:blur(8px)}
-#nl-pop.open{display:flex}
+
 
 /* ══ v3.72 - Fixed header padding, deals bar sticky. Smart header scroll. Hide on scroll down, show on scroll up. SVG icons replace all emoji in account panel, product detail, cart, checkout. Multi-step, delivery, VIP disclosure. Cart redesign. Free shipping bar, VIP upsell, order summary. All compliance pages. Compressed images. Mobile menu logo bumped up. New hero image. Cormorant Garamond wordmark replaces heart logo. Wishlist buttons fixed. ══ */
 .pd-vip-price-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
@@ -8234,7 +8233,6 @@ function subNewsletter(inputId, feedbackId){
     fb.textContent = 'You&apos;re already subscribed!';
     fb.style.color   = '#22C55E';
     fb.style.display = 'block';
-    if(inputId === 'nl-pop-email') setTimeout(closeNLPop, 2000);
     return;
   }
 
@@ -8246,7 +8244,7 @@ function subNewsletter(inputId, feedbackId){
   fb.style.display = 'none';
 
   /* Determine source for analytics */
-  var source = inputId === 'nl-pop-email' ? 'popup' : 'footer';
+  var source = 'footer';
 
   /* Helper: show success state */
   function onSuccess(){
@@ -8259,7 +8257,6 @@ function subNewsletter(inputId, feedbackId){
     fb.style.color   = '#22C55E';
     fb.style.display = 'block';
     toast('You\'re on the list! Check your inbox.');
-    if(inputId === 'nl-pop-email') setTimeout(closeNLPop, 2200);
   }
 
   /* Helper: show error state */
@@ -8298,17 +8295,6 @@ function subNewsletter(inputId, feedbackId){
     onSuccess();
   }
 }
-
-let nlPopShown=false;
-function maybeShowNLPop(){
-  if(nlPopShown||isVIP||localStorage.getItem('is_nl_shown')==='true') return;
-  nlPopShown=true;localStorage.setItem('is_nl_shown','true');
-  const el=document.getElementById('nl-pop');
-  if(el) el.style.display='flex';
-}
-function closeNLPop(){const el=document.getElementById('nl-pop');if(el)el.style.display='none';}
-document.addEventListener('mouseleave',e=>{if(e.clientY<0) maybeShowNLPop();});
-setTimeout(()=>{if(!isVIP&&!nlPopShown) maybeShowNLPop();},60000);
 
 function openLegal(type){
   // Legal docs are real pages now (/privacy, /terms, ...). From inside checkout, sign-in or the age gate
@@ -9531,7 +9517,7 @@ function renderAcctPanel(){
     ft.appendChild(tb);
     var nl = document.createElement('section');
     nl.style.cssText = 'background:#4A1D38;padding:40px 16px;text-align:center';
-    nl.innerHTML = '<div style="max-width:480px;margin:0 auto"><h2 style="font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;color:#fff;margin-bottom:5px">Get Early Access</h2><p style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:18px;line-height:1.55">Join our list for early access to new arrivals and exclusive member drops.</p><div style="display:flex;gap:7px;max-width:380px;margin:0 auto 9px"><input id="nl-ac-email" type="email" placeholder="Your email address" style="flex:1;border:none;border-radius:4px;padding:12px 13px;font-size:13px;outline:none;min-width:0"><button id="nl-ac-btn" style="background:#FFE600;color:#111;border:none;padding:12px 15px;font-family:var(--fd);font-size:15px;font-weight:900;text-transform:uppercase;border-radius:4px;cursor:pointer">Subscribe</button></div><p style="font-size:9.5px;color:rgba(255,255,255,.4)">Zero spam. Unsubscribe anytime.</p></div>';
+    nl.innerHTML = '<div style="max-width:480px;margin:0 auto"><h2 style="font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;color:#fff;margin-bottom:5px">Join Our Email List</h2><p style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:18px;line-height:1.55">Get new arrivals and member offers by email.</p><div style="display:flex;gap:7px;max-width:380px;margin:0 auto 9px"><input id="nl-ac-email" type="email" placeholder="Your email address" style="flex:1;border:none;border-radius:4px;padding:12px 13px;font-size:13px;outline:none;min-width:0"><button id="nl-ac-btn" style="background:#FFE600;color:#111;border:none;padding:12px 15px;font-family:var(--fd);font-size:15px;font-weight:900;text-transform:uppercase;border-radius:4px;cursor:pointer">Subscribe</button></div><p style="font-size:9.5px;color:rgba(255,255,255,.4)">Zero spam. Unsubscribe anytime.</p></div>';
     ft.appendChild(nl);
     var nlBtn = nl.querySelector('#nl-ac-btn');
     if(nlBtn) nlBtn.addEventListener('click', function(){ subNewsletter('nl-ac-email','nl-ac-fb'); });
@@ -9599,20 +9585,6 @@ try{ initAgeGate(); }catch(e){}
   </div>
 </div>
 
-<!-- NEWSLETTER POPUP -->
-<div id="nl-pop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:8000;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:30px 22px;text-align:center;position:relative">
-    <button onclick="closeNLPop()" style="position:absolute;top:11px;right:13px;font-size:22px;background:none;border:none;cursor:pointer;color:#999;line-height:1">×</button>
-    <div style="font-size:34px;margin-bottom:7px"></div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;margin-bottom:6px">Get Early Access</h2>
-    <p style="font-size:12px;color:#666;margin-bottom:18px;line-height:1.55">Join our list for early access to new arrivals and exclusive member drops.</p>
-    <input id="nl-pop-email" type="email" placeholder="Your email address" style="display:block;width:100%;border:1px solid #E5E5E5;border-radius:6px;padding:12px 13px;font-size:14px;margin-bottom:9px;outline:none;font-family:'Barlow',sans-serif">
-    <button onclick="subNewsletter(&apos;nl-pop-email&apos;,&apos;nl-pop-fb&apos;)" style="display:block;width:100%;background:#4A1D38;color:#fff;border:none;padding:13px;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;border-radius:4px;cursor:pointer;margin-bottom:7px">Get Early Access</button>
-    <div id="nl-pop-fb" style="display:none;font-size:12px;font-weight:600;margin-bottom:5px"></div>
-    <p style="font-size:10px;color:#999">Zero spam. Unsubscribe anytime.</p>
-  </div>
-</div>
-
 <!-- LEGAL MODAL -->
 <div id="legal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:8500;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:12px;max-width:500px;width:100%;padding:26px 20px;max-height:80vh;overflow-y:auto;position:relative">
@@ -9661,8 +9633,8 @@ try{ initAgeGate(); }catch(e){}
 <!-- NEWSLETTER FOOTER SECTION -->
 <section style="background:#4A1D38;padding:40px 16px;text-align:center">
   <div style="max-width:480px;margin:0 auto">
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(22px,6vw,34px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;color:#fff;margin-bottom:5px">Get Early Access</h2>
-    <p style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:18px;line-height:1.55">Join our list for early access to new arrivals and exclusive member drops.</p>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(22px,6vw,34px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;color:#fff;margin-bottom:5px">Join Our Email List</h2>
+    <p style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:18px;line-height:1.55">Get new arrivals and member offers by email.</p>
     <div style="display:flex;gap:7px;max-width:380px;margin:0 auto 9px">
       <input id="nl-ft-email" type="email" placeholder="Your email address" style="flex:1;border:none;border-radius:4px;padding:12px 13px;font-size:13px;outline:none;font-family:'Barlow',sans-serif;min-width:0">
       <button onclick="subNewsletter(&apos;nl-ft-email&apos;,&apos;nl-ft-fb&apos;)" style="background:#FFE600;color:#111;border:none;padding:12px 15px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;border-radius:4px;cursor:pointer;white-space:nowrap">Subscribe</button>
@@ -10114,8 +10086,8 @@ try{ initAgeGate(); }catch(e){}
 <!-- NEWSLETTER -->
 <section style="background:#4A1D38;padding:40px 16px;text-align:center">
   <div style="max-width:480px;margin:0 auto">
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(22px,6vw,34px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;color:#fff;margin-bottom:5px">Get Early Access</h2>
-    <p style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:18px;line-height:1.55">Join our list for early access to new arrivals and exclusive member drops.</p>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(22px,6vw,34px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;color:#fff;margin-bottom:5px">Join Our Email List</h2>
+    <p style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:18px;line-height:1.55">Get new arrivals and member offers by email.</p>
     <div style="display:flex;gap:7px;max-width:380px;margin:0 auto 9px">
       <input id="nl-ms-email" type="email" placeholder="Your email address" style="flex:1;border:none;border-radius:4px;padding:12px 13px;font-size:13px;outline:none;font-family:'Barlow',sans-serif;min-width:0">
       <button onclick="subNewsletter(&apos;nl-ms-email&apos;,&apos;nl-ms-fb&apos;)" style="background:#FFE600;color:#111;border:none;padding:12px 15px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;border-radius:4px;cursor:pointer;white-space:nowrap">Subscribe</button>
@@ -10292,8 +10264,8 @@ try{ initAgeGate(); }catch(e){}
 <!-- NEWSLETTER -->
 <section style="background:#4A1D38;padding:40px 16px;text-align:center">
   <div style="max-width:480px;margin:0 auto">
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(22px,6vw,34px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;color:#fff;margin-bottom:5px">Get Early Access</h2>
-    <p style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:18px;line-height:1.55">Join our list for early access to new arrivals and exclusive member drops.</p>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(22px,6vw,34px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;color:#fff;margin-bottom:5px">Join Our Email List</h2>
+    <p style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:18px;line-height:1.55">Get new arrivals and member offers by email.</p>
     <div style="display:flex;gap:7px;max-width:380px;margin:0 auto 9px">
       <input id="nl-ab-email" type="email" placeholder="Your email address" style="flex:1;border:none;border-radius:4px;padding:12px 13px;font-size:13px;outline:none;font-family:'Barlow',sans-serif;min-width:0">
       <button onclick="subNewsletter(&apos;nl-ab-email&apos;,&apos;nl-ab-fb&apos;)" style="background:#FFE600;color:#111;border:none;padding:12px 15px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;border-radius:4px;cursor:pointer;white-space:nowrap">Subscribe</button>
