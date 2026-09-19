@@ -39,7 +39,7 @@ function mapFirestoreProduct(doc, index) {
     material: d.material || '',
     features: d.features || [],
     desc: d.desc != null ? cleanWholesaleText(d.desc) : null,
-    b: d.b, slug: d.s,
+    b: d.b, slug: d.s, f: d.f,
     brand: d.brand || '',
     model: d.model || '',
   };
@@ -1037,6 +1037,9 @@ function applyAndRender() {
     base = base.slice().sort(function(a,b){ return b.rating - a.rating; });
   } else if (activeSort === 'newest') {
     base = base.slice().sort(function(a,b){ return b.isNew - a.isNew; });
+  } else {
+    /* Featured: the catalog build ranks what shoppers buy first (vibrators, outfits, dildos, plugs, cages) */
+    base = base.slice().sort(function(a,b){ return (a.f == null ? 1e9 : a.f) - (b.f == null ? 1e9 : b.f); });
   }
 
   // Group variants
