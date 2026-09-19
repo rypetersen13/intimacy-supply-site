@@ -4479,6 +4479,37 @@ select.qfi{cursor:pointer;appearance:none;-webkit-appearance:none}
 #prod-grid .pp-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 #prod-grid .pp-row .pc2{font-family:var(--fd);font-size:28px;font-weight:800;color:#111;line-height:1}
 #prod-grid .pp-row .po{font-size:19px;color:#777;text-decoration:line-through}
+
+/* ── Account: plain website styling (flat lists and hairlines), not app-style cards ── */
+#ovp-account .ac-hero{text-align:left;padding:22px 16px 14px}
+#ovp-account .ac-hero-name{font-size:30px;font-weight:800;text-align:left;letter-spacing:0;line-height:1.1;color:#111}
+#ovp-account .ac-hero-email{text-align:left;font-size:14px;margin:4px 0 12px;color:#666}
+#ovp-account .ac-hero-vip{display:inline-block;border-radius:0;box-shadow:none;background:#111;color:#fff;font-size:11px;padding:5px 10px;letter-spacing:.08em;margin:0 0 16px}
+#ovp-account .ac-hero-vip::before{display:none}
+#ovp-account .ac-stats-row{display:flex;border:0;border-top:1px solid #e0dbd3;border-bottom:1px solid #e0dbd3;border-radius:0;box-shadow:none;background:none;margin:0;width:auto}
+#ovp-account .ac-stat-cell{flex:1;padding:14px 4px;border:0;border-right:1px solid #e0dbd3;background:none;box-shadow:none;border-radius:0}
+#ovp-account .ac-stat-cell:last-child{border-right:0}
+#ovp-account .ac-stat-v{font-size:24px;font-weight:800}
+#ovp-account .ac-signout{border-radius:4px}
+#ac-panel-overview h2{display:none}
+#ac-panel-overview button[onclick*="ovp-services"]:not(.ac-support-btn){background:none!important;color:#111!important;border:none!important;border-radius:0!important;padding:0!important;text-align:left!important;text-decoration:underline;font-family:var(--fb)!important;font-size:14px!important;font-weight:600!important;letter-spacing:0!important;text-transform:none!important;margin:2px 0 14px!important;width:auto!important;display:inline-block!important}
+#ovp-account .ac-vip-status{border-radius:0;box-shadow:none;background:#FAF8F5;border:1px solid #e0dbd3;margin:0 16px 8px;padding:14px 16px}
+#ovp-account .ac-vip-check{display:none}
+#ovp-account .ac-panel,#ac-panel-overview{background:#fff}
+#ovp-account .ac-stat-cell{text-align:left;padding-left:12px}
+#ovp-account .ac-action-btn{margin:0!important;display:flex;align-items:center;width:100%;background:#fff;border:0!important;border-bottom:1px solid #e0dbd3!important;border-radius:0;box-shadow:none;padding:18px 0;text-align:left;gap:0}
+#ovp-account .ac-action-icon{display:none!important}
+#ovp-account .ac-action-title{font-family:var(--fb);font-size:16px;font-weight:700;text-transform:none;letter-spacing:0}
+#ovp-account .ac-action-sub{font-size:14px;color:#666;margin-top:2px}
+#ovp-account .ac-action-arrow{margin-left:auto;color:#999;font-size:22px}
+#ovp-account .ac-support{background:none}
+#ovp-account .ac-support h3{color:#111}
+#ovp-account .ac-support p{color:#555}
+#ovp-account .ac-support-btn{background:#fff;color:#111;border:1px solid #d9d4cc;border-radius:0;box-shadow:none}
+#ovp-account .ac-support-btn svg{stroke:#111}
+#ovp-account .ac-support-label{color:#111}
+#ovp-account .ac-support-sub{color:#666}
+#ovp-account .ac-card{border-radius:0;box-shadow:none}
 /* tags and pills */
 .pd-off-pill,.pd-price-badge,.pd-bdg.sale,.pd-vip-badge,.pd-lto,.pd-vip-pill,.gc-pill-badge,.ac-order-status,.chpb,.ch-vip-header{background:var(--ink);color:#fff}
 .cibdg,.ch-bag-badge{background:var(--brand-red);color:#fff}
