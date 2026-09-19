@@ -6675,8 +6675,7 @@ function submitAccount(){
         email,
         phone:     quizData.phone     || '',
         isVIP:     false,
-        foundingMember: pendingFounding,
-        vipExpires:     pendingFounding ? new Date(Date.now() + 365*24*60*60*1000).toISOString() : null,
+        vipExpires:     null,
         joinedAt:  firebase.firestore.FieldValue.serverTimestamp(),
         // Quiz preference data  -  stored under users/{uid}
         category:  quizData.category  || [],
@@ -6848,117 +6847,7 @@ function doPasswordReset(){
 /* ═══════════════════════════════════════════
    CHECKOUT
 ═══════════════════════════════════════════ */
-/* PRE-LAUNCH MODE: products show live, but checkout captures a notify-me lead
-   instead of taking payment. Set to false to enable real checkout once payments
-   and inventory are live. */
-var PRELAUNCH = false;
-
-/* ---- FOUNDING MEMBER OFFER ----
-   First N visitors get 1 year of the full VIP discount free (no monthly fee, no
-   tokens). Adjust the cap or turn the auto-popup off with the flags below. */
-var FOUNDING_CAP = 250;
-var FOUNDING_AUTOSHOW = true;
-var foundingCount = 0;
-var pendingFounding = false;
-
-function loadFoundingCount(cb){
-  if(!db){ if(cb) cb(foundingCount); return; }
-  db.collection('meta').doc('founding').get().then(function(d){
-    foundingCount = (d.exists && d.data().count) || 0;
-    if(cb) cb(foundingCount);
-  }).catch(function(){ if(cb) cb(foundingCount); });
-}
-function foundingSpotsLeft(){ return Math.max(0, FOUNDING_CAP - foundingCount); }
-
-function showFoundingOffer(){
-  var ex = document.getElementById('founding-modal'); if(ex) ex.remove();
-  loadFoundingCount(function(){
-    var full = foundingCount >= FOUNDING_CAP;
-    var prefill = (user && user.email) ? user.email : '';
-    var pct = Math.min(100, Math.round((foundingCount / FOUNDING_CAP) * 100));
-    var body = full
-      ? '<div style="font-family:var(--fd);font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Founding Spots Filled</div>'
-        + '<h3 style="font-family:var(--fh,serif);font-size:24px;line-height:1.2;color:var(--plum);margin:0 0 12px">All ' + FOUNDING_CAP + ' founding spots are claimed</h3>'
-        + '<p style="font-size:14px;line-height:1.6;color:#6b5a63;margin:0 0 18px">Leave your email and we will hold the next wave for you.</p>'
-        + '<input id="fm-email" type="email" value="' + prefill + '" placeholder="you@email.com" style="width:100%;padding:13px 15px;border:1.5px solid #e3dade;border-radius:10px;font-size:15px;margin-bottom:12px;box-sizing:border-box">'
-        + '<button onclick="claimFounding(true)" style="width:100%;padding:14px;border:none;border-radius:10px;background:var(--plum);color:#fff;font-family:var(--fd);font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Join the Waitlist</button>'
-      : '<div style="font-family:var(--fd);font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Founding Member</div>'
-        + '<h3 style="font-family:var(--fh,serif);font-size:26px;line-height:1.18;color:var(--plum);margin:0 0 10px">One year of VIP, on the house</h3>'
-        + '<p style="font-size:14px;line-height:1.6;color:#6b5a63;margin:0 0 16px">Founding members keep the full VIP discount (up to 34% off) for a year with no monthly fee. Be one of the first ' + FOUNDING_CAP + '.</p>'
-        + '<div style="margin-bottom:16px">'
-        +   '<div style="height:8px;background:#efe7ea;border-radius:99px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,var(--plum),var(--gold));transition:width .4s"></div></div>'
-        +   '<div style="font-size:12px;font-weight:700;color:var(--plum)">' + foundingCount + ' of ' + FOUNDING_CAP + ' claimed &middot; ' + foundingSpotsLeft() + ' spots left</div>'
-        + '</div>'
-        + '<input id="fm-email" type="email" value="' + prefill + '" placeholder="you@email.com" style="width:100%;padding:13px 15px;border:1.5px solid #e3dade;border-radius:10px;font-size:15px;margin-bottom:12px;box-sizing:border-box">'
-        + '<button onclick="claimFounding(false)" style="width:100%;padding:14px;border:none;border-radius:10px;background:var(--plum);color:#fff;font-family:var(--fd);font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Claim My Founding Spot</button>';
-    var ov = document.createElement('div');
-    ov.id = 'founding-modal';
-    ov.style.cssText = 'position:fixed;inset:0;z-index:99998;background:rgba(20,8,15,.84);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px';
-    ov.innerHTML = '<div style="background:#fff;max-width:440px;width:100%;border-radius:18px;padding:34px 28px;text-align:center;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.4)">'
-      + '<button onclick="closeFoundingOffer()" aria-label="Close" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:26px;line-height:1;color:#9a8a92;cursor:pointer">&times;</button>'
-      + '<div id="fm-body">' + body + '<div id="fm-err" style="color:var(--red);font-size:12px;margin-top:10px;min-height:14px"></div></div>'
-      + '</div>';
-    document.body.appendChild(ov);
-    document.body.style.overflow = 'hidden';
-    try{ localStorage.setItem('is_founding_seen','1'); }catch(e){}
-  });
-}
-function closeFoundingOffer(){
-  var ov = document.getElementById('founding-modal'); if(ov) ov.remove();
-  document.body.style.overflow = '';
-}
-function claimFounding(waitlist){
-  var inp = document.getElementById('fm-email');
-  var err = document.getElementById('fm-err');
-  var email = ((inp && inp.value) || (user && user.email) || '').trim();
-  if(!email || email.indexOf('@') < 1){ if(err) err.textContent = 'Please enter a valid email.'; return; }
-  var done = function(spot){
-    pendingFounding = !waitlist;
-    try{ if(!waitlist) localStorage.setItem('is_founding_email', email.toLowerCase()); }catch(e){}
-    var b = document.getElementById('fm-body');
-    if(!b) return;
-    b.innerHTML = '<div style="font-size:42px;line-height:1;color:var(--gold);margin-bottom:8px">&#10003;</div>'
-      + '<h3 style="font-family:var(--fh,serif);font-size:24px;color:var(--plum);margin:0 0 10px">' + (waitlist ? 'You are on the waitlist' : 'You are founding member #' + spot) + '</h3>'
-      + '<p style="font-size:14px;line-height:1.6;color:#6b5a63;margin:0 0 22px">' + (waitlist ? 'We will reach out the moment the next wave opens.' : 'Your year of VIP is reserved to this email. We will reach out the moment the doors open.') + '</p>'
-      + '<button onclick="closeFoundingOffer()" style="width:100%;padding:13px;border:1.5px solid var(--plum);border-radius:10px;background:#fff;color:var(--plum);font-family:var(--fd);font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Keep Exploring</button>';
-  };
-  try{ gaEvent('lead', { source: waitlist ? 'founding_waitlist' : 'founding_member' }); }catch(e){}
-  try{
-    klaviyoIdentify({ email: email, source: waitlist ? 'founding_waitlist' : 'founding_member' });
-    klaviyoTrackEvent(waitlist ? 'Founding Waitlist Joined' : 'Founding Member Claimed', { customerEmail: email });
-  }catch(e){}
-  if(!db){ done(foundingCount + 1); return; }
-  if(waitlist){
-    db.collection('founding_waitlist').doc(email.toLowerCase()).set({ email: email, createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).catch(function(){});
-    done(0); return;
-  }
-  var already = false;
-  try{ already = localStorage.getItem('is_founding_email') === email.toLowerCase(); }catch(e){}
-  if(already){ done(foundingCount); return; }
-  var spot = foundingCount + 1;
-  db.collection('founding_members').doc(email.toLowerCase()).set({
-    email: email, spot: spot, userId: (user && user.uid) || null,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function(){
-    return db.collection('meta').doc('founding').set({ count: firebase.firestore.FieldValue.increment(1) }, { merge: true });
-  }).then(function(){ foundingCount = spot; done(spot); })
-  .catch(function(e){ console.warn('[IS] founding claim failed:', e); done(spot); });
-}
-function maybeFoundingAutoShow(tries){
-  tries = tries || 0;
-  if(!FOUNDING_AUTOSHOW) return;
-  try{ if(localStorage.getItem('is_founding_seen')) return; }catch(e){}
-  if(user) return;
-  if(tries > 6) return;
-  if(document.body.style.overflow === 'hidden' || document.getElementById('founding-modal') || document.getElementById('launch-wall')){
-    setTimeout(function(){ maybeFoundingAutoShow(tries + 1); }, 4000); return;
-  }
-  showFoundingOffer();
-}
-window.addEventListener('load', function(){ setTimeout(function(){ maybeFoundingAutoShow(0); }, 6000); });
-
 function openCheckout(){
-  if(PRELAUNCH){ showLaunchWall(); return; }
   if(cart.length===0){ toast('Your bag is empty!'); return; }
   closeCart();
   checkoutStep=1;
@@ -6972,65 +6861,6 @@ function openCheckout(){
 function closeCheckout(){
   document.getElementById('cho').classList.remove('open');
   document.body.style.overflow='';
-}
-
-/* Pre-launch checkout wall: captures a notify-me lead instead of taking payment. */
-function showLaunchWall(){
-  if(cart.length===0){ toast('Your bag is empty!'); return; }
-  closeCart();
-  var existing = document.getElementById('launch-wall'); if(existing) existing.remove();
-  var email = (user && user.email) ? user.email : '';
-  var captureBlock = email
-    ? '<div style="background:#f7f2f4;border:1px solid #ece2e7;border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.5;color:var(--plum);margin-bottom:16px;word-break:break-all">We will alert <strong>' + email + '</strong> the moment they drop.</div>'
-    : '<input id="lw-email" type="email" placeholder="you@email.com" style="width:100%;padding:13px 15px;border:1.5px solid #e3dade;border-radius:10px;font-size:15px;margin-bottom:12px;box-sizing:border-box">';
-  var ov = document.createElement('div');
-  ov.id = 'launch-wall';
-  ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(20,8,15,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px';
-  ov.innerHTML = '<div style="background:#fff;max-width:440px;width:100%;border-radius:18px;padding:34px 28px;text-align:center;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.4)">'
-    + '<button onclick="closeLaunchWall()" aria-label="Close" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:26px;line-height:1;color:#9a8a92;cursor:pointer">&times;</button>'
-    + '<div id="lw-body">'
-    + '<div style="font-family:var(--fd);font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Almost Live</div>'
-    + '<h3 style="font-family:var(--fh,serif);font-size:26px;line-height:1.2;color:var(--plum);margin:0 0 12px">These pieces drop soon</h3>'
-    + '<p style="font-size:14px;line-height:1.6;color:#6b5a63;margin:0 0 18px">They are not in stock just yet, but they are coming. Tap below and you will be first to know the moment they drop.</p>'
-    + captureBlock
-    + '<button onclick="submitLaunchWall()" style="width:100%;padding:14px;border:none;border-radius:10px;background:var(--plum);color:#fff;font-family:var(--fd);font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Notify Me When Live</button>'
-    + '<div id="lw-err" style="color:var(--red);font-size:12px;margin-top:10px;min-height:14px"></div>'
-    + '</div>'
-    + '</div>';
-  document.body.appendChild(ov);
-  document.body.style.overflow='hidden';
-}
-function closeLaunchWall(){
-  var ov = document.getElementById('launch-wall'); if(ov) ov.remove();
-  document.body.style.overflow='';
-}
-function submitLaunchWall(){
-  var inp = document.getElementById('lw-email');
-  var err = document.getElementById('lw-err');
-  var email = (user && user.email) ? user.email : (((inp && inp.value) || '').trim());
-  if(!email || email.indexOf('@') < 1){ if(err) err.textContent = 'Please enter a valid email.'; return; }
-  var items = cart.map(function(i){ var p = PRODUCTS.find(function(x){ return String(x.id)===String(i.id); }); return p ? { id:p.id, name:p.name } : null; }).filter(Boolean);
-  if(db){
-    db.collection('restock_notify').add({
-      email: email,
-      userId: (user && user.uid) || null,
-      items: items,
-      source: 'launch_wall',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    }).catch(function(e){ console.warn('[IS] launch wall capture failed:', e); });
-  }
-  try{ gaEvent('lead', { source:'launch_wall', value: items.length }); }catch(e){}
-  try{
-    klaviyoIdentify({ email: email, source: 'launch_wall' });
-    klaviyoTrackEvent('Launch Wall Lead', { customerEmail: email, items: items.map(function(i){ return i.name; }).join(', ') });
-  }catch(e){}
-  var body = document.getElementById('lw-body');
-  if(body){
-    body.innerHTML = '<div style="font-size:42px;line-height:1;color:var(--gold);margin-bottom:8px">&#10003;</div>'
-      + '<h3 style="font-family:var(--fh,serif);font-size:24px;color:var(--plum);margin:0 0 10px">You are on the list</h3>'
-      + '<p style="font-size:14px;line-height:1.6;color:#6b5a63;margin:0 0 22px">We will email you the second these are available. Thanks for being early.</p>'
-      + '<button onclick="closeLaunchWall()" style="width:100%;padding:13px;border:1.5px solid var(--plum);border-radius:10px;background:#fff;color:var(--plum);font-family:var(--fd);font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Keep Browsing</button>';
-  }
 }
 
 function renderCheckout(){
