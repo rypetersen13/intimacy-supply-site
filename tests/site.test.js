@@ -70,3 +70,12 @@ test("featured order leads with what shoppers buy, spread across brands", { skip
   const has = rx => top.filter(p => rx.test(p.name)).length;
   assert.ok(has(/vibrat|rabbit|wand|bullet/i) >= 4 && has(/dildo|dong/i) >= 4 && has(/teddy|babydoll|chemise|bodysuit|corset|bustier|set/i) >= 4);
 });
+
+test("partner pages carry no invented claims and the dashboard never reads Firestore directly", { skip: !exists("partners.html") }, () => {
+  const pages = ["partners.html", "creator.html", "dashboard.html"].map(read).join("\n");
+  for (const bad of [/50K\+/, /5M\b/, /\$69\.95/, /\$3\.50/, /Sarah M\./, /picsum\.photos/, /legal\?type/, /Real Members/]) assert.ok(!bad.test(pages), "found: " + bad);
+  const dash = read("dashboard.html");
+  assert.ok(!/collection\(/.test(dash) && !/accessCode/.test(dash), "dashboard reads data or codes directly");
+  assert.ok(/\/\.netlify\/functions\/affiliate/.test(dash));
+  assert.ok(/\$25/.test(read("partners.html")) && !/\$50 minimum/.test(read("partners.html")));
+});

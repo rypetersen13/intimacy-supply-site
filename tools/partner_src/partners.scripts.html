@@ -1,0 +1,112 @@
+<script>
+var selectedPlatforms = ['Reddit', 'Adult Lifestyle'];
+
+// Klaviyo notification (same account as the rest of the site). Set up a Klaviyo
+// flow triggered by the "Partner Application Submitted" metric to email yourself.
+var KL = { enabled: true, companyId: 'UFRYNs' };
+function klaviyoIdentify(email, props){
+  if(!KL.enabled || !email) return;
+  fetch('https://a.klaviyo.com/client/profiles/?company_id=' + KL.companyId, {
+    method:'POST', headers:{'Content-Type':'application/json','revision':'2023-02-22'},
+    body: JSON.stringify({ data:{ type:'profile', attributes:{ email: email, properties: props || {} } } })
+  }).catch(function(){});
+}
+function klaviyoTrack(metric, email, props){
+  if(!KL.enabled || !email) return;
+  fetch('https://a.klaviyo.com/client/events/?company_id=' + KL.companyId, {
+    method:'POST', headers:{'Content-Type':'application/json','revision':'2023-02-22'},
+    body: JSON.stringify({ data:{ type:'event', attributes:{ metric:{data:{type:'metric',attributes:{name:metric}}}, profile:{data:{type:'profile',attributes:{email:email}}}, properties: props || {}, time:new Date().toISOString() } } })
+  }).catch(function(){});
+}
+
+function togglePlatform(el, name){
+  el.classList.toggle('sel');
+  var idx = selectedPlatforms.indexOf(name);
+  if(idx > -1){
+    selectedPlatforms.splice(idx,1);
+  } else {
+    selectedPlatforms.push(name);
+  }
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+function submitApplication(){
+  var fname    = document.getElementById('f-fname').value.trim();
+  var lname    = document.getElementById('f-lname').value.trim();
+  var email    = document.getElementById('f-email').value.trim();
+  var handle   = document.getElementById('f-handle').value.trim();
+  var reach    = document.getElementById('f-reach').value;
+  var link     = document.getElementById('f-link').value.trim();
+  var why      = document.getElementById('f-why').value.trim();
+  var promo    = document.getElementById('f-promo').value.trim();
+
+  if(!fname || !lname){ showToast('Please enter your full name.'); return; }
+  if(!email || !email.includes('@')){ showToast('Please enter a valid email address.'); return; }
+  if(!handle){ showToast('Please enter your primary handle or username.'); return; }
+  if(!reach){ showToast('Please select your approximate monthly reach.'); return; }
+  if(!link){ showToast('Please include a link to your profile or content.'); return; }
+  if(!why){ showToast('Please tell us about your audience.'); return; }
+  if(selectedPlatforms.length === 0){ showToast('Please select at least one platform.'); return; }
+
+  var appData = {
+    name:      fname + ' ' + lname,
+    firstName: fname,
+    lastName:  lname,
+    email:     email,
+    handle:    handle,
+    reach:     reach,
+    link:      link,
+    why:       why,
+    promo:     promo,
+    platforms: selectedPlatforms,
+    status:    'pending',
+    submittedAt: new Date().toISOString(),
+  };
+
+  var btn = document.querySelector('.btn-submit');
+  btn.textContent = 'Submitting...';
+  btn.disabled = true;
+
+  if(window.db){
+    window.db.collection('partner_applications').add(
+      Object.assign(appData, { serverTs: firebase.firestore.FieldValue.serverTimestamp() })
+    ).then(function(){
+      klaviyoIdentify(email, { partner_handle: handle, partner_reach: reach, partner_platforms: (selectedPlatforms||[]).join(', '), source: 'partner_application' });
+      klaviyoTrack('Partner Application Submitted', email, { name: fname + ' ' + lname, handle: handle, reach: reach, link: link });
+      document.getElementById('application-form').style.display = 'none';
+      document.getElementById('success-state').style.display = 'block';
+      window.scrollTo({ top: document.getElementById('apply').offsetTop - 80, behavior: 'smooth' });
+    }).catch(function(e){
+      console.error('[IS] Application save failed:', e);
+      showToast('Something went wrong. Please try again or email hello@intimacysupply.com');
+      btn.textContent = 'Submit Application';
+      btn.disabled = false;
+    });
+  } else {
+    // Firebase unavailable: do NOT show a fake success screen. Send them to email.
+    showToast('We could not reach our servers. Please email hello@intimacysupply.com and we will get you set up.');
+    btn.textContent = 'Submit Application';
+    btn.disabled = false;
+  }
+}
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  var config = {
+    apiKey:    'AIzaSyBQfmhqROjix1vGv_l1f-AxGGdPwCGVGzQ',
+    projectId: 'intimacy-supply',
+  };
+  try {
+    if(!firebase.apps.length) firebase.initializeApp(config);
+    window.db = firebase.firestore();
+  } catch(e){ console.warn('[IS] Firebase init failed on partners page:', e); }
+})();
+</script>

@@ -1,371 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title id="page-title">Exclusive VIP Offer  -  Intimacy Supply</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,900&family=Barlow:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --plum:#4A1D38;--plum-l:#6B2D52;--black:#0D0D0D;
-  --yellow:#FFE600;--red:#D4000F;--off:#F8F5F2;
-  --muted:#666;--border:#E5E5E5;
-  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
-}
-/* ── BRAND WORDMARK (unified v3.72) ── */
-.logo-wordmark{display:flex;flex-direction:column;align-items:center;gap:0;line-height:1;text-decoration:none}
-.logo-intimacy{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);line-height:1}
-.logo-supply{font-family:'Cormorant Garamond',Georgia,serif;font-size:11px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--plum);line-height:1;margin-top:1px}
-.logo-wordmark.dark .logo-intimacy{color:#fff}
-.logo-wordmark.dark .logo-supply{color:rgba(255,255,255,.82)}
-.logo-wordmark.sm .logo-intimacy{font-size:16px;letter-spacing:.16em}
-.logo-wordmark.sm .logo-supply{font-size:8.5px;letter-spacing:.3em}
-.logo-area-tag{font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-left:10px;padding-left:10px;border-left:1px solid rgba(255,255,255,.18)}
-
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--fb);color:var(--black);background:#fff;overflow-x:hidden}
-
-/* HEADER */
-.header{
-  position:sticky;top:0;z-index:100;
-  background:rgba(17,17,17,.96);backdrop-filter:blur(10px);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:13px 20px;border-bottom:1px solid rgba(255,255,255,.07);
-}
-.header-logo{
-  font-family:var(--fd);font-size:18px;font-weight:900;
-  text-transform:uppercase;color:#fff;text-decoration:none;
-  display:flex;align-items:center;gap:4px;
-}
-.header-logo .dot{color:var(--plum)}
-.header-cta{
-  background:var(--yellow);color:var(--black);
-  font-family:var(--fd);font-size:14px;font-weight:900;
-  text-transform:uppercase;letter-spacing:.06em;
-  padding:9px 20px;border-radius:3px;text-decoration:none;border:none;cursor:pointer;
-  transition:background .15s;
-}
-.header-cta:hover{background:#e6d400}
-
-/* HERO */
-.hero{
-  background:linear-gradient(160deg,#0A0308 0%,#1A0A14 40%,#3D1530 70%,#5A2248 100%);
-  min-height:70vh;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;text-align:center;padding:60px 20px;
-  position:relative;overflow:hidden;
-}
-.hero-bg{
-  position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse 70% 50% at 50% 60%,rgba(107,45,82,.2),transparent);
-}
-.hero-glyph{
-  position:absolute;font-size:360px;color:rgba(255,255,255,.02);
-  font-family:var(--fd);font-weight:900;line-height:1;pointer-events:none;
-  top:50%;left:50%;transform:translate(-50%,-50%);user-select:none;
-}
-.hero-inner{position:relative;z-index:2;max-width:600px}
-.creator-badge{
-  display:inline-flex;align-items:center;gap:10px;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-  border-radius:99px;padding:8px 18px;margin-bottom:24px;
-}
-.creator-avatar{
-  width:32px;height:32px;border-radius:50%;
-  background:linear-gradient(135deg,var(--plum),#9B5DE5);
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;font-weight:900;color:#fff;font-family:var(--fd);
-  flex-shrink:0;
-}
-.creator-name-badge{font-size:13px;font-weight:700;color:#fff}
-.creator-suffix{font-size:12px;color:rgba(255,255,255,.45)}
-.hero-eyebrow{
-  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;
-  color:rgba(255,255,255,.4);margin-bottom:14px;
-}
-h1{
-  font-family:var(--fd);font-size:clamp(48px,14vw,88px);
-  font-weight:900;text-transform:uppercase;letter-spacing:-.04em;
-  line-height:.88;color:#fff;margin-bottom:18px;
-}
-h1 em{font-style:italic;color:var(--yellow)}
-.hero-sub{
-  font-size:15px;color:rgba(255,255,255,.55);line-height:1.7;
-  max-width:420px;margin:0 auto 32px;
-}
-.hero-ctas{display:flex;flex-direction:column;gap:12px;max-width:320px;margin:0 auto 44px}
-.btn-primary{
-  display:block;background:var(--yellow);color:var(--black);
-  font-family:var(--fd);font-size:20px;font-weight:900;text-transform:uppercase;
-  letter-spacing:.06em;padding:16px;border-radius:4px;text-decoration:none;
-  text-align:center;border:none;cursor:pointer;
-  box-shadow:0 6px 30px rgba(255,237,0,.2);
-  transition:background .15s,transform .15s;
-}
-.btn-primary:hover{background:#e6d400;transform:translateY(-2px)}
-.hero-trust{display:flex;justify-content:center;gap:28px;flex-wrap:wrap}
-.trust-item{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.06em}
-.trust-item svg{width:14px;height:14px;stroke:rgba(255,255,255,.35);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-
-/* HOW VIP WORKS */
-.section{padding:56px 20px;max-width:680px;margin:0 auto;background:#fff}
-.eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--plum);margin-bottom:10px}
-.section-title{font-family:var(--fd);font-size:clamp(26px,7vw,44px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;margin-bottom:12px;line-height:1}
-.section-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:36px;max-width:500px}
-
-/* VALUE PROPS */
-.vp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:36px}
-.vp{background:var(--off);border-radius:12px;padding:20px 18px}
-.vp-icon{font-size:26px;margin-bottom:10px}
-.vp strong{display:block;font-family:var(--fd);font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px}
-.vp span{font-size:12px;color:var(--muted);line-height:1.6}
-
-/* PRODUCTS PREVIEW */
-.products-strip{background:var(--off);padding:48px 20px}
-.products-inner{max-width:720px;margin:0 auto}
-.prod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
-@media(min-width:480px){.prod-grid{grid-template-columns:repeat(3,1fr)}}
-.prod-card{background:#fff;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
-.prod-img{aspect-ratio:3/4;background:#F2EDF2;display:flex;align-items:center;justify-content:center;font-size:48px;overflow:hidden}
-.prod-img img{width:100%;height:100%;object-fit:cover}
-.prod-info{padding:10px 12px}
-.prod-name{font-size:12px;font-weight:600;color:var(--black);margin-bottom:4px;line-height:1.3}
-.prod-prices{display:flex;align-items:center;gap:6px}
-.prod-vip{font-family:var(--fd);font-size:17px;font-weight:900;color:var(--plum)}
-.prod-orig{font-size:11px;color:#bbb;text-decoration:line-through}
-.prod-badge{display:inline-block;background:var(--yellow);color:var(--black);font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;margin-left:4px}
-
-/* TESTIMONIALS */
-.testimonials{padding:48px 20px;max-width:680px;margin:0 auto;background:#fff}
-.testi{background:#F8F5F2;border-radius:12px;padding:20px 22px;margin-bottom:12px}
-.testi-text{font-size:14px;color:var(--black);line-height:1.7;font-style:italic;margin-bottom:10px}
-.testi-attr{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.stars{color:#F59E0B;margin-bottom:8px;font-size:14px;letter-spacing:2px}
-
-/* URGENCY BAR */
-.urgency-bar{
-  background:var(--plum);padding:18px 20px;text-align:center;
-  font-family:var(--fd);font-size:clamp(14px,4vw,20px);font-weight:900;
-  text-transform:uppercase;letter-spacing:.04em;color:#fff;
-}
-.urgency-bar span{color:var(--yellow)}
-
-/* CTA SECTION */
-.cta-section{
-  background:linear-gradient(135deg,#0D0509,#2D1020,#4A1D38);
-  padding:56px 20px;text-align:center;color:#fff;
-}
-.cta-section h2{font-family:var(--fd);font-size:clamp(32px,9vw,60px);font-weight:900;text-transform:uppercase;letter-spacing:-.03em;line-height:.95;margin-bottom:14px}
-.cta-section h2 em{font-style:italic;color:var(--yellow)}
-.cta-section p{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:28px;line-height:1.65;max-width:420px;margin-left:auto;margin-right:auto}
-.cta-btn{
-  display:inline-block;background:var(--yellow);color:var(--black);
-  font-family:var(--fd);font-size:20px;font-weight:900;text-transform:uppercase;
-  letter-spacing:.06em;padding:16px 40px;border-radius:4px;text-decoration:none;
-  border:none;cursor:pointer;
-  box-shadow:0 6px 30px rgba(255,237,0,.25);
-  transition:background .15s,transform .15s;
-}
-.cta-btn:hover{background:#e6d400;transform:translateY(-2px)}
-.cta-note{font-size:11px;color:rgba(255,255,255,.3);margin-top:16px;line-height:1.65}
-
-/* FOOTER */
-footer{background:var(--black);padding:28px 20px;text-align:center}
-footer p{font-size:11px;color:rgba(255,255,255,.3);line-height:1.8}
-footer a{color:rgba(255,255,255,.4);text-decoration:none}
-
-@media(min-width:600px){.vp-grid{grid-template-columns:repeat(4,1fr)}}
-</style>
-</head>
-<body>
-
-<!-- HEADER -->
-<header class="header">
-  <a href="/" class="header-logo">
-    <span class="logo-wordmark dark"><span class="logo-intimacy">Intimacy</span><span class="logo-supply">Supply</span></span>
-  </a>
-  <a href="/" class="header-cta" id="header-cta-btn">Get Up to 34% Off</a>
-</header>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-glyph"><span class="ig ig-hf"></span></div>
-  <div class="hero-inner">
-
-    <div class="creator-badge">
-      <div class="creator-avatar" id="creator-avatar">?</div>
-      <span class="creator-name-badge" id="creator-name-badge">Creator</span>
-      <span class="creator-suffix">exclusive offer</span>
-    </div>
-
-    <div class="hero-eyebrow" id="hero-eyebrow">You're invited by a friend</div>
-    <h1 id="hero-h1">Get<br><em>up to 34% off</em><br>everything.</h1>
-    <p class="hero-sub" id="hero-sub">Your favorite creator trusts Intimacy Supply. Now you get VIP access  -  up to 34% off our entire collection, plain packaging, and full privacy. Always.</p>
-
-    <div class="hero-ctas">
-      <a href="/" class="btn-primary" id="hero-main-cta">Claim Your Up to 34% Off</a>
-    </div>
-
-    <div class="hero-trust">
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Plain Packaging
-      </div>
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        100% Discreet
-      </div>
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        Cancel Anytime
-      </div>
-    </div>
-
-  </div>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIP offer</title>
+<meta name="description" content="Up to 34% off everything with VIP membership at Intimacy Supply. Plain packaging and discreet billing.">
+<link rel="canonical" href="https://intimacysupply.com/creator.html"><meta name="theme-color" content="#4A1D38">
+<link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+</head><body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="bar">VIP members save up to 34% on everything. <a href="/vip-membership">See how it works</a></div>
+<header class="site"><div class="hd">
+<a class="logo" href="/">Intimacy Supply</a>
+<nav class="main" aria-label="Main"><a href="/">Shop</a><a href="/p/">All products</a><a href="/brands/">Brands</a><a href="/vip-membership">VIP membership</a><a href="/about">About</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></nav>
+<a class="bagbtn" href="/">Shop now</a>
+<details class="menu"><summary>Menu</summary><div><a href="/">Shop</a><a href="/p/">All products</a><a href="/brands/">Brands</a><a href="/vip-membership">VIP membership</a><a href="/about">About</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div></details>
+</div></header>
+<main id="main"><section class="vip-hero">
+<div class="vip-hero-in">
+<div class="eyebrow-w" id="c-eyebrow">VIP offer</div>
+<h1 id="c-h1">Up to 34% off everything</h1>
+<p class="lede" id="c-sub">VIP members save up to 34% on every order, get a $50 Member Token each month, and can skip or cancel any time. Orders ship in plain packaging with discreet billing.</p>
+<a class="btn-red" id="c-cta" href="/">Shop VIP prices</a>
+<div class="facts">
+<div><b>Up to 34%</b><span>off every item, applied automatically</span></div>
+<div><b>$50</b><span>Member Token each month</span></div>
+<div><b>Plain</b><span>packaging, discreet billing</span></div>
+<div><b>Skip or cancel</b><span>any time, no fee</span></div>
+</div>
+</div>
 </section>
-
-<!-- URGENCY -->
-<div class="urgency-bar">
-  VIP offer active &nbsp; - &nbsp; <span>up to 34% off</span> unlocked through your creator's link
+<div class="narrow">
+<h2>Popular right now</h2>
+<p class="lede-d">Every item shows the VIP price and the regular price.</p>
+<div class="grid" id="c-grid"></div>
+<h2>How VIP works</h2>
+<ol class="steps">
+<li><strong>Shop</strong>Browse over 7,000 products from 550+ brands. Create a free account to add items to your bag.</li>
+<li><strong>Choose VIP at checkout</strong>VIP membership is $39.95 a month, billed on the 6th. You are charged at VIP prices on your first order, and your card statement shows Dharma Media &amp; Technology LLC.</li>
+<li><strong>Use your monthly token</strong>Each token covers up to $50 toward an item. Skip a month between the 1st and 5th and you are not charged.</li>
+<li><strong>Cancel any time</strong>Cancel online or by phone. No cancellation fees. Full terms are in the <a href="/vip-membership">VIP membership details</a> and the <a href="/terms">Terms of Service</a>.</li>
+</ol>
+<a class="btn-red" id="c-cta2" href="/">Start shopping</a>
+<p class="cmp-note" style="margin-top:22px">This page contains a referral link. The person who shared it may earn a commission if you purchase. Adults 18+ only.</p>
+</div></main>
+<footer class="site"><div class="ft">
+<div><h3>Shop</h3><a href="/">Shop all</a><a href="/p/">Product directory</a><a href="/brands/">Brands</a><a href="/vip-membership">VIP membership</a></div>
+<div><h3>Help</h3><a href="/contact">Contact us</a><a href="/faq">FAQ</a><a href="/shipping-returns">Shipping &amp; returns</a><a href="/refund-policy">Refunds &amp; cancellation</a><a href="/recognize-a-charge">Recognize a charge?</a><a href="/complaints">Complaints</a></div>
+<div><h3>Company</h3><a href="/about">About us</a><a href="/affiliate-disclosure">Affiliate disclosure</a><a href="/affiliate-terms">Affiliate program terms</a><a href="/compliance">Compliance</a></div>
+<div><h3>Legal</h3><a href="/terms">Terms of service</a><a href="/privacy">Privacy policy</a><a href="/do-not-sell">Do not sell my information</a><a href="/gdpr">GDPR notice</a><a href="/accessibility">Accessibility</a><a href="/email-preferences">Email preferences</a></div>
 </div>
-
-<!-- HOW IT WORKS -->
-<div class="section">
-  <div class="eyebrow">VIP Membership</div>
-  <div class="section-title">What You Get</div>
-  <p class="section-sub">This isn't a one-time coupon. It's a full VIP membership with permanent access to the best pricing in the category.</p>
-  <div class="vp-grid">
-    <div class="vp">
-      <div class="vp-icon"></div>
-      <strong>Up to 34% Off</strong>
-      <span>VIP pricing on every product. Automatically applied. No code needed.</span>
-    </div>
-    <div class="vp">
-      <div class="vp-icon"></div>
-      <strong>Plain Box</strong>
-      <span>No brand markings outside. Statement shows Dharma Media & Technology LLC.</span>
-    </div>
-    <div class="vp">
-      <div class="vp-icon"></div>
-      <strong>$69.95/mo Credit</strong>
-      <span>Monthly credit to spend on anything. Skip any month, cancel any time.</span>
-    </div>
-    <div class="vp">
-      <div class="vp-icon"></div>
-      <strong>VIP Drops</strong>
-      <span>Early access to new arrivals before they go to general sale.</span>
-    </div>
-  </div>
-  <a href="/" class="btn-primary" style="max-width:340px;margin:0 auto;display:block;text-align:center">Start Shopping  -  Up to 34% Off</a>
-</div>
-
-<!-- PRODUCTS -->
-<div class="products-strip">
-  <div class="products-inner">
-    <div class="eyebrow">VIP Pricing</div>
-    <div class="section-title">Popular Right Now</div>
-    <div class="prod-grid">
-      <div class="prod-card">
-        <div class="prod-img"><img src="https://picsum.photos/seed/IS-p1-a/400/530" alt="Clit Suction Stimulator" loading="lazy" onerror="this.parentElement.innerHTML=''"></div>
-        <div class="prod-info">
-          <div class="prod-name">Clit Suction Stimulator</div>
-          <div class="prod-prices"><span class="prod-vip">$29.98</span><span class="prod-orig">$149.95</span><span class="prod-badge">Up to 34% Off</span></div>
-        </div>
-      </div>
-      <div class="prod-card">
-        <div class="prod-img"><img src="https://picsum.photos/seed/IS-p5-a/400/530" alt="Lace Halter Bralette Set" loading="lazy" onerror="this.parentElement.innerHTML=''"></div>
-        <div class="prod-info">
-          <div class="prod-name">Lace Halter Bralette Set</div>
-          <div class="prod-prices"><span class="prod-vip">$19.00</span><span class="prod-orig">$109.95</span><span class="prod-badge">Up to 34% Off</span></div>
-        </div>
-      </div>
-      <div class="prod-card">
-        <div class="prod-img"><img src="https://picsum.photos/seed/IS-p3-a/400/530" alt="Luxury Rabbit Vibrator" loading="lazy" onerror="this.parentElement.innerHTML=''"></div>
-        <div class="prod-info">
-          <div class="prod-name">Luxury Rabbit Vibrator</div>
-          <div class="prod-prices"><span class="prod-vip">$39.98</span><span class="prod-orig">$199.95</span><span class="prod-badge">Up to 34% Off</span></div>
-        </div>
-      </div>
-    </div>
-    <div style="text-align:center">
-      <a href="/" class="btn-primary" style="display:inline-block;padding:14px 36px;text-decoration:none">See All Products</a>
-    </div>
-  </div>
-</div>
-
-<!-- TESTIMONIALS -->
-<div class="testimonials">
-  <div class="eyebrow">Real Members</div>
-  <div class="section-title">What People Say</div>
-  <div class="testi">
-    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-    <div class="testi-text">"Genuinely shocked at the quality for the price. Ordered three things, all arrived in a plain brown box exactly as promised. Already a monthly subscriber."</div>
-    <div class="testi-attr">Sarah M.  -  Austin, TX</div>
-  </div>
-  <div class="testi">
-    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-    <div class="testi-text">"The skip month feature is actually real and actually works. I skipped two months and the team was totally chill about it. Great experience."</div>
-    <div class="testi-attr">James K.  -  Seattle, WA</div>
-  </div>
-  <div class="testi">
-    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-    <div class="testi-text">"My statement says Dharma Media & Technology LLC. My partner has absolutely no idea. The discreet shipping is the whole reason I subscribe."</div>
-    <div class="testi-attr">Anonymous Member</div>
-  </div>
-</div>
-
-<!-- FINAL CTA -->
-<section class="cta-section">
-  <h2 id="final-cta-h2">Your <em>up to 34% off</em><br>is waiting.</h2>
-  <p id="final-cta-p">This link gives you VIP access immediately. Shop the full collection at up to 34% off. Cancel anytime. No questions asked.</p>
-  <a href="/" class="cta-btn">Claim VIP Access Now</a>
-  <div class="cta-note">$69.95/month after intro order &bull; Skip or cancel anytime &bull; Plain packaging always</div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <p>
-    <a href="/">intimacysupply.com</a> &bull;
-    <a href="/?legal=terms">Terms</a> &bull;
-    <a href="/?legal=privacy">Privacy</a> &bull;
-    18+ Only
-  </p>
-  <p style="margin-top:6px">Dharma Media & Technology LLC &bull; This page contains a referral link. The creator may earn a commission.</p>
-</footer>
-
-<script>
-// Read creator handle from URL: /creator?ref=sarah or ?creator=sarah
+<div class="fine">&copy; 2026 Intimacy Supply &middot; Dharma Media &amp; Technology LLC &middot; c/o Northwest Registered Agent, 30 N Gould St Ste N, Sheridan, WY 82801 &middot; hello@intimacysupply.com &middot; (559) 334-0826<br>Plain packaging. Discreet billing. Adults 18+ only.</div>
+</footer><script>
 (function(){
-  var params = new URLSearchParams(window.location.search);
-  var handle = params.get('ref') || params.get('creator') || params.get('c') || '';
-  handle = handle.replace(/[^a-zA-Z0-9_\-\.]/g,'');
-
-  if(!handle) return; // Generic page if no handle provided
-
-  // Capitalize for display
-  var displayName = handle.charAt(0).toUpperCase() + handle.slice(1);
-  var initial = displayName.charAt(0).toUpperCase();
-
-  // Update page
-  document.title = displayName + "'s Exclusive VIP Offer  -  Intimacy Supply";
-  document.getElementById('creator-avatar').textContent = initial;
-  document.getElementById('creator-name-badge').textContent = '@' + handle;
-  document.getElementById('hero-eyebrow').textContent = 'Exclusive offer from @' + handle;
-  document.getElementById('hero-h1').innerHTML = '<em>' + displayName + '</em> sent<br>you up to 34% off.';
-  document.getElementById('hero-sub').textContent = '@' + handle + ' is a partner with Intimacy Supply. This exclusive link unlocks VIP pricing  -  up to 34% off everything, plain packaging, total privacy.';
-  document.getElementById('final-cta-h2').innerHTML = '<em>' + displayName + "'s</em><br>offer is waiting.";
-  document.getElementById('final-cta-p').textContent = '@' + handle + " shared this link so you could access VIP pricing. up to 34% off the full collection. Skip or cancel any month, no questions asked.";
-
-  // All CTAs add the ref parameter so it gets captured by the main site tracking
-  var ref = '?ref=' + handle;
-  document.getElementById('header-cta-btn').href = '/' + ref;
-  document.getElementById('hero-main-cta').href = '/' + ref;
-  document.querySelectorAll('a[href="/"]').forEach(function(el){
-    el.href = '/' + ref;
-  });
-
+  var p = new URLSearchParams(location.search);
+  var handle = (p.get('ref') || p.get('creator') || p.get('c') || '').replace(/[^a-zA-Z0-9_.\-]/g, '').slice(0, 60);
+  var q = handle ? '?ref=' + handle : '';
+  function el(id){ return document.getElementById(id); }
+  if (handle) {
+    document.title = '@' + handle + ' shared a VIP offer | Intimacy Supply';
+    el('c-eyebrow').textContent = 'Shared by @' + handle;
+    el('c-h1').textContent = 'Up to 34% off everything';
+    el('c-sub').textContent = '@' + handle + ' is a partner of Intimacy Supply. VIP members save up to 34% on every order, get a $50 Member Token each month, and can skip or cancel any time.';
+  }
+  document.querySelectorAll('a[href="/"]').forEach(function(a){ a.href = '/' + q; });
+  fetch('/products.json').then(function(r){ return r.json(); }).then(function(list){
+    var seen = {}, out = [];
+    list.filter(function(x){ return x.inStock !== false && x.f != null; }).sort(function(a, b){ return a.f - b.f; }).forEach(function(x){
+      if (out.length < 4 && !seen[x.s]) { seen[x.s] = 1; out.push(x); }
+    });
+    el('c-grid').innerHTML = out.map(function(x){
+      var save = x.orig > x.price ? Math.round((1 - x.price / x.orig) * 100) : 0;
+      var img = '<img src="' + x.image.replace(/"/g, '&quot;') + '" alt="" loading="lazy" width="400" height="400">';
+      var name = x.name.replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+      return '<a class="card" href="/' + (q ? q + '&' : '?') + 'product=' + encodeURIComponent(x.model) + '"><div class="card-img">' + img + '</div><div class="card-name">' + name + '</div>' +
+        '<div class="pr pr-sm"><div class="pr-vip"><b>$' + x.price.toFixed(2) + '</b><span>VIP price</span></div>' +
+        (save ? '<div class="pr-reg"><s>$' + x.orig.toFixed(2) + '</s><span>Regular price</span></div><div class="pr-save">Save ' + save + '% with VIP</div>' : '') + '</div></a>';
+    }).join('');
+  }).catch(function(){ el('c-grid').innerHTML = ''; });
 })();
-</script>
-
-</body>
-</html>
+</script></body></html>

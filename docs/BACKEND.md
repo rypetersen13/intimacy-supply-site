@@ -15,6 +15,7 @@
 | ccbill-checkout-link / ccbill-onetime-link | Server-priced CCBill links (see above) |
 | ccbill-webhook | Payment events from CCBill; amount check; VIP status; tokens |
 | ccbill-cancel | Cancels a subscription through CCBill Datalink |
+| affiliate | Creator dashboard: verifies handle + access code, returns only that partner's totals (no customer data), creates payout requests |
 | get-order | Order confirmation data (needs access key) |
 | membership-request | Membership requests to the operator |
 | client-error | Browser error reports written to the function log |

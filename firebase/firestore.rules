@@ -78,17 +78,11 @@ service cloud.firestore {
     match /cancellations/{id}         { allow create: if signedIn() && request.resource.data.userId == request.auth.uid; allow read, update, delete: if isAdmin(); }
     match /cancellation_requests/{id} { allow create: if signedIn() && request.resource.data.userId == request.auth.uid; allow read, update, delete: if isAdmin(); }
 
-    // Affiliates: only the server credits them (when an order is actually paid). Signed-in
-    // creators can read their own dashboard; the admin panel edits them.
-    match /affiliates/{handle} {
-      allow read: if signedIn();
-      allow write: if isAdmin();
-    }
-    match /payouts/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn();
-      allow update, delete: if isAdmin();
-    }
+    // Affiliates and payouts hold access codes and payout emails. Partners use the "affiliate" server
+    // function (it verifies their code and returns only their own totals); only the admin panel and the
+    // server touch these collections directly.
+    match /affiliates/{handle} { allow read, write: if isAdmin(); }
+    match /payouts/{id}        { allow read, write: if isAdmin(); }
 
     // Public partner application form.
     match /partner_applications/{id} {
