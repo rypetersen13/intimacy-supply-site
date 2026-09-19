@@ -113,3 +113,8 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--gold);outline-offs
 .jump{display:flex;flex-wrap:wrap;gap:8px 14px;margin:6px 0 18px;font-weight:700}
 .jump a{color:var(--ink)}
 .dir li a{color:var(--ink);text-decoration:none}
+
+/* own identity: plum wordmark and headings */
+.logo{color:#4A1D38}
+h1{color:#4A1D38}
+.pdp h1{color:#1B1B19}
