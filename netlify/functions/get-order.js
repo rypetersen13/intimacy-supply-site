@@ -3,7 +3,10 @@
 // totals) instead of placeholders. Read-only, single document by ID -- does
 // not expose any other order or user data.
 //
-// GET /.netlify/functions/get-order?orderId=IS-20260911-1234
+// GET /.netlify/functions/get-order?orderId=IS-20260911-1234&k=<accessKey>
+//
+// The order's random accessKey (created with the order, kept in the customer's browser) must be
+// supplied. Order numbers alone are guessable, so without the key nothing is returned.
 //
 // Required Netlify environment variables:
 //   FIREBASE_SERVICE_ACCOUNT   base64 of the service account JSON
@@ -71,10 +74,12 @@ function fromFirestoreFields(fields) {
 
 exports.handler = async function (event) {
   try {
-    const orderId = (event.queryStringParameters || {}).orderId;
-    if (!orderId) {
+    const qs = event.queryStringParameters || {};
+    const orderId = qs.orderId;
+    if (!orderId || !/^IS-\d{8}-\d{4}$/.test(orderId)) {
       return { statusCode: 400, body: JSON.stringify({ error: "orderId is required" }) };
     }
+    const providedKey = String(qs.k || "");
 
     const token = await getAccessToken();
     const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/orders/${encodeURIComponent(orderId)}`;
@@ -89,6 +94,15 @@ exports.handler = async function (event) {
 
     const doc = await res.json();
     const data = fromFirestoreFields(doc.fields || {});
+
+    // Constant-time check of the order's private access key. Same 404 as "not found" so the
+    // endpoint does not reveal which order numbers exist.
+    const storedKey = String(data.accessKey || "");
+    const okKey = providedKey.length >= 16 && storedKey.length === providedKey.length &&
+      crypto.timingSafeEqual(Buffer.from(providedKey), Buffer.from(storedKey));
+    if (!okKey) {
+      return { statusCode: 404, body: JSON.stringify({ error: "order not found" }) };
+    }
 
     // Only return what the confirmation page actually needs -- never the
     // customer's address, email, or other PII, even though this endpoint

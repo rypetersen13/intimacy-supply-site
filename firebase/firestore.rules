@@ -1,0 +1,102 @@
+rules_version = '2';
+
+// RECOMMENDED Firestore rules for Intimacy Supply.
+//
+// Principle: the browser may create and edit ITS OWN profile-type data, but it can never
+// grant itself money, membership, tokens or order status. Those are changed only by the
+// server (the Netlify functions use a service account, which bypasses these rules).
+//
+// How to publish: Firebase console > Firestore Database > Rules. Copy your CURRENT rules
+// somewhere safe first, paste this file, use the Rules Playground on the cases listed in
+// docs/BACKEND.md, then Publish. If something breaks, paste the old rules back.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    // The admin panel signs in as this account.
+    function isAdmin() { return signedIn() && request.auth.uid == 'CAssJZ6lGGXfCeukLIZwaOouDjR2'; }
+    function short(s, n) { return s is string && s.size() <= n; }
+
+    // Catalog extras and site settings: public read, admin write.
+    match /products/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /meta/{doc}    { allow read: if true; allow write: if isAdmin(); }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+
+      // New accounts start as non-members with no tokens.
+      allow create: if isOwner(uid)
+        && request.resource.data.get('isVIP', false) == false
+        && request.resource.data.get('credits', 0) == 0;
+
+      // Owners can edit their profile, but cannot make themselves a member, add tokens, or
+      // touch billing / affiliate fields. (They can still lower tokens: spending them.)
+      allow update: if isAdmin() || (isOwner(uid)
+        && (request.resource.data.get('isVIP', false) == false
+            || request.resource.data.get('isVIP', false) == resource.data.get('isVIP', false))
+        && request.resource.data.get('credits', 0) <= resource.data.get('credits', 0)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+             'ccbillSubscriptionId', 'vipProvider', 'vipActivatedAt', 'vipLastEvent',
+             'vipLastEventAt', 'vipDeactivatedAt', 'vipDeactivationReason',
+             'lastTokenIssuedAt', 'vipExpires', 'affiliate', 'creator', 'role']));
+
+      allow delete: if isOwner(uid) || isAdmin();
+    }
+
+    // Orders: a customer can place an unpaid order for themselves and read their own orders.
+    // Only the server (or admin) can change an order afterwards, so nobody can mark their own
+    // order paid or edit the expected amount.
+    match /orders/{orderId} {
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.paymentStatus == 'unpaid'
+        && request.resource.data.status == 'pending'
+        && !('expectedTotal' in request.resource.data)
+        && !('paidAt' in request.resource.data);
+      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    // Reviews are public once approved; new reviews arrive unapproved.
+    match /reviews/{id} {
+      allow read: if resource.data.approved == true || isAdmin();
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.approved == false
+        && short(request.resource.data.text, 2000);
+      allow update, delete: if isAdmin();
+    }
+
+    match /restock_notify/{id} {
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /cancellations/{id}         { allow create: if signedIn() && request.resource.data.userId == request.auth.uid; allow read, update, delete: if isAdmin(); }
+    match /cancellation_requests/{id} { allow create: if signedIn() && request.resource.data.userId == request.auth.uid; allow read, update, delete: if isAdmin(); }
+
+    // Affiliates: only the server credits them (when an order is actually paid). Signed-in
+    // creators can read their own dashboard; the admin panel edits them.
+    match /affiliates/{handle} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    match /payouts/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Public partner application form.
+    match /partner_applications/{id} {
+      allow create: if short(request.resource.data.get('email', ''), 200);
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Retired features and everything else: no client access.
+    match /{document=**} { allow read, write: if isAdmin(); }
+  }
+}

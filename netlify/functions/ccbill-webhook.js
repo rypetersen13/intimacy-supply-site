@@ -196,7 +196,7 @@ async function findLatestUnpaidOrder(token, userId) {
   return { id: newest.name.split("/").pop(), fields: fromFirestoreFields(newest.fields) };
 }
 
-async function sendOrderNotification(order, subscriptionId) {
+async function sendOrderNotification(order, subscriptionId, note) {
   if (!process.env.RESEND_API_KEY) return;
   const to = process.env.ORDER_NOTIFY_EMAIL || DEFAULT_NOTIFY_EMAIL;
   const c = order.customer || {};
@@ -205,6 +205,7 @@ async function sendOrderNotification(order, subscriptionId) {
   ).join("\n") || "  (no items on file)";
   const pricing = order.pricing || {};
   const text = [
+    ...(note ? [`*** ${note} ***`, ``] : []),
     `New paid order: ${order.orderId || "(unknown id)"}`,
     `CCBill subscription: ${subscriptionId || "-"}`,
     ``,
@@ -234,13 +235,77 @@ async function sendOrderNotification(order, subscriptionId) {
       body: JSON.stringify({
         from: "Intimacy Supply Orders <onboarding@resend.dev>",
         to: [to],
-        subject: `New order — ${order.orderId || "unknown"} — $${(pricing.total || 0).toFixed(2)}`,
+        subject: `${note ? "CHECK: " : ""}New order — ${order.orderId || "unknown"} — $${(pricing.total || 0).toFixed(2)}`,
         text,
       }),
     });
   } catch (err) {
     console.error("ccbill-webhook: order notification email failed", err.message);
   }
+}
+
+
+// ---- Payment verification --------------------------------------------------------------
+// The checkout link functions store the amount CCBill should bill in order.expectedTotal
+// (computed on the server). Here we compare it with what CCBill says was actually charged.
+// If the amounts clearly disagree the order is NOT marked paid, so it can never be fulfilled
+// from an under-payment. If we cannot verify (older orders, missing fields) we keep the
+// previous behavior but flag the order, and we never fail the webhook because of this check.
+const shared = require("./_lib/firestore");
+
+function chargedAmount(all) {
+  for (const k of ["billedInitialPrice", "accountingInitialPrice", "initialPrice", "price"]) {
+    if (all[k] !== undefined && all[k] !== "") {
+      const n = parseFloat(String(all[k]).replace(/[^0-9.]/g, ""));
+      if (!isNaN(n)) return n;
+    }
+  }
+  return null;
+}
+
+function checkAmount(orderFields, all) {
+  const expected = orderFields && typeof orderFields.expectedTotal === "number" ? orderFields.expectedTotal : null;
+  const paid = chargedAmount(all);
+  if (expected === null || paid === null) return { status: "unverified", expected, paid };
+  if (paid + 0.01 < expected) return { status: "underpaid", expected, paid };
+  return { status: "ok", expected, paid };
+}
+
+// Marks the order paid (or underpaid), notifies, and credits the affiliate once.
+async function settleOrder(token, order, subscriptionId, all, nowIso) {
+  let verdict = { status: "unverified" };
+  try { verdict = checkAmount(order.fields, all); } catch (e) { console.error("ccbill-webhook: amount check failed", e.message); }
+  const underpaid = verdict.status === "underpaid";
+  const fields = {
+    paymentStatus: { stringValue: underpaid ? "underpaid" : "paid" },
+    paymentMethod: { stringValue: "ccbill" },
+    paymentRef: { stringValue: subscriptionId || "" },
+    paidAt: { timestampValue: nowIso },
+    amountVerified: { booleanValue: verdict.status === "ok" },
+  };
+  if (verdict.paid !== null && verdict.paid !== undefined) fields.paidAmount = { doubleValue: verdict.paid };
+  await patchDoc(token, "orders/" + order.id, fields)
+    .catch(err => console.error("ccbill-webhook: failed to mark order paid", order.id, err.message));
+
+  const base = { ...order.fields, orderId: order.fields.orderId || order.id };
+  if (underpaid) {
+    console.error("ccbill-webhook: UNDERPAID order", order.id, "expected", verdict.expected, "paid", verdict.paid);
+    await sendOrderNotification(base, subscriptionId, `UNDERPAID: expected $${Number(verdict.expected).toFixed(2)}, CCBill charged $${Number(verdict.paid).toFixed(2)}. Do NOT fulfill until checked.`);
+    return verdict;
+  }
+  await sendOrderNotification(base, subscriptionId, verdict.status === "unverified" ? "Amount could not be verified against the order total" : "");
+
+  const handle = order.fields.affiliate;
+  if (handle && typeof handle === "string") {
+    try {
+      const total = Number((order.fields.pricing || {}).total) || 0;
+      await shared.incrementFields("affiliates/" + handle, {
+        totalOrders: 1, totalRevenue: total, pendingCommission: Math.round(total * 5) / 100,
+      });
+      await patchDoc(token, "affiliates/" + handle, { lastOrderAt: { timestampValue: nowIso } });
+    } catch (e) { console.error("ccbill-webhook: affiliate credit failed for", handle, e.message); }
+  }
+  return verdict;
 }
 
 function clientIp(event) {
@@ -334,13 +399,7 @@ exports.handler = async function (event) {
       if (eventType === "NewSaleSuccess") {
         const order = await findLatestUnpaidOrder(token, userId);
         if (order) {
-          await patchDoc(token, "orders/" + order.id, {
-            paymentStatus: { stringValue: "paid" },
-            paymentMethod: { stringValue: "ccbill" },
-            paymentRef: { stringValue: subscriptionId || "" },
-            paidAt: { timestampValue: nowIso },
-          }).catch(err => console.error("ccbill-webhook: failed to mark order paid", order.id, err.message));
-          await sendOrderNotification({ ...order.fields, orderId: order.fields.orderId || order.id }, subscriptionId);
+          await settleOrder(token, order, subscriptionId, all, nowIso);
         } else {
           console.error("ccbill-webhook: one-time NewSaleSuccess but no unpaid order found for user", userId);
         }
@@ -388,13 +447,7 @@ exports.handler = async function (event) {
       if (eventType === "NewSaleSuccess") {
         const order = await findLatestUnpaidOrder(token, userId);
         if (order) {
-          await patchDoc(token, "orders/" + order.id, {
-            paymentStatus: { stringValue: "paid" },
-            paymentMethod: { stringValue: "ccbill" },
-            paymentRef: { stringValue: subscriptionId || "" },
-            paidAt: { timestampValue: nowIso },
-          }).catch(err => console.error("ccbill-webhook: failed to mark order paid", order.id, err.message));
-          await sendOrderNotification({ ...order.fields, orderId: order.fields.orderId || order.id }, subscriptionId);
+          await settleOrder(token, order, subscriptionId, all, nowIso);
         } else {
           console.error("ccbill-webhook: NewSaleSuccess but no unpaid order found for user", userId);
         }
@@ -425,3 +478,6 @@ exports.handler = async function (event) {
     return { statusCode: 500, body: "error" };
   }
 };
+
+// Exposed for unit tests only.
+exports._test = { chargedAmount, checkAmount };
