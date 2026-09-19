@@ -3077,7 +3077,11 @@ function drawWheel(){
   } catch(e){ /* canvas not ready */ }
 }
 
+/* Spin wheel is switched off for now. Set to true to bring it back (it also needs an honest prize, see notes). */
+var SPIN_WHEEL_ENABLED = false;
+
 function openSpin(){
+  if(!SPIN_WHEEL_ENABLED) return;
   try {
     var spo = document.getElementById('spo');
     if(!spo) return;
@@ -3233,6 +3237,7 @@ if(wishlist.length>0){
   // Does NOT fire if quiz is open.
 
   function maybeShowSpin(){
+    if(!SPIN_WHEEL_ENABLED) return;
     if(isVIP || user) return;
     if(spinShown) return;
     var qo = document.getElementById('qo');
