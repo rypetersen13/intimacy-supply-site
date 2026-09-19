@@ -4378,6 +4378,81 @@ select.qfi{cursor:pointer;appearance:none;-webkit-appearance:none}
 #hero h1 em,#hero .heye{color:#C9A26B}
 /* savings text is ink, not red */
 .pdeal,.pp2 .pdeal{color:var(--ink)}
+
+/* ── Product page: Fabletics structure ── */
+#pdo{background:#fff}
+#pd-content{max-width:680px;margin:0 auto;background:#fff;color:#111}
+.fp-top{padding:16px 16px 12px}
+.fp-brand{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#777;margin-bottom:4px}
+.fp-name{font-family:var(--fd);font-size:27px;font-weight:800;line-height:1.08;text-transform:none;margin:0 0 6px;color:#111;letter-spacing:0}
+.fp-rat{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.fp-rc{font-size:13px;color:#666}
+.fp-offer{display:inline-block;background:#F4FF00;color:#111;font-family:var(--fd);font-weight:800;font-size:18px;text-transform:uppercase;padding:9px 12px;margin:8px 0 6px;line-height:1.1}
+.fp-nm{font-size:16px;margin:4px 0 8px;color:#111}
+.fp-nm b{font-weight:800}
+#pdo .pd-gallery-wrap{position:relative;background:#fff;margin:0;padding:0}
+#pdo .pd-gallery-scroll{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#pdo .pd-gallery-scroll::-webkit-scrollbar{display:none}
+#pdo .pd-gallery-slide{flex:0 0 88%;min-width:0;scroll-snap-align:start;aspect-ratio:3/4;background:#F1EFEB;display:flex;align-items:center;justify-content:center}
+#pdo .pd-gallery-slide img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+#pdo .pd-gallery-dots,#pdo .pd-hero-badges{display:none}
+.fp-heart{position:absolute;top:10px;right:calc(12% + 10px);width:40px;height:40px;border-radius:50%;background:#fff;border:none;box-shadow:0 1px 6px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#111}
+.fp-prog{position:relative;height:4px;background:#e6e2dc;margin:12px 16px 0}
+.fp-prog i{position:absolute;top:-1px;left:0;height:6px;width:24%;background:#1B1B19;display:block}
+.fp-body{padding:6px 16px 48px}
+.fp-lbl{font-size:15px;font-weight:600;margin-right:10px;color:#111}
+#pdo .pd-attr-row{margin:18px 0 8px;display:flex;justify-content:space-between;align-items:center}
+#pdo .pd-attr-lbl{font-size:15px;color:#111;text-transform:none;letter-spacing:0;font-weight:500}
+#pdo .pd-attr-lbl span,#pdo .pd-attr-lbl b{color:#111!important;font-weight:800;text-transform:none;letter-spacing:0}
+#pdo .pd-color-row{display:flex;gap:8px;flex-wrap:wrap}
+.fp-th{width:64px;height:84px;padding:0;border:1px solid #d9d4cc;background:#F1EFEB;cursor:pointer;flex:none}
+.fp-th.active{border:2px solid #111}
+.fp-th img{width:100%;height:100%;object-fit:cover;display:block}
+.fp-th.oos{opacity:.35;cursor:not-allowed}
+#pdo .pd-sizes{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px}
+#pdo .pd-sz{height:48px;border:1px solid #d9d4cc;background:#fff;color:#111;font-weight:700;font-size:15px;border-radius:4px;padding:0 8px;cursor:pointer}
+#pdo .pd-sz.active{border:2px solid #111}
+.fp-qty{display:flex;align-items:center;margin:20px 0 6px}
+.fp-qty .pd-qty-ctrl{display:inline-flex;border:1.5px solid #cfc9c1;border-radius:4px;overflow:hidden;background:#fff}
+.fp-qty .pd-qb{width:46px;height:44px;background:#fff;border:none;font-size:20px;color:#111;cursor:pointer}
+.fp-qty .pd-q{min-width:70px;display:flex;align-items:center;justify-content:center;font-weight:700;border-left:1.5px solid #cfc9c1;border-right:1.5px solid #cfc9c1;color:#111}
+.fp-buy{margin-top:12px;border-top:1px solid #e7e2db;padding-top:14px}
+.fp-red,.fp-black{display:block;width:100%;border:none;border-radius:4px;padding:18px 12px;font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;cursor:pointer;margin-top:10px}
+.fp-red{background:#D4000F;color:#fff}
+.fp-red:hover{background:#B8000D}
+.fp-black{background:#1B1B19;color:#fff}
+.fp-black:hover{background:#000}
+.fp-line,#pdo .pd-retail-btn.fp-line{display:block;width:100%;background:#fff;color:#111;border:1.5px solid #111;border-radius:4px;padding:16px 12px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;cursor:pointer;margin-top:10px}
+.fp-disc{font-size:12px;color:#555;line-height:1.55;margin:10px 0 4px}
+.fp-actions{display:flex;justify-content:center;gap:24px;margin:14px 0 22px}
+.fp-actions button{background:none;border:none;color:#555;font-size:14px;cursor:pointer}
+.fp-acc{border-top:1px solid #d9d4cc}
+.fp-acc:last-of-type{border-bottom:1px solid #d9d4cc}
+.fp-acc summary{list-style:none;cursor:pointer;padding:18px 2px;font-family:var(--fd);font-size:21px;font-weight:800;display:flex;justify-content:space-between;align-items:center;color:#111}
+.fp-acc summary::-webkit-details-marker{display:none}
+.fp-acc summary::after{content:'';width:9px;height:9px;border-right:2px solid #111;border-bottom:2px solid #111;transform:rotate(45deg);margin-right:6px}
+.fp-acc[open] summary::after{transform:rotate(-135deg)}
+.fp-acc-b{padding:0 2px 18px;font-size:15px;line-height:1.6;color:#222}
+.fp-acc-b ul{padding-left:18px;margin:8px 0}
+.fp-acc-b a{color:#111}
+.fp-meta{font-size:13px;color:#666}
+.fp-h{font-family:var(--fd);font-size:25px;font-weight:800;text-align:center;margin:38px 0 16px;color:#111;text-transform:none;letter-spacing:0}
+.fp-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 12px}
+.fp-card{cursor:pointer}
+.fp-card-img{aspect-ratio:3/4;background:#F1EFEB;overflow:hidden}
+.fp-card-img img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;display:block}
+.fp-card-name{font-size:14px;margin:8px 0 2px;line-height:1.3;color:#111}
+.fp-card-p b{font-family:var(--fd);font-size:21px;font-weight:800;color:#111}
+.fp-card-p span,.fp-card-o span{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#777;margin-left:6px}
+.fp-card-o s{color:#777;font-size:13px}
+.fp-avg{text-align:center;margin-bottom:10px}
+.fp-avg b{display:block;font-family:var(--fd);font-size:56px;font-weight:800;line-height:1;color:#111}
+.fp-avg span{display:block;font-size:13px;color:#666;margin-top:4px}
+.fp-muted{font-size:13px;color:#777;padding:8px 0;text-align:center}
+.fp-revform{border:1px solid #e0dbd3;padding:16px;margin-top:18px}
+.fp-stars{margin:6px 0}
+.fp-stars span{font-size:28px;color:#ccc;cursor:pointer;padding-right:4px}
+.fp-revform textarea{width:100%;border:1px solid #cfc9c1;border-radius:4px;padding:10px;font:inherit;font-size:14px;margin:8px 0;box-sizing:border-box;color:#111;background:#fff}
 /* tags and pills */
 .pd-off-pill,.pd-price-badge,.pd-bdg.sale,.pd-vip-badge,.pd-lto,.pd-vip-pill,.gc-pill-badge,.ac-order-status,.chpb,.ch-vip-header{background:var(--ink);color:#fff}
 .cibdg,.ch-bag-badge{background:var(--brand-red);color:#fff}
@@ -5982,7 +6057,7 @@ function renderProdGrid(list){
     return `<div class="pc" data-id="${p.id}">
       <div class="pi">
         <img src="${imgSrc}" alt="${p.name}" loading="lazy" onerror="var c=this.closest('.pc');if(c){c.remove();if(typeof decProdCount==='function')decProdCount();}">
-        <button class="hb ${liked?'liked':''}" onclick="event.stopPropagation();toggleWL(${pidStr},this)">${liked?'<span class="ig ig-hf"></span>':'<span class="ig ig-ho"></span>'}</button>
+        <button class="hb ${liked?'liked':''}" onclick="event.stopPropagation();toggleWL('${p.id}',this)">${liked?'<span class="ig ig-hf"></span>':'<span class="ig ig-ho"></span>'}</button>
         ${!p.inStock ? '<span class="bbn" style="background:var(--muted)">Sold Out</span>'
           : p.isNew ? '<span class="bbn">New</span>' : ''}
       </div>
@@ -6214,7 +6289,11 @@ function renderPD(){
   var displayPrice = activeVariant ? { price: activeVariant.price, orig: activeVariant.orig } : { price: p.price, orig: p.orig };
   document.getElementById('pd-name-hdr').textContent = p.name;
   const price   = isVIP ? displayPrice.price : displayPrice.orig;
-  const related = (PRODUCTS_ALL_MASTER || PRODUCTS_ALL).filter(x=>x.id!==p.id&&x.cat===p.cat).slice(0,6);
+  var _seenBase = {}; _seenBase[getBaseName(p.name)] = 1;
+  const related = (PRODUCTS_ALL_MASTER || PRODUCTS_ALL).filter(function(x){ return x.cat===p.cat && x.inStock!==false; })
+    .sort(function(a,b){ return (b.brand===p.brand) - (a.brand===p.brand); })
+    .filter(function(x){ var k=getBaseName(x.name); if(_seenBase[k]) return false; _seenBase[k]=1; return true; })
+    .slice(0,4);
 
   const gallerySlides = (p.images && p.images.length ? p.images : ['']).map((img, i) => `
     <div class="pd-gallery-slide">
@@ -6278,6 +6357,10 @@ function renderPD(){
             var isActive = String(v.id)===String(currentDetailId);
             var fill = c ? c.hex : '#C7C4C1';
             var oos = !v.inStock;
+            var thumb = v.images && v.images[0];
+            if (thumb) {
+              return `<button class="fp-th${isActive?' active':''}${oos?' oos':''}" title="${v.label}${oos?' (Out of stock)':''}" aria-label="${v.label}" ${oos?'disabled':''} onclick="switchVariant('${v.id}')"><img src="${thumb}" alt="" loading="lazy"></button>`;
+            }
             return `<button class="pd-color-sw${isActive?' active':''}"
                 style="background:${fill}${oos?';opacity:.35;cursor:not-allowed':''}"
                 title="${v.label}${oos?' (Out of stock)':''}"
@@ -6304,149 +6387,107 @@ function renderPD(){
   }
 
   const relatedCards = related.map(r => `
-    <div class="pd-rec-card" onclick="openPD('${r.id}')">
-      <div class="pd-rec-img">
-        ${r.images && r.images[0]
-          ? `<img src="${r.images[0]}" alt="${r.name}" loading="lazy">`
-          : '<span>&#9829;</span>'}
-      </div>
-      <div class="pd-rec-info">
-        <div class="pd-rec-name">${r.name}</div>
-        <div class="pd-rec-price">${(isVIP?r.price:r.orig).toFixed(2)}</div>
-      </div>
+    <div class="fp-card" onclick="openPD('${r.id}')">
+      <div class="fp-card-img">${r.images && r.images[0] ? `<img src="${r.images[0]}" alt="${r.name}" loading="lazy">` : ''}</div>
+      <div class="fp-card-name">${r.name}</div>
+      <div class="fp-card-p"><b>$${r.price.toFixed(2)}</b><span>VIP price</span></div>
+      ${r.orig>r.price ? `<div class="fp-card-o"><s>$${r.orig.toFixed(2)}</s><span>Regular price</span></div>` : ''}
     </div>
   `).join('');
 
+  const dp = displayPrice;
+  const hasDeal = dp.orig > dp.price;
+  const pct = hasDeal ? Math.round((1 - dp.price/dp.orig)*100) : 0;
+  const liked = wishlist.includes(p.id);
+  const revCount = p.reviews || 0;
+  const pidS = String(p.id).replace(/'/g, "\\'");
+  const nameS = String(p.name).replace(/'/g, "\\'");
+  const detailsBody = (p.desc ? `<p>${p.desc}</p>` : '')
+    + ((p.features && p.features.length) ? `<ul>${p.features.map(f=>`<li>${f}</li>`).join('')}</ul>` : '')
+    + `<p class="fp-meta">${p.brand ? 'Brand: ' + p.brand + '<br>' : ''}${p.material && p.material.trim() ? 'Material: ' + p.material + '<br>' : ''}Item #: ${p.model || p.id}</p>`;
+
   document.getElementById('pd-content').innerHTML = `
-    <!-- Top info -->
-    <div class="pd-top-info">
-      <div class="pd-cat-tag">${p.cat}</div>
-      <h1 class="pd-name">${p.name}</h1>
-      <div class="pd-rat">
-        ${starsHTML}
-        <span class="pd-rat-count">${p.reviews > 0 ? p.rating + ' &nbsp;(' + p.reviews.toLocaleString() + ' reviews)' : 'No reviews yet'}</span>
-      </div>
+    <div class="fp-top">
+      ${p.brand ? `<div class="fp-brand">${p.brand}</div>` : ''}
+      <h1 class="fp-name">${p.name}</h1>
+      ${revCount > 0 ? `<div class="fp-rat">${starsHTML}<span class="fp-rc">(${revCount.toLocaleString()})</span></div>` : ''}
+      ${hasDeal ? `<div class="fp-offer">VIP price: $${dp.price.toFixed(2)} &nbsp;&middot;&nbsp; Save ${pct}%</div>` : ''}
+      <div class="fp-nm">Non-Member: <b>$${dp.orig.toFixed(2)}</b></div>
     </div>
 
-    <!-- Gallery -->
     <div class="pd-gallery-wrap">
       <div class="pd-gallery-scroll" id="pd-gallery-scroll">${gallerySlides}</div>
+      <button class="fp-heart${liked?' liked':''}" onclick="toggleWL('${pidS}', this)" aria-label="Save to wishlist">${liked?'<span class="ig ig-hf"></span>':'<span class="ig ig-ho"></span>'}</button>
       <div class="pd-gallery-dots" id="pd-gallery-dots">${galleryDots}</div>
-      <div class="pd-hero-badges">
-        ${(p.orig>p.price && (1-p.price/p.orig)>=0.05) ? '<div class="pd-off-pill">'+Math.round((1-p.price/p.orig)*100)+'% OFF</div>' : ''}
-        ${isVIP ? '<div class="pd-vip-pill">VIP PRICE</div>' : ''}
-      </div>
+      <div class="fp-prog"><i id="fp-prog-i"></i></div>
     </div>
 
-    <!-- CTAs directly after gallery -->
-    <div class="pd-cta-wrap">
-      ${p.inStock ? (isVIP ? `
-        <button class="pd-atc-btn" onclick="addToCartFromDetail()" id="pd-atc">Add to Bag &mdash; $${p.price.toFixed(2)}</button>
-        <button class="pd-token-btn" onclick="addToCartFromDetailRedeem()">Redeem with ${tokensFor(p.price)} token${tokensFor(p.price)>1?'s':''}</button>
-      ` : `
-        ${(p.orig>p.price&&(1-p.price/p.orig)>=0.05)?'<div class="pd-lto">VIP savings: '+Math.round((1-p.price/p.orig)*100)+'% off</div>':''}
-        <div style="background:#F8F5F2;border-radius:8px;padding:14px 14px 16px;margin-bottom:10px">
-          <button class="pd-atc-btn" style="margin-bottom:12px" onclick="addToCartVIP()" id="pd-atc">VIP Add to Bag &mdash; $${p.price.toFixed(2)}</button>
-          <div style="font-size:12px;color:#555;line-height:1.6">After your first order you will be charged $39.95 each month for a Member Token, unless you Skip between the 1st and the 5th. Each token covers any item up to $50. Skip or cancel anytime.</div>
-        </div>
-        <div style="font-size:14px;color:#111;margin-bottom:8px">Non-Member: <strong>$${p.orig.toFixed(2)}</strong></div>
-        <button class="pd-retail-btn" onclick="addToCartFromDetail()" style="width:100%;background:#1A1A1A;color:#fff;border:none;padding:16px;font-family:var(--fd);font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;border-radius:6px;cursor:pointer;margin-bottom:10px">Add to Bag</button>
-      `) : `
-        <button class="pd-atc-btn" onclick="notifyMeRestock(${p.id},'${p.name.replace(/'/g,'\\\'')}')">${p.label==='Coming Soon'?'Notify Me at Launch':'Notify Me When Back In Stock'}</button>
-      `}
-      <div class="pd-secondary-row">
-        <button class="pd-wl-btn" onclick="toggleWL(${p.id}, null)">&#9825; Save</button>
-        <button class="pd-wl-btn" onclick="sharePD('${p.id}', this)">&#8599;&#65038; Share</button>
-      </div>
-    </div>
-
-    <!-- Body -->
-    <div class="pd-body">
-      <!-- Color (legacy p.colors swatches; only when present) -->
+    <div class="fp-body">
       ${(p.colors && p.colors.length) ? `
-      <div class="pd-attr-row">
-        <span class="pd-attr-lbl">Color:</span>
-        <span class="pd-attr-val" id="sel-color-name">${p.colors[0].name}</span>
-      </div>
+      <div class="pd-attr-row"><span class="pd-attr-lbl">Color: <b id="sel-color-name">${p.colors[0].name}</b></span></div>
       <div class="pd-swatches">${swatches}</div>` : ''}
-
-      <!-- Size -->
       ${sizes}
-
-      <!-- Variants -->
       ${variantSelector}
 
-      <!-- Qty -->
-      <div class="pd-qty-row" style="margin-top:${p.sizes.length>1?'4px':'18px'}">
-        <span class="pd-attr-lbl">Quantity:</span>
+      <div class="fp-qty">
+        <span class="fp-lbl">Qty:</span>
         <div class="pd-qty-ctrl">
-          <button class="pd-qb" onclick="changeDetailQty(-1)">&#8722;</button>
+          <button class="pd-qb" onclick="changeDetailQty(-1)" aria-label="Decrease quantity">&#8722;</button>
           <span class="pd-q" id="pd-qty-n">1</span>
-          <button class="pd-qb" onclick="changeDetailQty(1)">+</button>
+          <button class="pd-qb" onclick="changeDetailQty(1)" aria-label="Increase quantity">+</button>
         </div>
       </div>
 
-
-
-      <!-- Trust -->
-      <div class="pd-trust-strip">
-        <div class="pd-trust-item">Secure Checkout</div>
-        <div class="pd-trust-item">Plain Packaging</div>
-        <div class="pd-trust-item">Easy Returns</div>
-        <div class="pd-trust-item">Discreet Billing</div>
+      <div class="fp-buy">
+        ${hasDeal ? `<div class="fp-offer">VIP price: $${dp.price.toFixed(2)} &nbsp;&middot;&nbsp; Save ${pct}%</div>` : ''}
+        <div class="fp-nm">Non-Member: <b>$${dp.orig.toFixed(2)}</b></div>
+        ${p.inStock ? (isVIP ? `
+          <button class="fp-red" onclick="addToCartFromDetail()" id="pd-atc">Add to bag &mdash; $${dp.price.toFixed(2)}</button>
+          <button class="fp-black" onclick="addToCartFromDetailRedeem()">Redeem with ${tokensFor(dp.price)} token${tokensFor(dp.price)>1?'s':''}</button>
+        ` : `
+          <button class="fp-red" onclick="addToCartVIP()" id="pd-atc">Add to bag &amp; claim VIP offer</button>
+          <p class="fp-disc">After your first order you will be charged $39.95 each month for a Member Token, unless you Skip between the 1st and the 5th. Each token covers any item up to $50. Skip or cancel anytime.</p>
+          <button class="pd-retail-btn fp-line" onclick="addToCartFromDetail()">Add to bag at regular price &mdash; $${dp.orig.toFixed(2)}</button>
+        `) : `
+          <button class="fp-black" onclick="notifyMeRestock('${pidS}','${nameS}')">${p.label==='Coming Soon'?'Notify Me at Launch':'Notify Me When Back In Stock'}</button>
+        `}
+        <div class="fp-actions">
+          <button onclick="sharePD('${pidS}', this)">&#8599;&#65038; Share</button>
+        </div>
       </div>
 
+      <details class="fp-acc" open><summary>Details</summary><div class="fp-acc-b">${detailsBody}</div></details>
+      <details class="fp-acc"><summary>Shipping &amp; returns</summary><div class="fp-acc-b">
+        <p>Ships in plain packaging with discreet billing. Standard shipping is free (6&ndash;10 business days). Expedited is $15.95 (3&ndash;4 business days).</p>
+        <p>Unopened items can be returned within 30 days. <a href="/shipping-returns" target="_blank" rel="noopener">Full policy</a></p>
+      </div></details>
 
+      ${related.length ? `<h2 class="fp-h">You may also like</h2><div class="fp-grid">${relatedCards}</div>` : ''}
 
-      <div class="pd-divider"></div>
-
-      <!-- Description -->
-      <div class="pd-section-hdr">About This Product</div>
-      <p class="pd-desc">${p.desc}</p>
-
-      <!-- Features -->
-      <div class="pd-section-hdr">Key Features</div>
-      <ul class="pd-feat-list">
-        ${p.features.map(f=>`<li>${f}</li>`).join('')}
-        ${p.material && p.material.trim() ? `<li>Material: ${p.material}</li>` : ''}
-      </ul>
-
-      ${related.length ? `
-        <div class="pd-divider"></div>
-        <div class="pd-section-hdr">You May Also Like</div>
-        <div class="pd-rec-grid">${relatedCards}</div>
-      ` : ''}
-
-      <div class="pd-divider"></div>
-      <div class="pd-section-hdr">Customer Reviews</div>
-      <div id="pd-reviews-${p.id}" style="margin-bottom:16px">
-        <div style="font-size:12px;color:var(--muted);text-align:center;padding:16px 0">Loading reviews...</div>
-      </div>
-
+      <h2 class="fp-h">Reviews</h2>
+      ${revCount > 0 ? `<div class="fp-avg"><b>${p.rating}</b>${starsHTML}<span>${revCount.toLocaleString()} review${revCount>1?'s':''}</span></div>` : ''}
+      <div id="pd-reviews-${p.id}" class="fp-revs"><div class="fp-muted">Loading reviews...</div></div>
       ${user ? `
-      <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:16px;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.6);margin-bottom:12px">Leave a Review</div>
-        <div style="display:flex;gap:6px;margin-bottom:10px" id="star-pick-${p.id}">
-          ${[1,2,3,4,5].map(n=>`<span onclick="setReviewStar(${p.id},${n})" style="font-size:22px;cursor:pointer;color:rgba(255,255,255,.3)" data-star="${n}">&#9733;</span>`).join('')}
+      <div class="fp-revform">
+        <div class="fp-lbl">Leave a review</div>
+        <div class="fp-stars" id="star-pick-${p.id}">
+          ${[1,2,3,4,5].map(n=>`<span onclick="setReviewStar('${pidS}',${n})" data-star="${n}">&#9733;</span>`).join('')}
         </div>
-        <textarea id="review-text-${p.id}" placeholder="Share your experience..." style="width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:10px;color:#fff;font-size:13px;resize:none;height:80px;outline:none;font-family:var(--fb)"></textarea>
-        <button onclick="submitReview(${p.id},'${p.name.replace(/'/g,'\\\'')}')" style="margin-top:8px;background:#1B1B19;color:#111;border:none;padding:10px 20px;font-family:var(--fd);font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;border-radius:4px;cursor:pointer;width:100%">Submit Review</button>
-        <div id="review-fb-${p.id}" style="font-size:11px;margin-top:6px;text-align:center"></div>
+        <textarea id="review-text-${p.id}" placeholder="Share your experience..." rows="3"></textarea>
+        <button class="fp-black" onclick="submitReview('${pidS}','${nameS}')">Submit review</button>
+        <div id="review-fb-${p.id}" class="fp-muted"></div>
       </div>
       ` : `
-      <div style="text-align:center;padding:12px 0;font-size:12px;color:rgba(255,255,255,.5)">
-        <a href="#" onclick="openQuiz('review_gate');return false" style="color:#FFFFFF;text-decoration:none">Create an account</a> to leave a review.
-      </div>
+      <div class="fp-muted"><a href="#" onclick="openQuiz('review_gate');return false">Create an account</a> to leave a review.</div>
       `}
-
     </div>
   `;
-
-
 
   setTimeout(()=>{
     const s = document.getElementById('pd-gallery-scroll');
     if(s) s.addEventListener('scroll', syncPDDots, {passive:true});
+    if(s) s.addEventListener('scroll', function(){ var i=document.getElementById('fp-prog-i'); if(!i) return; var max=s.scrollWidth-s.clientWidth; var w=Math.max(12, (s.clientWidth/s.scrollWidth)*100); i.style.width=w+'%'; i.style.left=(max>0? (s.scrollLeft/max)*(100-w) : 0)+'%'; }, {passive:true});
+    if(s){ var i0=document.getElementById('fp-prog-i'); if(i0){ i0.style.width=Math.max(12,(s.clientWidth/s.scrollWidth)*100)+'%'; } }
   }, 50);
 }
 
@@ -6473,7 +6514,7 @@ function changeDetailQty(d){
   const p=PRODUCTS.find(x=>String(x.id)===String(currentDetailId));
   const price=isVIP?p.price:p.orig;
   const atcBtn=document.getElementById('pd-atc');
-  if(atcBtn && p.inStock) atcBtn.textContent=`ADD TO BAG  -  ${(price*detailQty).toFixed(2)}`;
+  if(atcBtn && p.inStock && isVIP) atcBtn.textContent='Add to bag \u2014 $' + (price*detailQty).toFixed(2);
 }
 function addToCartFromDetail(){
   const p=PRODUCTS.find(x=>String(x.id)===String(currentDetailId));
@@ -7413,18 +7454,18 @@ function loadProductReviews(productId){
   db.collection('reviews').where('productId','==',productId).where('approved','==',true)
     .orderBy('createdAt','desc').limit(10).get()
     .then(snap=>{
-      if(snap.empty){ el.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.4);text-align:center;padding:12px 0">No reviews yet. Be the first!</div>'; return; }
+      if(snap.empty){ el.innerHTML = '<div class="fp-muted">No reviews yet. Be the first!</div>'; return; }
       el.innerHTML = snap.docs.map(doc=>{
         const r = doc.data();
-        const stars = '<span style="color:#FFFFFF">&#9733;</span>'.repeat(r.stars||5) + '<span style="color:rgba(255,255,255,.2)">&#9733;</span>'.repeat(5-(r.stars||5));
+        const stars = '<span style="color:#FFFFFF">&#9733;</span>'.repeat(r.stars||5) + '<span style="color:#ccc">&#9733;</span>'.repeat(5-(r.stars||5));
         const date = r.createdAt ? new Date(r.createdAt.seconds*1000).toLocaleDateString() : '';
-        return `<div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        return `<div style="padding:14px 0;border-bottom:1px solid #E4E1DE">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-            <div style="font-size:13px;font-weight:700;color:#fff">${r.name}</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.3)">${date}</div>
+            <div style="font-size:14px;font-weight:800;color:#111">${r.name}</div>
+            <div style="font-size:11px;color:#888">${date}</div>
           </div>
           <div style="font-size:13px;margin-bottom:4px">${stars}</div>
-          <div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.55">${r.text}</div>
+          <div style="font-size:14px;color:#222;line-height:1.55">${r.text}</div>
         </div>`;
       }).join('');
       // Update live rating on product
@@ -7442,7 +7483,7 @@ function setReviewStar(productId, n){
   if(!container) return;
   container.querySelectorAll('span').forEach(s=>{
     const sn = parseInt(s.getAttribute('data-star'));
-    s.style.color = sn <= n ? '#1B1B19' : 'rgba(255,255,255,.3)';
+    s.style.color = sn <= n ? '#111111' : '#CCCCCC';
   });
 }
 
