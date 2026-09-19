@@ -47,7 +47,7 @@ function computeTotals(items, catalog, opts) {
     if (!Number.isInteger(qty) || qty < 1 || qty > 50) return { error: "invalid quantity" };
     const p = catalog.get(String(it.productId));
     if (!p || !(p.price > 0) || !(p.orig > 0)) return { error: "unknown product " + it.productId };
-    if (!p.inStock) return { error: "out of stock: " + it.productId, outOfStock: true };
+    if (!p.inStock || (opts.oos && opts.oos.has(String(it.productId)))) return { error: "out of stock: " + it.productId, outOfStock: true };
     const unit = vip ? p.price : p.orig;
     sub += unit * qty;
     if (it.redeemed && vip && opts.redeemAllowed) {

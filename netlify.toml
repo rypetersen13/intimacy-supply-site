@@ -31,3 +31,7 @@
   for = "/order-confirmation.html"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
+
+# Stock sync from the distributor feed (dry run until SYNC_LIVE=1 is set in Netlify).
+[functions."sync-stock"]
+  schedule = "0 5,14 * * *"

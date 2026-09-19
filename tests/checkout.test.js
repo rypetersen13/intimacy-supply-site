@@ -89,6 +89,18 @@ test("members pay VIP prices and can redeem tokens they actually have", async ()
   await expectStatus(prepareCheckout(ev({ itemTotal: 9.95 }), "onetime", nonMember), 409);
 });
 
+test("items on the distributor's unavailable list block checkout, and a missing list does not", async () => {
+  const withOos = deps({ order: order(), user: {} });
+  const base = withOos.fs.getDoc;
+  withOos.fs.getDoc = async p => (p === "meta/stock" ? { oos: ["A"] } : base(p));
+  await expectStatus(prepareCheckout(ev({ itemTotal: 99 }), "vip", withOos), 409);
+  const broken = deps({ order: order(), user: {} });
+  const b2 = broken.fs.getDoc;
+  broken.fs.getDoc = async p => { if (p === "meta/stock") throw new Error("down"); return b2(p); };
+  const ok = await prepareCheckout(ev({ itemTotal: 99 }), "vip", broken);
+  assert.ok(ok.expectedTotal > 0);
+});
+
 test("out-of-stock and unknown items block checkout", async () => {
   await expectStatus(prepareCheckout(ev({}), "vip", deps({ order: order({ items: [{ productId: "ZZZ", qty: 1 }] }), user: {} })), 422);
 });

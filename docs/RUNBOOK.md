@@ -19,3 +19,9 @@ Playground cases: signed-in user reads own order (allow) / another user's order 
 
 ## Errors customers hit
 Netlify > Logs > Functions > `client-error`.
+
+## Turn on the stock sync
+1. Ask the distributor for a new SFTP password (the old one has been shared in chat), then add `ELDORADO_SFTP_HOST`, `ELDORADO_SFTP_USER`, `ELDORADO_SFTP_PASS` in Netlify as secret values and deploy.
+2. Netlify > Functions > `sync-stock` > Run now (or wait for the schedule). Open its log: it prints `sync-stock summary` with the feed size, how many of our products would be marked unavailable, and how many prices are below the minimum advertised price.
+3. If the numbers look right, add `SYNC_LIVE=1`, deploy, and run it again. The shop then hides unavailable products.
+4. If a bad feed ever slips through, delete the `meta/stock` document in Firestore (everything shows as available again) or set `SYNC_LIVE` back to 0.

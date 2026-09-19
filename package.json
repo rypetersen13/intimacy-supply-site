@@ -7,5 +7,10 @@
     "build:catalog": "python3 tools/build_catalog.py",
     "build:vip": "python3 tools/build_vip.py"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ssh2": "^1.16.0"
+  }
 }
