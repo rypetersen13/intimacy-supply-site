@@ -29,7 +29,7 @@ const MIN_PRICE = 2.95;   // CCBill account-wide minimum
 const PERIOD_DAYS = 30;
 const NUM_REBILLS = 99;   // effectively "until cancelled" -- max allowed by CCBill's field
 
-exports.handler = async function (event, context, deps) {
+async function handle(event, context, deps) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "method not allowed" };
   }
@@ -72,4 +72,9 @@ exports.handler = async function (event, context, deps) {
   } catch (err) {
     return errorResponse(err);
   }
-};
+}
+
+// Node 24 runs handlers with three or more parameters as callback-style handlers and refuses them,
+// so the real handler takes exactly (event) and the injectable version is exported for tests.
+exports.handle = handle;
+exports.handler = async function (event) { return handle(event, {}); };

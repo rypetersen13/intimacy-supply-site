@@ -48,7 +48,7 @@ function deps(over = {}) {
     fs: { getDoc: async () => ({ status: "approved", accessCode: "right-code" }), createDoc: async (c, o) => { created.push([c, o]); return "id1"; } },
     summaryFor: async (h) => aff.buildSummary(h, [order({ pricing: { total: 1000, tax: 0, shipping: 0 } })], [], NOW), ...over };
 }
-const call = (body, d, ip = "1.2.3.4") => fn.handler({ httpMethod: "POST", headers: { "x-nf-client-connection-ip": ip }, body: JSON.stringify(body) }, {}, d);
+const call = (body, d, ip = "1.2.3.4") => fn.handle({ httpMethod: "POST", headers: { "x-nf-client-connection-ip": ip }, body: JSON.stringify(body) }, {}, d);
 
 test("login: right code works, wrong code is refused and repeated failures are throttled", async () => {
   const d = deps();

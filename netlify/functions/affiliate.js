@@ -22,7 +22,7 @@ async function summaryFor(handle) {
   return aff.buildSummary(handle, orders, payouts, Date.now());
 }
 
-exports.handler = async function (event, context, deps) {
+async function handle(event, context, deps) {
   if (event.httpMethod !== "POST") return reply(405, { error: "method not allowed" });
   const d = Object.assign({ fs, secret, now: () => Date.now(), sleep }, deps && typeof deps === "object" ? deps : {});
   let body; try { body = JSON.parse(event.body || "{}"); } catch (e) { return reply(400, { error: "invalid request" }); }
@@ -60,4 +60,9 @@ exports.handler = async function (event, context, deps) {
     console.error("affiliate error:", err && err.message);
     return reply(500, { error: "Something went wrong. Please try again." });
   }
-};
+}
+
+// Node 24 runs handlers with three or more parameters as callback-style handlers and refuses them,
+// so the real handler takes exactly (event) and the injectable version is exported for tests.
+exports.handle = handle;
+exports.handler = async function (event) { return handle(event, {}); };

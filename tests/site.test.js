@@ -79,3 +79,14 @@ test("partner pages carry no invented claims and the dashboard never reads Fires
   assert.ok(/\/\.netlify\/functions\/affiliate/.test(dash));
   assert.ok(/\$25/.test(read("partners.html")) && !/\$50 minimum/.test(read("partners.html")));
 });
+
+test("function handlers take at most two arguments (Node 24 rejects callback-style handlers)", () => {
+  const dir = path.join(root, "netlify", "functions");
+  const files = fs.readdirSync(dir).filter(f => f.endsWith(".js"));
+  assert.ok(files.length >= 8);
+  for (const f of files) {
+    const mod = require(path.join(dir, f));
+    assert.equal(typeof mod.handler, "function", f + " has no handler");
+    assert.ok(mod.handler.length <= 2, f + " handler takes " + mod.handler.length + " arguments");
+  }
+});

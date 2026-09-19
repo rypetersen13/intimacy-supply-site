@@ -29,7 +29,7 @@ process.env.CCBILL_SALT_KEY = "test-salt";
 test("VIP checkout uses the server total, records it on the order, and signs the CCBill digest", async () => {
   const patched = [];
   const d = deps({ order: order(), user: { isVIP: false }, patched });
-  const r = await vipLink.handler(ev({ itemTotal: 999 }), {}, d);   // browser claims more: harmless
+  const r = await vipLink.handle(ev({ itemTotal: 999 }), {}, d);   // browser claims more: harmless
   assert.equal(r.statusCode, 200);
   const url = new URL(JSON.parse(r.body).url);
   const expected = P.round2(14.95 + 9.95 + 14.95 * 0.0875);
@@ -43,7 +43,7 @@ test("VIP checkout uses the server total, records it on the order, and signs the
 
 test("one-time checkout signs the digest without recurring fields", async () => {
   const d = deps({ order: order(), user: { isVIP: false } });
-  const r = await oneLink.handler(ev({ itemTotal: 34.9 }), {}, d);
+  const r = await oneLink.handle(ev({ itemTotal: 34.9 }), {}, d);
   assert.equal(r.statusCode, 200);
   const url = new URL(JSON.parse(r.body).url);
   const expected = P.round2(20.42 + 9.95 + 20.42 * 0.0875);     // non-member pays the regular price
@@ -54,14 +54,14 @@ test("one-time checkout signs the digest without recurring fields", async () => 
 
 test("a lowered browser total is rejected", async () => {
   const d = deps({ order: order(), user: {} });
-  const r = await vipLink.handler(ev({ itemTotal: 2.95 }), {}, d);
+  const r = await vipLink.handle(ev({ itemTotal: 2.95 }), {}, d);
   assert.equal(r.statusCode, 409);
   assert.match(JSON.parse(r.body).error, /changed/);
 });
 
 test("the amount comes from the catalog even if the stored order line prices were edited", async () => {
   const d = deps({ order: order({ items: [{ productId: "B", qty: 1, unitPrice: 0.01, lineTotal: 0.01 }], pricing: { total: 0.01 } }), user: {} });
-  const r = await oneLink.handler(ev({ itemTotal: 0.01 }), {}, d);
+  const r = await oneLink.handle(ev({ itemTotal: 0.01 }), {}, d);
   assert.equal(r.statusCode, 409);              // 0.01 claimed vs ~187 real
 });
 
