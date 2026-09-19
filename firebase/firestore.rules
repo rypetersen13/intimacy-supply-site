@@ -1,25 +1,22 @@
 rules_version = '2';
 
-// RECOMMENDED Firestore rules for Intimacy Supply.
+// Intimacy Supply Firestore rules (version 2). Replaces the earlier rules that let any signed-in user
+// edit their own membership and tokens, let anyone read affiliate access codes and write to
+// products and meta, and left reviews without any rules.
 //
-// Principle: the browser may create and edit ITS OWN profile-type data, but it can never
-// grant itself money, membership, tokens or order status. Those are changed only by the
-// server (the Netlify functions use a service account, which bypasses these rules).
-//
-// How to publish: Firebase console > Firestore Database > Rules. Copy your CURRENT rules
-// somewhere safe first, paste this file, use the Rules Playground on the cases listed in
-// docs/BACKEND.md, then Publish. If something breaks, paste the old rules back.
+// Principle: the browser may edit ITS OWN profile-type data, but never grant itself money,
+// membership, tokens or order status. Those change only on the server (Netlify functions use a
+// service account, which bypasses these rules).
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
     function signedIn() { return request.auth != null; }
     function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
-    // The admin panel signs in as this account.
     function isAdmin() { return signedIn() && request.auth.uid == 'CAssJZ6lGGXfCeukLIZwaOouDjR2'; }
     function short(s, n) { return s is string && s.size() <= n; }
 
-    // Catalog extras and site settings: public read, admin write.
+    // Public to read, admin to change.
     match /products/{id} { allow read: if true; allow write: if isAdmin(); }
     match /meta/{doc}    { allow read: if true; allow write: if isAdmin(); }
 
@@ -31,8 +28,8 @@ service cloud.firestore {
         && request.resource.data.get('isVIP', false) == false
         && request.resource.data.get('credits', 0) == 0;
 
-      // Owners can edit their profile, but cannot make themselves a member, add tokens, or
-      // touch billing / affiliate fields. (They can still lower tokens: spending them.)
+      // Owners can edit their profile but cannot make themselves a member, add tokens, or touch
+      // billing and partner fields. They can still lower tokens (spending them).
       allow update: if isAdmin() || (isOwner(uid)
         && (request.resource.data.get('isVIP', false) == false
             || request.resource.data.get('isVIP', false) == resource.data.get('isVIP', false))
@@ -45,9 +42,8 @@ service cloud.firestore {
       allow delete: if isOwner(uid) || isAdmin();
     }
 
-    // Orders: a customer can place an unpaid order for themselves and read their own orders.
-    // Only the server (or admin) can change an order afterwards, so nobody can mark their own
-    // order paid or edit the expected amount.
+    // A customer can place an unpaid order for themselves and read their own orders. Only the server
+    // or the admin can change an order afterwards, so nobody can mark their own order paid.
     match /orders/{orderId} {
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid
@@ -78,19 +74,25 @@ service cloud.firestore {
     match /cancellations/{id}         { allow create: if signedIn() && request.resource.data.userId == request.auth.uid; allow read, update, delete: if isAdmin(); }
     match /cancellation_requests/{id} { allow create: if signedIn() && request.resource.data.userId == request.auth.uid; allow read, update, delete: if isAdmin(); }
 
-    // Affiliates and payouts hold access codes and payout emails. Partners use the "affiliate" server
-    // function (it verifies their code and returns only their own totals); only the admin panel and the
-    // server touch these collections directly.
+    match /gift_card_orders/{id} { allow create: if signedIn(); allow read, update, delete: if false; }
+
+    // Partner records hold access codes and payout emails. Partners use the "affiliate" server
+    // function; only the admin panel and the server touch these collections.
     match /affiliates/{handle} { allow read, write: if isAdmin(); }
     match /payouts/{id}        { allow read, write: if isAdmin(); }
 
     // Public partner application form.
     match /partner_applications/{id} {
-      allow create: if short(request.resource.data.get('email', ''), 200);
-      allow read, update, delete: if isAdmin();
+      allow create: if request.resource.data.status == 'pending' && short(request.resource.data.get('email', ''), 200);
+      allow read, update: if isAdmin();
+      allow delete: if false;
     }
 
-    // Retired features and everything else: no client access.
+    // Retired features: existing data stays readable by the admin only; nobody can add more.
+    match /founding_members/{id}  { allow read, update, delete: if isAdmin(); }
+    match /founding_waitlist/{id} { allow read, update, delete: if isAdmin(); }
+
+    // Everything else: admin only.
     match /{document=**} { allow read, write: if isAdmin(); }
   }
 }
