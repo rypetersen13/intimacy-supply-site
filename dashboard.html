@@ -1,614 +1,123 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Creator Dashboard  -  Intimacy Supply</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --plum:#4A1D38;--plum-l:#6B2D52;--black:#0D0D0D;
-  --yellow:#FFE600;--green:#16A34A;--off:#F8F5F2;
-  --muted:#666;--border:#E5E5E5;
-  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
-}
-/* ── BRAND WORDMARK (unified v3.72) ── */
-.logo-wordmark{display:flex;flex-direction:column;align-items:center;gap:0;line-height:1;text-decoration:none}
-.logo-intimacy{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--plum);line-height:1}
-.logo-supply{font-family:'Cormorant Garamond',Georgia,serif;font-size:11px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--plum);line-height:1;margin-top:1px}
-.logo-wordmark.dark .logo-intimacy{color:#fff}
-.logo-wordmark.dark .logo-supply{color:rgba(255,255,255,.82)}
-.logo-wordmark.sm .logo-intimacy{font-size:16px;letter-spacing:.16em}
-.logo-wordmark.sm .logo-supply{font-size:8.5px;letter-spacing:.3em}
-.logo-area-tag{font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-left:10px;padding-left:10px;border-left:1px solid rgba(255,255,255,.18)}
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partner dashboard</title>
+<meta name="description" content="Sign in to see your orders, commissions and payouts.">
+<link rel="canonical" href="https://intimacysupply.com/dashboard.html"><meta name="theme-color" content="#4A1D38">
+<link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<meta name="robots" content="noindex, nofollow"></head><body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="bar">VIP members save up to 34% on everything. <a href="/vip-membership">See how it works</a></div>
+<header class="site"><div class="hd">
+<a class="logo" href="/">Intimacy Supply</a>
+<nav class="main" aria-label="Main"><a href="/">Shop</a><a href="/p/">All products</a><a href="/brands/">Brands</a><a href="/vip-membership">VIP membership</a><a href="/about">About</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></nav>
+<a class="bagbtn" href="/">Shop now</a>
+<details class="menu"><summary>Menu</summary><div><a href="/">Shop</a><a href="/p/">All products</a><a href="/brands/">Brands</a><a href="/vip-membership">VIP membership</a><a href="/about">About</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div></details>
+</div></header>
+<main id="main"><div id="login-screen" class="dash-login">
+<h1>Partner dashboard</h1>
+<p class="lede-d">Sign in with your creator handle and access code.</p>
+<div class="pf">
+<div class="pf-g"><label for="d-handle">Creator handle</label><input id="d-handle" type="text" autocomplete="username" placeholder="u/yourname or @yourhandle"></div>
+<div class="pf-g"><label for="d-code">Access code</label><input id="d-code" type="password" autocomplete="current-password" placeholder="Provided by Intimacy Supply"></div>
+<div class="pf-err" id="dash-err" style="display:none"></div>
+<button class="btn-black login-btn" type="button" onclick="dashLogin()">Sign in</button>
+<p class="pf-note">Not a partner yet? <a href="/partners.html">Apply here</a>. Questions? <a href="mailto:hello@intimacysupply.com">hello@intimacysupply.com</a></p>
+</div>
+</div>
+<div id="app" style="display:none">
+<div class="dash-top"><div><div class="eyebrow-d">Creator partner</div><h1 id="dash-welcome">Welcome</h1></div><button class="btn-line" type="button" onclick="dashLogout()">Sign out</button></div>
 
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--fb);background:#F4F4F6;color:var(--black);min-height:100vh}
-button,input{font-family:var(--fb)}
+<div class="stat-grid" id="dash-stats"></div>
 
-/* LOGIN */
-#login-screen{
-  position:fixed;inset:0;
-  background:linear-gradient(160deg,#0D0509,#1A0A14,#3D1530,#5A2248);
-  display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;
-}
-.login-box{background:#fff;border-radius:20px;padding:40px 32px;width:100%;max-width:380px;text-align:center}
-.login-logo{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;margin-bottom:4px}
-.login-logo span{color:var(--plum)}
-.login-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:28px}
-.login-label{display:block;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--black);margin-bottom:6px}
-.login-input{
-  display:block;width:100%;border:1.5px solid var(--border);border-radius:8px;
-  padding:13px 15px;font-size:15px;margin-bottom:14px;outline:none;
-  transition:border-color .15s;
-}
-.login-input:focus{border-color:var(--plum)}
-.login-btn{
-  display:block;width:100%;background:var(--plum);color:#fff;
-  font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;
-  letter-spacing:.06em;padding:14px;border-radius:6px;border:none;cursor:pointer;
-  margin-bottom:14px;transition:background .15s;
-}
-.login-btn:hover{background:var(--plum-l)}
-.login-err{font-size:12px;color:#DC2626;margin-bottom:10px;display:none;text-align:left}
-.login-footer{font-size:12px;color:var(--muted);line-height:1.65}
-.login-footer a{color:var(--plum)}
+<h2>Your referral link</h2>
+<div class="copybox"><span id="ref-link-display">https://intimacysupply.com/?ref=</span><button type="button" id="copy-link-btn" onclick="copyLink()">Copy</button></div>
+<p class="cmp-note">Anyone who follows this link and places a paid order within 90 days is credited to you. Always disclose: "I may earn a commission if you purchase through my link. I am a partner of Intimacy Supply."</p>
+<div class="copybox"><span id="page-link-display">https://intimacysupply.com/creator.html?ref=</span><button type="button" onclick="copyPage()">Copy</button></div>
+<p class="cmp-note">Your landing page, with your handle on it.</p>
 
-/* APP */
-#app{display:none}
-
-/* HEADER */
-.dash-header{
-  background:linear-gradient(135deg,#0D0509,#2D1020,#4A1D38);
-  padding:24px 20px;color:#fff;
-}
-.dash-header-inner{max-width:800px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:16px}
-.dash-logo{font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;color:rgba(255,255,255,.6)}
-.dash-logo span{color:#fff}
-.dash-welcome{font-family:var(--fd);font-size:clamp(24px,7vw,38px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;margin-bottom:4px}
-.dash-handle{font-size:13px;color:rgba(255,255,255,.5);font-weight:600}
-.dash-signout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:8px 16px;border-radius:99px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:all .15s;white-space:nowrap}
-.dash-signout:hover{background:rgba(255,255,255,.15);color:#fff}
-
-/* CONTENT */
-.dash-body{max-width:800px;margin:0 auto;padding:24px 20px 60px}
-
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px}
-@media(min-width:600px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
-.stat{background:#fff;border-radius:12px;padding:18px 16px;border:1px solid var(--border)}
-.stat-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
-.stat-val{font-family:var(--fd);font-size:28px;font-weight:900;color:var(--black);line-height:1}
-.stat-val.green{color:var(--green)}
-.stat-val.plum{color:var(--plum)}
-.stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
-
-/* LINK CARD */
-.link-card{background:#fff;border-radius:14px;border:1px solid var(--border);padding:22px 20px;margin-bottom:16px}
-.link-card-title{font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;margin-bottom:4px}
-.link-card-sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6}
-.link-display{
-  display:flex;align-items:center;gap:10px;
-  background:var(--off);border-radius:8px;padding:12px 14px;
-  border:1.5px solid var(--border);margin-bottom:12px;
-}
-.link-url{font-size:13px;font-weight:600;color:var(--plum);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.copy-btn{
-  background:var(--plum);color:#fff;border:none;padding:8px 16px;
-  border-radius:6px;font-size:12px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.04em;cursor:pointer;white-space:nowrap;flex-shrink:0;
-  transition:background .15s;
-}
-.copy-btn:hover{background:var(--plum-l)}
-.copy-btn.copied{background:var(--green)}
-.promo-display{
-  display:inline-flex;align-items:center;gap:10px;
-  background:#1A0A14;border-radius:8px;padding:10px 16px;
-}
-.promo-code{font-family:var(--fd);font-size:22px;font-weight:900;color:var(--yellow);letter-spacing:.08em}
-.promo-copy{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);padding:6px 12px;border-radius:5px;font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap}
-.promo-copy:hover{background:rgba(255,255,255,.2);color:#fff}
-
-/* COMMISSION */
-.commission-card{background:linear-gradient(135deg,#0D0509,#2D1020,#4A1D38);border-radius:14px;padding:24px 20px;margin-bottom:16px;color:#fff}
-.comm-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:10px}
-.comm-balance{font-family:var(--fd);font-size:clamp(36px,10vw,56px);font-weight:900;letter-spacing:-.04em;line-height:1;margin-bottom:4px}
-.comm-balance span{color:var(--yellow)}
-.comm-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:20px}
-.comm-breakdown{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden}
-.comm-cell{background:rgba(255,255,255,.04);padding:14px 10px;text-align:center}
-.comm-cell-val{font-family:var(--fd);font-size:20px;font-weight:900;color:#fff;margin-bottom:2px}
-.comm-cell-lbl{font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.07em}
-
-/* HOW TO PROMOTE */
-.tips-card{background:#fff;border-radius:14px;border:1px solid var(--border);padding:22px 20px;margin-bottom:16px}
-.tip{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid #f0f0f0}
-.tip:last-child{border-bottom:none}
-.tip-icon{font-size:22px;flex-shrink:0;margin-top:2px}
-.tip-body strong{display:block;font-size:14px;font-weight:700;color:var(--black);margin-bottom:3px}
-.tip-body span{font-size:12px;color:var(--muted);line-height:1.6}
-
-/* HISTORY TABLE */
-.history-table{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:16px}
-.ht-hdr{display:grid;grid-template-columns:1fr 80px 90px 80px;gap:12px;padding:12px 16px;background:var(--off);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--border)}
-.ht-row{display:grid;grid-template-columns:1fr 80px 90px 80px;gap:12px;padding:13px 16px;border-bottom:1px solid #f4f4f4;align-items:center}
-.ht-row:last-child{border-bottom:none}
-
-/* SECTION LABELS */
-.section-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:24px 0 10px}
-
-/* TOAST */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--black);color:#fff;padding:12px 22px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity .25s,transform .25s;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-</style>
-</head>
-<body>
-
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo"><span class="logo-wordmark"><span class="logo-intimacy">Intimacy</span><span class="logo-supply">Supply</span></span></div>
-    <div class="login-eyebrow">Creator Dashboard</div>
-    <label class="login-label" for="d-handle">Your Creator Handle</label>
-    <input class="login-input" id="d-handle" type="text" placeholder="u/yourname or @yourhandle" autocomplete="username">
-    <label class="login-label" for="d-code">Access Code</label>
-    <input class="login-input" id="d-code" type="password" placeholder="Provided by Intimacy Supply" autocomplete="current-password" onkeydown="if(event.key==='Enter')dashLogin()">
-    <div class="login-err" id="dash-err">Handle or access code not recognized. Contact support@intimacysupply.com.</div>
-    <button class="login-btn" onclick="dashLogin()">Access Dashboard</button>
-    <div class="login-footer">
-      Not a partner yet? <a href="/partners.html">Apply here</a>.<br>
-      Questions? <a href="mailto:support@intimacysupply.com">support@intimacysupply.com</a>
-    </div>
-  </div>
+<h2>Payout</h2>
+<div class="card-flat">
+<p id="payout-status-msg" class="cmp-note"></p>
+<div id="payout-form" class="pf">
+<div class="pf-g"><label for="payout-paypal">PayPal email</label><input id="payout-paypal" type="email" placeholder="you@example.com"></div>
+<button class="btn-black" id="payout-btn" type="button" onclick="requestPayout()">Request payout</button>
+</div>
 </div>
 
-<!-- APP -->
-<div id="app">
-  <div class="dash-header">
-    <div class="dash-header-inner">
-      <div class="dash-logo" style="display:flex;align-items:center"><span class="logo-wordmark dark sm"><span class="logo-intimacy">Intimacy</span><span class="logo-supply">Supply</span></span><span class="logo-area-tag">Partners</span></div>
-      <button class="dash-signout" onclick="dashLogout()">Sign Out</button>
-    </div>
-    <div style="max-width:800px;margin:20px auto 0">
-      <div class="dash-welcome" id="dash-welcome">Welcome back!</div>
-      <div class="dash-handle" id="dash-handle-display"></div>
-    </div>
-  </div>
+<h2>Recent orders from your link</h2>
+<div class="tbl"><div class="tbl-h"><span>Date</span><span>Order</span><span>Net sale</span><span>Commission</span><span>Status</span></div><div id="signup-history"></div></div>
+<p class="cmp-note">Customer names and details are never shown. Commissions are 5% of net revenue and confirm 30 days after payment.</p>
 
-  <div class="dash-body">
-
-    <!-- STATS -->
-    <div class="section-lbl">Your Performance</div>
-    <div class="stats-grid" id="dash-stats"></div>
-
-    <!-- COMMISSION BALANCE -->
-    <div class="section-lbl">Commission Balance</div>
-    <div class="commission-card">
-      <div class="comm-title">Total Earned This Month</div>
-      <div class="comm-balance"><span id="comm-balance-val">$0</span></div>
-      <div class="comm-sub">Paid on the 7th of each month via your preferred method.</div>
-      <div class="comm-breakdown">
-        <div class="comm-cell">
-          <div class="comm-cell-val" id="comm-signups">0</div>
-          <div class="comm-cell-lbl">New Signups</div>
-        </div>
-        <div class="comm-cell">
-          <div class="comm-cell-val" id="comm-retained">0</div>
-          <div class="comm-cell-lbl">Active Members</div>
-        </div>
-        <div class="comm-cell">
-          <div class="comm-cell-val" id="comm-lifetime">$0</div>
-          <div class="comm-cell-lbl">Lifetime Earned</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- YOUR LINK -->
-    <div class="section-lbl">Your Referral Link</div>
-    <div class="link-card">
-      <div class="link-card-title">Referral Link</div>
-      <div class="link-card-sub">Share this link anywhere. Anyone who clicks it and joins VIP within 90 days earns you a commission.</div>
-      <div class="link-display">
-        <div class="link-url" id="ref-link-display">https://intimacysupply.com?ref=...</div>
-        <button class="copy-btn" id="copy-link-btn" onclick="copyLink()">Copy</button>
-      </div>
-      <div class="link-card-title" style="margin-top:18px">Promo Code</div>
-      <div class="link-card-sub">Share this code directly. Works at checkout when they don't have your link.</div>
-      <div class="promo-display">
-        <div class="promo-code" id="promo-code-display">IS-XXXXX</div>
-        <button class="promo-copy" onclick="copyPromo()">Copy Code</button>
-      </div>
-    </div>
-
-    <!-- PROMOTION TIPS -->
-    <div class="section-lbl">How to Promote</div>
-    <div class="tips-card">
-      <div class="tip">
-        <div class="tip-icon"></div>
-        <div class="tip-body">
-          <strong>Pin your link</strong>
-          <span>Add your referral link to your Reddit bio, OnlyFans bio, or Twitter/X pinned post. Passive signups come in daily with zero effort.</span>
-        </div>
-      </div>
-      <div class="tip">
-        <div class="tip-icon"></div>
-        <div class="tip-body">
-          <strong>Lead with the deal</strong>
-          <span>Your audience gets up to 34% off everything as a VIP member. Lead with that. The $69.95 membership pays for itself on the first order.</span>
-        </div>
-      </div>
-      <div class="tip">
-        <div class="tip-icon"></div>
-        <div class="tip-body">
-          <strong>Show the product</strong>
-          <span>We'll send you free products to feature. Real photos from real creators convert 3-5x better than product shots alone.</span>
-        </div>
-      </div>
-      <div class="tip">
-        <div class="tip-icon"></div>
-        <div class="tip-body">
-          <strong>FTC disclosure</strong>
-          <span>Always disclose your partnership. Use #ad or #partner or "I earn a commission." It builds trust and keeps you compliant.</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- PAYOUT REQUEST -->
-    <div class="section-lbl">Request Payout</div>
-    <div class="link-card" id="payout-card">
-      <div class="link-card-title">Withdraw Earnings</div>
-      <div class="link-card-sub">Minimum payout is $25. Confirmed commissions (30+ days, no chargeback) are eligible. Payouts processed within 5 business days.</div>
-      <div id="payout-status-msg" style="font-size:13px;color:var(--muted);margin-bottom:12px;display:none"></div>
-      <input class="login-input" id="payout-paypal" type="email" placeholder="Your PayPal email address" style="margin-bottom:10px">
-      <button class="login-btn" id="payout-btn" onclick="requestPayout()" style="margin-bottom:0">Request Payout</button>
-    </div>
-
-    <!-- SIGN-UP HISTORY -->
-    <div class="section-lbl">Recent Orders from Your Link</div>
-    <div class="history-table">
-      <div class="ht-hdr" style="grid-template-columns:1fr 90px 100px 90px">
-        <div>Date</div>
-        <div>Order Total</div>
-        <div>Commission</div>
-        <div>Status</div>
-      </div>
-      <div id="signup-history"></div>
-    </div>
-
-    <!-- PAYOUT HISTORY -->
-    <div class="section-lbl">Payout History</div>
-    <div class="history-table">
-      <div class="ht-hdr" style="grid-template-columns:1fr 100px 90px">
-        <div>Date</div>
-        <div>Amount</div>
-        <div>Status</div>
-      </div>
-      <div id="payout-history"></div>
-    </div>
-
-    <div style="text-align:center;padding:20px;font-size:12px;color:var(--muted)">
-      Questions about your commissions? <a href="mailto:support@intimacysupply.com" style="color:var(--plum);font-weight:700">support@intimacysupply.com</a>
-    </div>
-
-  </div>
+<h2>Payout history</h2>
+<div class="tbl tbl-3"><div class="tbl-h"><span>Date</span><span>Amount</span><span>Status</span></div><div id="payout-history"></div></div>
+<div id="toast" class="toast"></div>
+</div></main>
+<footer class="site"><div class="ft">
+<div><h3>Shop</h3><a href="/">Shop all</a><a href="/p/">Product directory</a><a href="/brands/">Brands</a><a href="/vip-membership">VIP membership</a></div>
+<div><h3>Help</h3><a href="/contact">Contact us</a><a href="/faq">FAQ</a><a href="/shipping-returns">Shipping &amp; returns</a><a href="/refund-policy">Refunds &amp; cancellation</a><a href="/recognize-a-charge">Recognize a charge?</a><a href="/complaints">Complaints</a></div>
+<div><h3>Company</h3><a href="/about">About us</a><a href="/affiliate-disclosure">Affiliate disclosure</a><a href="/affiliate-terms">Affiliate program terms</a><a href="/compliance">Compliance</a></div>
+<div><h3>Legal</h3><a href="/terms">Terms of service</a><a href="/privacy">Privacy policy</a><a href="/do-not-sell">Do not sell my information</a><a href="/gdpr">GDPR notice</a><a href="/accessibility">Accessibility</a><a href="/email-preferences">Email preferences</a></div>
 </div>
+<div class="fine">&copy; 2026 Intimacy Supply &middot; Dharma Media &amp; Technology LLC &middot; c/o Northwest Registered Agent, 30 N Gould St Ste N, Sheridan, WY 82801 &middot; hello@intimacysupply.com &middot; (559) 334-0826<br>Plain packaging. Discreet billing. Adults 18+ only.</div>
+</footer><script>
+var DASH_TOKEN = 'is_dash_token', currentHandle = '';
+function cleanHandle(raw){ return (raw || '').trim().replace(/^https?:\/\/(www\.)?reddit\.com/i, '').replace(/^\/?(u|user)\//i, '').replace(/^@/, '').replace(/\s+/g, '').toLowerCase(); }
+function $(id){ return document.getElementById(id); }
+function money(n){ return '$' + (Number(n) || 0).toFixed(2); }
+function showErr(m){ var e = $('dash-err'); e.textContent = m; e.style.display = 'block'; }
+function showToast(m){ var t = $('toast'); t.textContent = m; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 2800); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function api(body){ return fetch('/.netlify/functions/affiliate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) }).then(function(r){ return r.json().then(function(j){ j.status = r.status; return j; }); }); }
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<script>
-var DASH_SESSION = 'is_dash_session';
-var currentHandle = '';
-var db = null;
-var COMMISSION_RATE = 0.05; // 5% of order total
-
-// ── HANDLE SANITIZER ────────────────────────────────────────
-// Must stay identical to the cleanHandle used in admin.html so a
-// handle typed at login resolves to the same affiliates/{id} doc
-// that approval created.
-function cleanHandle(raw){
-  return (raw || '')
-    .trim()
-    .replace(/^https?:\/\/(www\.)?reddit\.com/i, '')
-    .replace(/^\/?(u|user)\//i, '')
-    .replace(/^@/, '')
-    .replace(/\s+/g, '')
-    .toLowerCase();
-}
-
-// Firebase init
-var firebaseConfig = {
-  apiKey:    'AIzaSyBQfmhqROjix1vGv_l1f-AxGGdPwCGVGzQ',
-  projectId: 'intimacy-supply',
-};
-try {
-  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-} catch(e){ console.warn('[IS] Firebase init failed on dashboard:', e); }
-
-// ── AUTH ────────────────────────────────────────────────────
 function dashLogin(){
-  var handle = cleanHandle(document.getElementById('d-handle').value);
-  var code   = document.getElementById('d-code').value.trim();
-  if(!handle || !code){ showErr('Please enter your handle and access code.'); return; }
-
-  var btn = document.querySelector('.login-btn');
-  btn.textContent = 'Checking...';
-  btn.disabled = true;
-
-  if(db){
-    // Verify against affiliates/{handle} doc in Firestore
-    db.collection('affiliates').doc(handle).get().then(function(doc){
-      if(doc.exists && doc.data().accessCode === code && doc.data().status === 'approved'){
-        sessionStorage.setItem(DASH_SESSION, handle);
-        initDash(handle);
-      } else {
-        showErr('Handle or access code not recognized. Contact support@intimacysupply.com.');
-        btn.textContent = 'Access Dashboard';
-        btn.disabled = false;
-      }
-    }).catch(function(){
-      // Firebase unavailable - fall back to localStorage codes (dev mode)
-      var codes = JSON.parse(localStorage.getItem('is_creator_codes')||'{}');
-      if(codes[handle] && codes[handle] === code){
-        sessionStorage.setItem(DASH_SESSION, handle);
-        initDash(handle);
-      } else {
-        showErr('Handle or access code not recognized. Contact support@intimacysupply.com.');
-        btn.textContent = 'Access Dashboard';
-        btn.disabled = false;
-      }
-    });
-  } else {
-    var codes = JSON.parse(localStorage.getItem('is_creator_codes')||'{}');
-    if(codes[handle] && codes[handle] === code){
-      sessionStorage.setItem(DASH_SESSION, handle);
-      initDash(handle);
-    } else {
-      showErr('Handle or access code not recognized.');
-      btn.textContent = 'Access Dashboard';
-      btn.disabled = false;
-    }
-  }
+  var handle = cleanHandle($('d-handle').value), code = $('d-code').value.trim();
+  if(!handle || !code){ showErr('Enter your handle and access code.'); return; }
+  var btn = document.querySelector('.login-btn'); btn.textContent = 'Checking...'; btn.disabled = true;
+  api({ action:'login', handle:handle, code:code }).then(function(j){
+    if(j.token){ sessionStorage.setItem(DASH_TOKEN, j.token); show(j.summary); }
+    else { showErr(j.error || 'Could not sign in.'); btn.textContent = 'Sign in'; btn.disabled = false; }
+  }).catch(function(){ showErr('Could not reach the server. Try again in a minute.'); btn.textContent = 'Sign in'; btn.disabled = false; });
 }
-
-function dashLogout(){
-  sessionStorage.removeItem(DASH_SESSION);
-  location.reload();
+function dashLogout(){ sessionStorage.removeItem(DASH_TOKEN); location.reload(); }
+function refresh(){
+  var t = sessionStorage.getItem(DASH_TOKEN); if(!t) return;
+  api({ action:'summary', token:t }).then(function(j){ if(j.summary) show(j.summary); else { sessionStorage.removeItem(DASH_TOKEN); } });
 }
-
-function showErr(msg){
-  var el = document.getElementById('dash-err');
-  el.textContent = msg;
-  el.style.display = 'block';
+function show(s){
+  currentHandle = s.handle;
+  $('login-screen').style.display = 'none'; $('app').style.display = 'block';
+  $('dash-welcome').textContent = '@' + s.handle;
+  $('ref-link-display').textContent = 'https://intimacysupply.com/?ref=' + s.handle;
+  $('page-link-display').textContent = 'https://intimacysupply.com/creator.html?ref=' + s.handle;
+  var t = s.totals;
+  $('dash-stats').innerHTML = [['Orders', t.orders, 'Paid, all time'], ['This month', s.thisMonth.orders, money(s.thisMonth.commission) + ' earned'],
+    ['Confirmed balance', money(t.confirmedBalance), 'Ready to withdraw'], ['Pending', money(t.pendingBalance), 'Confirms after ' + s.payout.holdDays + ' days'],
+    ['Paid out', money(t.paidOut), 'All time']].map(function(x){ return '<div class="stat"><span>' + esc(x[0]) + '</span><b>' + esc(x[1]) + '</b><em>' + esc(x[2]) + '</em></div>'; }).join('');
+  var msg = $('payout-status-msg'), form = $('payout-form');
+  if(s.payout.open){ msg.textContent = 'You have a payout request in progress. We process requests within 5 business days.'; form.style.display = 'none'; }
+  else if(!s.payout.canRequest){ msg.textContent = 'The minimum payout is ' + money(s.payout.minimum) + ' of confirmed commission. Your confirmed balance is ' + money(t.confirmedBalance) + '.'; form.style.display = 'none'; }
+  else { msg.textContent = 'You can withdraw ' + money(t.confirmedBalance) + '.'; form.style.display = 'block'; }
+  $('signup-history').innerHTML = s.recentOrders.length ? s.recentOrders.map(function(o){
+    return '<div class="tbl-r"><span>' + esc(o.date) + '</span><span>' + esc(o.ref) + '</span><span>' + money(o.net) + '</span><span>' + money(o.commission) + '</span><span class="st-' + esc(o.status) + '">' + esc(o.status.charAt(0).toUpperCase() + o.status.slice(1)) + '</span></div>';
+  }).join('') : '<div class="tbl-empty">No paid orders yet. Share your link to start earning.</div>';
+  $('payout-history').innerHTML = s.payouts.length ? s.payouts.map(function(p){
+    return '<div class="tbl-r"><span>' + esc(p.date) + ' ' + esc(p.to) + '</span><span>' + money(p.amount) + '</span><span class="st-' + esc(p.status) + '">' + (p.status === 'paid' ? 'Paid' : 'Pending') + '</span></div>';
+  }).join('') : '<div class="tbl-empty">No payouts yet.</div>';
 }
-
-var savedHandle = sessionStorage.getItem(DASH_SESSION);
-if(savedHandle){ initDash(savedHandle); }
-
-// ── INIT ────────────────────────────────────────────────────
-function initDash(handle){
-  currentHandle = handle;
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  document.getElementById('dash-welcome').textContent = 'Welcome back, @' + handle;
-  document.getElementById('dash-handle-display').textContent = 'Creator Partner';
-
-  var refLink = 'https://intimacysupply.com?ref=' + handle;
-  document.getElementById('ref-link-display').textContent = refLink;
-  var promoCode = 'IS-' + handle.toUpperCase().replace(/[^A-Z0-9]/g,'').substring(0,8);
-  document.getElementById('promo-code-display').textContent = promoCode;
-
-  loadDashData(handle);
-}
-
-// ── DATA ────────────────────────────────────────────────────
-function loadDashData(handle){
-  if(!db){
-    renderDashStats([], []);
-    return;
-  }
-
-  // Load orders attributed to this creator
-  db.collection('orders')
-    .where('affiliate', '==', handle)
-    .orderBy('timestamp', 'desc')
-    .limit(100)
-    .get()
-    .then(function(snap){
-      var orders = snap.docs.map(function(d){ return Object.assign({id: d.id}, d.data()); });
-      // Load payout history
-      db.collection('payouts')
-        .where('handle', '==', handle)
-        .orderBy('createdAt', 'desc')
-        .get()
-        .then(function(pSnap){
-          var payouts = pSnap.docs.map(function(d){ return Object.assign({id: d.id}, d.data()); });
-          renderDashStats(orders, payouts);
-          renderOrderHistory(orders);
-          renderPayoutHistory(payouts);
-        }).catch(function(){ renderDashStats(orders, []); renderOrderHistory(orders); });
-    })
-    .catch(function(e){
-      console.warn('[IS] Dashboard Firestore read failed:', e);
-      renderDashStats([], []);
-    });
-}
-
-function renderDashStats(orders, payouts){
-  var now = new Date();
-  var thisMonth = orders.filter(function(o){
-    var d = o.timestamp && o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp||0);
-    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
-  });
-
-  var totalOrders   = orders.length;
-  var monthOrders   = thisMonth.length;
-  var totalRevenue  = orders.reduce(function(s,o){ return s + (o.pricing ? o.pricing.total : 0); }, 0);
-  var totalPaid     = payouts.filter(function(p){ return p.status==='paid'; })
-                             .reduce(function(s,p){ return s + (p.amount||0); }, 0);
-
-  // Commission breakdown
-  var pendingComm = 0, confirmedComm = 0;
-  orders.forEach(function(o){
-    var comm = o.affiliateCommission || (o.pricing ? +(o.pricing.total * COMMISSION_RATE).toFixed(2) : 0);
-    var orderDate = o.timestamp && o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp||0);
-    var ageMs = Date.now() - orderDate.getTime();
-    var thirtyDays = 30 * 24 * 60 * 60 * 1000;
-    if(o.commissionStatus === 'paid') return; // already paid out
-    if(o.commissionStatus === 'confirmed' || ageMs > thirtyDays){
-      confirmedComm += comm;
-    } else {
-      pendingComm += comm;
-    }
-  });
-  confirmedComm -= totalPaid; // subtract what's already been paid
-  confirmedComm = Math.max(0, confirmedComm);
-
-  var monthComm = thisMonth.reduce(function(s,o){
-    return s + (o.affiliateCommission || (o.pricing ? +(o.pricing.total * COMMISSION_RATE).toFixed(2) : 0));
-  }, 0);
-
-  document.getElementById('dash-stats').innerHTML = [
-    '<div class="stat"><div class="stat-lbl">Total Orders</div><div class="stat-val plum">' + totalOrders + '</div><div class="stat-sub">All time</div></div>',
-    '<div class="stat"><div class="stat-lbl">This Month</div><div class="stat-val">' + monthOrders + '</div><div class="stat-sub">New orders</div></div>',
-    '<div class="stat"><div class="stat-lbl">Confirmed Balance</div><div class="stat-val green">$' + confirmedComm.toFixed(2) + '</div><div class="stat-sub">Ready to withdraw</div></div>',
-    '<div class="stat"><div class="stat-lbl">Total Paid Out</div><div class="stat-val">$' + totalPaid.toFixed(2) + '</div><div class="stat-sub">All time</div></div>',
-  ].join('');
-
-  document.getElementById('comm-balance-val').textContent = '$' + monthComm.toFixed(2);
-  document.getElementById('comm-signups').textContent = monthOrders;
-  document.getElementById('comm-retained').textContent = totalOrders;
-  document.getElementById('comm-lifetime').textContent = '$' + (totalRevenue * COMMISSION_RATE).toFixed(2);
-
-  // Payout button state
-  var payoutBtn = document.getElementById('payout-btn');
-  var payoutMsg = document.getElementById('payout-status-msg');
-  var pending = orders.some(function(o){ return o.payoutStatus === 'pending'; });
-  if(pending){
-    payoutBtn.disabled = true;
-    payoutMsg.textContent = 'You have a payout request in progress. We will process it within 5 business days.';
-    payoutMsg.style.display = 'block';
-    payoutMsg.style.color = '#D97706';
-  } else if(confirmedComm < 25){
-    payoutBtn.disabled = true;
-    payoutMsg.textContent = 'Minimum payout is $25. Your confirmed balance is $' + confirmedComm.toFixed(2) + '. Keep sharing your link!';
-    payoutMsg.style.display = 'block';
-  } else {
-    payoutBtn.disabled = false;
-    payoutMsg.style.display = 'none';
-  }
-}
-
-function renderOrderHistory(orders){
-  var el = document.getElementById('signup-history');
-  if(!orders.length){
-    el.innerHTML = '<div style="text-align:center;padding:32px;font-size:13px;color:var(--muted)">No orders yet. Share your link to start earning.</div>';
-    return;
-  }
-  el.innerHTML = orders.slice(0,20).map(function(o){
-    var d = o.timestamp && o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp||0);
-    var dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});
-    var total   = o.pricing ? o.pricing.total : 0;
-    var comm    = o.affiliateCommission || +(total * COMMISSION_RATE).toFixed(2);
-    var ageMs   = Date.now() - d.getTime();
-    var status  = o.commissionStatus === 'paid' ? 'Paid'
-                : o.commissionStatus === 'confirmed' || ageMs > 30*24*60*60*1000 ? 'Confirmed'
-                : 'Pending';
-    var statusColor = status==='Paid'?'color:var(--green);font-weight:700'
-                    : status==='Confirmed'?'color:#2563EB;font-weight:700'
-                    : 'color:var(--muted)';
-    return '<div class="ht-row" style="grid-template-columns:1fr 90px 100px 90px">' +
-      '<div style="font-size:13px;font-weight:600">' + dateStr + '</div>' +
-      '<div style="font-size:13px;font-weight:700">$' + total.toFixed(2) + '</div>' +
-      '<div style="font-family:var(--fd);font-size:16px;font-weight:900;color:var(--green)">$' + comm.toFixed(2) + '</div>' +
-      '<div style="font-size:12px;' + statusColor + '">' + status + '</div>' +
-    '</div>';
-  }).join('');
-}
-
-function renderPayoutHistory(payouts){
-  var el = document.getElementById('payout-history');
-  if(!payouts.length){
-    el.innerHTML = '<div style="text-align:center;padding:32px;font-size:13px;color:var(--muted)">No payouts yet.</div>';
-    return;
-  }
-  el.innerHTML = payouts.map(function(p){
-    var d = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate() : new Date(p.createdAt||0);
-    var dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});
-    var statusColor = p.status==='paid'?'color:var(--green);font-weight:700':'color:var(--muted)';
-    return '<div class="ht-row" style="grid-template-columns:1fr 100px 90px">' +
-      '<div style="font-size:13px;font-weight:600">' + dateStr + ' - ' + (p.paypalEmail||'') + '</div>' +
-      '<div style="font-family:var(--fd);font-size:16px;font-weight:900">$' + (p.amount||0).toFixed(2) + '</div>' +
-      '<div style="font-size:12px;' + statusColor + '">' + (p.status==='paid'?'Paid':'Pending') + '</div>' +
-    '</div>';
-  }).join('');
-}
-
-// ── PAYOUT REQUEST ───────────────────────────────────────────
 function requestPayout(){
-  var email = document.getElementById('payout-paypal').value.trim();
-  if(!email || !email.includes('@')){
-    showToast('Please enter a valid PayPal email.');
-    return;
-  }
-  if(!db){ showToast('Unable to connect. Please try again later.'); return; }
-
-  var btn = document.getElementById('payout-btn');
-  btn.textContent = 'Submitting...';
-  btn.disabled = true;
-
-  var payoutDoc = {
-    handle:     currentHandle,
-    paypalEmail:email,
-    status:     'pending',
-    createdAt:  firebase.firestore.FieldValue.serverTimestamp(),
-    amount:     0, // admin fills in confirmed amount when processing
-  };
-
-  db.collection('payouts').add(payoutDoc).then(function(){
-    var msg = document.getElementById('payout-status-msg');
-    msg.textContent = 'Payout request submitted. We will process it within 5 business days to ' + email + '.';
-    msg.style.color = 'var(--green)';
-    msg.style.display = 'block';
-    document.getElementById('payout-paypal').style.display = 'none';
-    showToast('Payout request submitted.');
-  }).catch(function(e){
-    btn.disabled = false;
-    btn.textContent = 'Request Payout';
-    showToast('Error submitting request. Email support@intimacysupply.com.');
-  });
+  var email = $('payout-paypal').value.trim(), t = sessionStorage.getItem(DASH_TOKEN);
+  if(!email || email.indexOf('@') < 1){ showToast('Enter a valid PayPal email.'); return; }
+  var b = $('payout-btn'); b.textContent = 'Submitting...'; b.disabled = true;
+  api({ action:'payout', token:t, paypalEmail:email }).then(function(j){
+    if(j.ok){ showToast('Payout request submitted.'); refresh(); } else { showToast(j.error || 'Could not submit.'); b.textContent = 'Request payout'; b.disabled = false; }
+  }).catch(function(){ showToast('Could not reach the server.'); b.textContent = 'Request payout'; b.disabled = false; });
 }
-
-// ── COPY ────────────────────────────────────────────────────
-function copyLink(){
-  var link = 'https://intimacysupply.com?ref=' + currentHandle;
-  navigator.clipboard.writeText(link).then(function(){
-    var btn = document.getElementById('copy-link-btn');
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-  }).catch(function(){ showToast('Copy link: https://intimacysupply.com?ref=' + currentHandle); });
-}
-
-function copyPromo(){
-  var code = 'IS-' + currentHandle.toUpperCase().replace(/[^A-Z0-9]/g,'').substring(0,8);
-  navigator.clipboard.writeText(code).then(function(){
-    showToast('Promo code copied: ' + code);
-  }).catch(function(){ showToast('Your code: ' + code); });
-}
-
-// ── TOAST ────────────────────────────────────────────────────
-function showToast(msg){
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 2800);
-}
-</script>
-</body>
-</html>
+function copyText(txt, ok){ (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function(){ showToast(ok); }).catch(function(){ showToast('Copy this: ' + txt); }); }
+function copyLink(){ copyText('https://intimacysupply.com/?ref=' + currentHandle, 'Link copied'); }
+function copyPage(){ copyText('https://intimacysupply.com/creator.html?ref=' + currentHandle, 'Page link copied'); }
+if(sessionStorage.getItem(DASH_TOKEN)) refresh();
+document.addEventListener('keydown', function(e){ if(e.key === 'Enter' && $('login-screen').style.display !== 'none') dashLogin(); });
+</script></body></html>

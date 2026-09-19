@@ -59,3 +59,23 @@ test("payment pages send a signed-in token, never a bare userId", { skip: !haveS
   assert.ok(/getIdTokenPromise\(\)/.test(all));
   assert.ok(/idToken:\s+idToken/.test(all));
 });
+
+test("featured order leads with what shoppers buy, spread across brands", { skip: !exists("products.json") }, () => {
+  const list = JSON.parse(read("products.json")).sort((a, b) => a.f - b.f);
+  const seen = new Set(), top = [];
+  for (const p of list) { if (seen.has(p.s)) continue; seen.add(p.s); top.push(p); if (top.length === 60) break; }
+  const hidden = /\bbooks?\b|\bgames?\b|batter|cleaner|\boils?\b|candle|gift card/i;
+  assert.ok(top.every(p => !hidden.test(p.name)), "books, games, oils or cleaners are in the first 60");
+  assert.ok(new Set(top.map(p => p.brand.toLowerCase())).size >= 15, "first 60 come from too few brands");
+  const has = rx => top.filter(p => rx.test(p.name)).length;
+  assert.ok(has(/vibrat|rabbit|wand|bullet/i) >= 4 && has(/dildo|dong/i) >= 4 && has(/teddy|babydoll|chemise|bodysuit|corset|bustier|set/i) >= 4);
+});
+
+test("partner pages carry no invented claims and the dashboard never reads Firestore directly", { skip: !exists("partners.html") }, () => {
+  const pages = ["partners.html", "creator.html", "dashboard.html"].map(read).join("\n");
+  for (const bad of [/50K\+/, /5M\b/, /\$69\.95/, /\$3\.50/, /Sarah M\./, /picsum\.photos/, /legal\?type/, /Real Members/]) assert.ok(!bad.test(pages), "found: " + bad);
+  const dash = read("dashboard.html");
+  assert.ok(!/collection\(/.test(dash) && !/accessCode/.test(dash), "dashboard reads data or codes directly");
+  assert.ok(/\/\.netlify\/functions\/affiliate/.test(dash));
+  assert.ok(/\$25/.test(read("partners.html")) && !/\$50 minimum/.test(read("partners.html")));
+});

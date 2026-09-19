@@ -39,7 +39,7 @@ function mapFirestoreProduct(doc, index) {
     material: d.material || '',
     features: d.features || [],
     desc: d.desc != null ? cleanWholesaleText(d.desc) : null,
-    b: d.b, slug: d.s,
+    b: d.b, slug: d.s, f: d.f,
     brand: d.brand || '',
     model: d.model || '',
   };
@@ -124,9 +124,14 @@ function cleanWholesaleText(desc) {
 
 async function loadStaticProducts() {
   try {
+    var stockReq = fetch('/.netlify/functions/stock').then(function(r){ return r.ok ? r.json() : { oos: [] }; }).catch(function(){ return { oos: [] }; });
     var resp = await fetch('/products.json');
     if (!resp.ok) throw new Error('products.json not found');
     var data = await resp.json();
+    /* Distributor stock: models the feed says are unavailable are hidden from the shop */
+    var _stock = await stockReq, _oos = {};
+    (_stock.oos || []).forEach(function(m){ _oos[String(m)] = 1; });
+    data.forEach(function(d){ if (_oos[String(d.model)]) d.inStock = false; });
     PRODUCTS_ALL_MASTER = data.map(mapFirestoreProduct).filter(function(p) {
       var hasImg = (p.images && p.images.length && p.images[0]) || p.image;
       return hasImg && !isGiftCard(p) && !isWholesaleItem(p);
@@ -1032,6 +1037,9 @@ function applyAndRender() {
     base = base.slice().sort(function(a,b){ return b.rating - a.rating; });
   } else if (activeSort === 'newest') {
     base = base.slice().sort(function(a,b){ return b.isNew - a.isNew; });
+  } else {
+    /* Featured: the catalog build ranks what shoppers buy first (vibrators, outfits, dildos, plugs, cages) */
+    base = base.slice().sort(function(a,b){ return (a.f == null ? 1e9 : a.f) - (b.f == null ? 1e9 : b.f); });
   }
 
   // Group variants

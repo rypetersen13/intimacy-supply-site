@@ -112,4 +112,36 @@ async function incrementFields(path, increments) {
   return true;
 }
 
-module.exports = { PROJECT_ID, getAccessToken, getDoc, patchDoc, incrementFields, fromFields, toValue };
+
+// Documents in a collection whose top-level string field equals a value (no composite index needed).
+async function queryEq(collection, field, value, limit) {
+  const token = await getAccessToken();
+  const res = await fetch(`${BASE.replace("/documents", "")}/documents:runQuery`, {
+    method: "POST",
+    headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+    body: JSON.stringify({ structuredQuery: {
+      from: [{ collectionId: collection }],
+      where: { fieldFilter: { field: { fieldPath: field }, op: "EQUAL", value: { stringValue: String(value) } } },
+      limit: limit || 500,
+    } }),
+  });
+  if (!res.ok) throw new Error(`firestore query ${collection} failed: ${res.status}`);
+  const rows = await res.json();
+  return rows.filter(r => r.document).map(r => Object.assign({ id: r.document.name.split("/").pop() }, fromFields(r.document.fields || {})));
+}
+
+// Creates a document with an automatic id; returns the id.
+async function createDoc(collection, obj) {
+  const token = await getAccessToken();
+  const fields = {};
+  for (const k of Object.keys(obj)) fields[k] = toValue(obj[k]);
+  const res = await fetch(`${BASE}/${collection}`, {
+    method: "POST",
+    headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields }),
+  });
+  if (!res.ok) throw new Error(`firestore create ${collection} failed: ${res.status}`);
+  return (await res.json()).name.split("/").pop();
+}
+
+module.exports = { PROJECT_ID, getAccessToken, getDoc, patchDoc, incrementFields, queryEq, createDoc, fromFields, toValue };

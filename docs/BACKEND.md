@@ -15,6 +15,7 @@
 | ccbill-checkout-link / ccbill-onetime-link | Server-priced CCBill links (see above) |
 | ccbill-webhook | Payment events from CCBill; amount check; VIP status; tokens |
 | ccbill-cancel | Cancels a subscription through CCBill Datalink |
+| affiliate | Creator dashboard: verifies handle + access code, returns only that partner's totals (no customer data), creates payout requests |
 | get-order | Order confirmation data (needs access key) |
 | membership-request | Membership requests to the operator |
 | client-error | Browser error reports written to the function log |
@@ -23,6 +24,11 @@
 ## Environment variables (Netlify)
 `CCBILL_SALT_KEY`, `CCBILL_DATALINK_USER`, `CCBILL_DATALINK_PASS`, `FIREBASE_SERVICE_ACCOUNT` (base64 JSON), `RESEND_API_KEY`, `ORDER_NOTIFY_EMAIL`, optional `GA4_API_SECRET`, `CCBILL_SKIP_IP_CHECK` (never set in production). Mark every secret as "contains secret values".
 
+## Stock sync
+`sync-stock` runs twice a day (05:00 and 14:00 UTC, after the distributor's nightly feed). It downloads `feeds/product_feed.tsv` over SFTP, finds our models that are missing, discontinued, or at zero quantity, and saves that list in Firestore (`meta/stock`). The storefront reads it through the public `stock` function and hides those products; checkout refuses them. It also logs how many of our VIP prices are below the distributor's minimum advertised price (`map_price`).
+It is a **dry run until `SYNC_LIVE=1`** is set. Guards refuse to publish a broken-looking feed (fewer than 5,000 rows, or a sudden jump in unavailable items).
+Env vars: `ELDORADO_SFTP_HOST`, `ELDORADO_SFTP_USER`, `ELDORADO_SFTP_PASS`, optional `ELDORADO_FEED_PATH`, `SYNC_LIVE`.
+
 ## Catalog
 `tools/source/products.raw.json` is the source. `python3 tools/build_catalog.py` regenerates `products.json`, product/category/brand pages, and the sitemap. `python3 tools/build_assets.py` splits the built `index.html` into cached assets.
 
@@ -30,6 +36,6 @@
 `npm test` runs pricing, checkout, webhook and token tests plus site checks (scripts parse, catalog valid, sitemap links exist, no secrets). CI runs the same on every push.
 
 ## Known gaps
-- Stock is only as fresh as the last catalog build (no live sync from the distributor yet).
+- Product and category pages are built from the catalog snapshot, so their stock badges lag until the next catalog build; the shop and checkout use the live stock list.
 - Token balance is decremented by the browser (rules only allow it to go down); moving it server-side is the next step.
 - Order numbers use 4 random digits per day; a duplicate would be rejected by the rules.

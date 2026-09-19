@@ -298,7 +298,8 @@ async function settleOrder(token, order, subscriptionId, all, nowIso) {
   const handle = order.fields.affiliate;
   if (handle && typeof handle === "string") {
     try {
-      const total = Number((order.fields.pricing || {}).total) || 0;
+      const pr = order.fields.pricing || {};
+      const total = Math.max(0, (Number(pr.total) || 0) - (Number(pr.tax) || 0) - (Number(pr.shipping) || 0));
       await shared.incrementFields("affiliates/" + handle, {
         totalOrders: 1, totalRevenue: total, pendingCommission: Math.round(total * 5) / 100,
       });

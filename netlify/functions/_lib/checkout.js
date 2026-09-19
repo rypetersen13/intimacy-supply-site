@@ -35,9 +35,12 @@ async function prepareCheckout(event, mode, deps) {
   const isMember = user.isVIP === true;
   const basis = (mode === "vip" || isMember) ? "vip" : "regular";
   const catalog = await d.pricing.loadCatalog((event.headers || {}).host);
+  let oos = new Set();
+  try { const st = await d.fs.getDoc("meta/stock"); if (st && Array.isArray(st.oos)) oos = new Set(st.oos.map(String)); }
+  catch (e) { console.warn("checkout: stock list unavailable, using catalog stock only:", e.message); }
   const items = (order.items || []).map(i => ({ productId: i.productId, qty: i.qty, redeemed: !!i.redeemed }));
   const totals = d.pricing.computeTotals(items, catalog, {
-    basis, redeemAllowed: isMember, credits: Math.floor(Number(user.credits) || 0),
+    oos, basis, redeemAllowed: isMember, credits: Math.floor(Number(user.credits) || 0),
     delivery: order.delivery === "expedited" ? "expedited" : "standard",
   });
   if (totals.error) throw new HttpError(totals.outOfStock ? 409 : 422, totals.error);
