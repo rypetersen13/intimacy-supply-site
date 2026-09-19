@@ -712,7 +712,7 @@ function renderWL(){
       <div class="wli-info">
         <div class="wli-name">${p.name}</div>
         <div class="wli-price">${p.price.toFixed(2)} <span style="font-size:10px;color:var(--muted);text-decoration:line-through">${p.orig.toFixed(2)}</span></div>
-        <div class="wli-actions"><button class="wli-add" onclick="addToCart(${id});closeWL()">Add to Bag</button><button class="wli-rm" onclick="removeWL(${id})" title="Remove">&#10005;</button></div>
+        <div class="wli-actions"><button class="wli-add" onclick="addToCart('${id}');closeWL()">Add to Bag</button><button class="wli-rm" onclick="removeWL('${id}')" title="Remove">&#10005;</button></div>
       </div>
     </div>`;
   }).join('');
@@ -3376,28 +3376,32 @@ function subscribeEmailJS(email, source){
 }
 
 /* ── KLAVIYO IDENTIFY: creates/updates a profile in Klaviyo ── */
+function klaviyoPhone(raw){
+  var d = String(raw || '').replace(/\D/g, '');
+  if(d.length === 10) return '+1' + d;
+  if(d.length === 11 && d.charAt(0) === '1') return '+' + d;
+  return '';
+}
 function klaviyoIdentify(profile){
   if(!NL_CONFIG.klaviyo.enabled || NL_CONFIG.klaviyo.apiKey==='YOUR_PUBLIC_API_KEY') return;
+  if(!profile || !profile.email) return;
+  var attrs = {
+    email: profile.email,
+    properties: {
+      isVIP:    !!(profile.isVIP),
+      source:   profile.source || 'quiz',
+      sizes:    (profile.sizes||[]).join(', '),
+      zip:      profile.zip || '',
+      joinedAt: new Date().toISOString()
+    }
+  };
+  if(profile.firstName) attrs.first_name = profile.firstName;
+  var ph = klaviyoPhone(profile.phone);
+  if(ph) attrs.phone_number = ph;
   fetch('https://a.klaviyo.com/client/profiles/?company_id='+NL_CONFIG.klaviyo.apiKey, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'revision': '2023-02-22' },
-    body: JSON.stringify({
-      data: {
-        type: 'profile',
-        attributes: {
-          email:        profile.email      || '',
-          first_name:   profile.firstName  || '',
-          phone_number: profile.phone      || '',
-          properties: {
-            isVIP:      !!(profile.isVIP),
-            source:     profile.source     || 'quiz',
-            sizes:      (profile.sizes||[]).join(', '),
-            zip:        profile.zip        || '',
-            joinedAt:   new Date().toISOString(),
-          }
-        }
-      }
-    })
+    body: JSON.stringify({ data: { type: 'profile', attributes: attrs } })
   }).catch(err=>console.warn('[IS] Klaviyo identify error:',err));
 }
 

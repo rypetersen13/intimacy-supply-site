@@ -90,3 +90,9 @@ test("function handlers take at most two arguments (Node 24 rejects callback-sty
     assert.ok(mod.handler.length <= 2, f + " handler takes " + mod.handler.length + " arguments");
   }
 });
+
+test("wishlist buttons quote product ids and Klaviyo phones are normalized", { skip: !haveSite }, () => {
+  const js = fs.readdirSync(path.join(root, "assets")).filter(f => /^app\..*\.js$/.test(f)).map(f => read("assets/" + f)).join("\n");
+  assert.ok(!/removeWL\(\$\{id\}\)/.test(js) && !/addToCart\(\$\{id\}\);closeWL/.test(js), "wishlist buttons pass an unquoted product id");
+  assert.ok(/function klaviyoPhone/.test(js) && /phone_number = ph/.test(js));
+});
