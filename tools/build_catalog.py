@@ -114,6 +114,19 @@ for gk in order:
     for v in vs: v["s"] = slug
     glist.append(g)
 
+# ---------- brands ----------
+brand_names, brands = {}, {}
+for g in glist:
+    if not g["brand"]: continue
+    key = slugify(g["brand"])
+    if not key: continue
+    brand_names.setdefault(key, {}).setdefault(g["brand"], 0)
+    brand_names[key][g["brand"]] += 1
+    brands.setdefault(key, []).append(g)
+brand_display = {k: max(v.items(), key=lambda kv: kv[1])[0] for k, v in brand_names.items()}
+for g in glist:
+    g["bslug"] = slugify(g["brand"]) if g["brand"] and slugify(g["brand"]) in brands else ""
+
 # ---------- 2) lean catalog + lazy detail chunks (flat SKUs; the shop groups them itself) ----------
 lean = []
 for p in products:
@@ -209,7 +222,8 @@ for g in glist:
             '<p class="pdp-meta"><a href="/vip-membership">How VIP pricing works</a> &middot; <a href="/shipping-returns">Shipping &amp; returns</a></p></div></div>'
             '<h2 class="rel-h">You may also like</h2><div class="grid">%s</div>') % (
         g["cat"], catname, html.escape(g["name"]), html.escape(g["images"][0]), html.escape(g["name"], quote=True), thumbs,
-        html.escape(g["brand"]), html.escape(g["name"]), pricebox(rep), chips, html.escape(rep["model"]),
+        ('<a href="/b/%s/">%s</a>' % (g["bslug"], html.escape(brand_display[g["bslug"]])) if g["bslug"] else html.escape(g["brand"])),
+        html.escape(g["name"]), pricebox(rep), chips, html.escape(rep["model"]),
         "Add to bag" if rep["inStock"] else "Sold out - view item", html.escape(g["desc"]),
         ('<p class="pdp-meta">Material: %s</p>' % html.escape(g["material"])) if g["material"] else "",
         "".join(card(q) for q in rel)) + (PDP_JS % vjs if len(vs) > 1 else "")
@@ -250,12 +264,47 @@ dir_body = '<h1>Shop all</h1><p class="lede">Every category, one page each.</p><
 w("p/index.html", shell("Shop all", "Browse every Intimacy Supply category.", "/p/", dir_body))
 urls.append("/p/")
 
+# ---------- 5b) brand pages ----------
+brand_urls = []
+for key, items in sorted(brands.items()):
+    name = brand_display[key]
+    pages = math.ceil(len(items) / PER_PAGE)
+    base = "/b/%s/" % key
+    for pg in range(1, pages + 1):
+        chunk = items[(pg - 1) * PER_PAGE: pg * PER_PAGE]
+        path = base if pg == 1 else "%spage/%d/" % (base, pg)
+        body = ('<div class="crumbs"><a href="/">Home</a> / <a href="/brands/">Brands</a> / %s</div><h1>%s</h1>'
+                '<p class="lede">Shop %s at up to 34%% off with VIP membership. Every item shows the VIP price and the regular price.</p>'
+                '<div class="count">%d products%s</div><div class="grid">%s</div>%s') % (
+            html.escape(name), html.escape(name), html.escape(name), len(items),
+            " &middot; page %d of %d" % (pg, pages) if pages > 1 else "",
+            "".join(card(g) for g in chunk), pager(base, pg, pages))
+        t = name if pg == 1 else "%s, page %d" % (name, pg)
+        w(path.strip("/") + "/index.html", shell(t, "Shop %s at Intimacy Supply. VIP price and regular price on every item." % name, path, body))
+        brand_urls.append(path)
+
+letters = {}
+for key in sorted(brands, key=lambda k: brand_display[k].lower()):
+    n = brand_display[key]
+    L = n[0].upper() if n[0].isalpha() else "#"
+    letters.setdefault(L, []).append((key, n, len(brands[key])))
+dir_html = "".join('<h2 id="%s">%s</h2><ul class="dir">%s</ul>' % (L, L, "".join(
+    '<li><a href="/b/%s/">%s</a> <span>%d</span></li>' % (k, html.escape(n), c) for k, n, c in v)) for L, v in sorted(letters.items()))
+jump = " ".join('<a href="#%s">%s</a>' % (L, L) for L in sorted(letters))
+w("brands/index.html", shell("Brands", "Shop %d brands at Intimacy Supply." % len(brands), "/brands/",
+    '<div class="crumbs"><a href="/">Home</a> / Brands</div><h1>Brands</h1><p class="lede">%d brands. Pick one to see everything we carry from them.</p><p class="jump">%s</p>%s' % (len(brands), jump, dir_html)))
+brand_urls.append("/brands/")
+
+top = sorted(brands.items(), key=lambda kv: -len(kv[1]))[:24]
+w("data/brands-top.json", json.dumps({"brands": len(brands), "products": len(glist),
+    "top": [{"n": brand_display[k], "s": k} for k, _ in top]}, separators=(",", ":"), ensure_ascii=False))
+
 # ---------- 6) sitemap ----------
 static_pages = ["/", "/vip-membership/", "/about/", "/faq/", "/contact/", "/shipping-returns/", "/refund-policy/", "/terms/",
                 "/privacy/", "/do-not-sell/", "/gdpr/", "/accessibility/", "/recognize-a-charge/", "/complaints/",
                 "/affiliate-disclosure/", "/affiliate-terms/", "/compliance/", "/email-preferences/", "/partners.html"]
-all_urls = static_pages + urls + ["/p/%s/" % g["slug"] for g in glist]
+all_urls = static_pages + urls + brand_urls + ["/p/%s/" % g["slug"] for g in glist]
 w("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' %
   "".join("  <url><loc>%s%s</loc></url>\n" % (SITE, u) for u in all_urls))
 print("SKUs:", len(products), "-> products:", len(glist), "| with options:", sum(1 for g in glist if len(g["variants"]) > 1),
-      "| category pages:", len(urls) - 1, "| sitemap urls:", len(all_urls))
+      "| category pages:", len(urls) - 1, "| brand pages:", len(brand_urls), "| sitemap urls:", len(all_urls))

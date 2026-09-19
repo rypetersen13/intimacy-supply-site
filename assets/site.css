@@ -109,3 +109,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid var(--gold);outline-offs
 .cmp thead th.vip{background:#4A1D38;color:#fff;border-bottom-color:#4A1D38}
 .cmp td.vip{background:#F6EEF2;font-weight:700;color:#4A1D38}
 .cmp-note{font-size:14px;color:var(--muted);margin:6px 0 4px}
+
+.jump{display:flex;flex-wrap:wrap;gap:8px 14px;margin:6px 0 18px;font-weight:700}
+.jump a{color:var(--ink)}
+.dir li a{color:var(--ink);text-decoration:none}

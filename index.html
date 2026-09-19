@@ -4527,6 +4527,18 @@ section.hv .vd{border-color:rgba(255,255,255,.22)}
 .ct .btn-b:hover{background:#B8000D}
 /* signup buttons: white on the dark bands they sit in */
 button[onclick*="subNewsletter"],button#nl-ac-btn{background:#fff!important;color:#111!important;border:1px solid #1B1B19!important}
+
+/* ── Scale line + brand strip ── */
+#scale-bar[hidden],#brand-strip[hidden]{display:none!important}
+#scale-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 26px;background:#1B1B19;color:#fff;padding:14px 16px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-align:center}
+.brand-strip{background:#fff;padding:34px 0 6px;border-bottom:1px solid #E7E2DB}
+.bs-h{font-family:var(--fd);font-size:27px;font-weight:800;text-align:center;margin:0 0 16px;text-transform:none;color:#111;letter-spacing:0}
+.bs-row{display:flex;gap:10px;overflow-x:auto;padding:0 16px 24px;scrollbar-width:none}
+.bs-row::-webkit-scrollbar{display:none}
+.bs-row a{flex:none;border:1px solid #111;color:#111;text-decoration:none;padding:11px 18px;font-size:15px;font-weight:600;white-space:nowrap}
+.bs-row a:hover{background:#111;color:#fff}
+.bs-row .bs-all{background:#111;color:#fff}
+@media(min-width:900px){.bs-row{flex-wrap:wrap;justify-content:center;overflow:visible}}
 /* tags and pills */
 .pd-off-pill,.pd-price-badge,.pd-bdg.sale,.pd-vip-badge,.pd-lto,.pd-vip-pill,.gc-pill-badge,.ac-order-status,.chpb,.ch-vip-header{background:var(--ink);color:#fff}
 .cibdg,.ch-bag-badge{background:var(--brand-red);color:#fff}
@@ -4700,8 +4712,10 @@ function declineCookies(){
     </div>
   </div>
 </section>
+<div id="scale-bar" hidden></div>
 
 <!-- PRODUCT GRID -->
+<section id="brand-strip" class="brand-strip" hidden><div class="si"><h2 class="bs-h">Shop by brand</h2><div class="bs-row" id="bs-row"></div></div></section>
 <section class="sec" id="products" style="background:#fff">
   <div class="si">
     <h2 class="st" id="pg-title">Explore Our Latest Collections</h2>
@@ -10475,6 +10489,26 @@ function maybeShowSkipNudge(){
       q.delete('payment'); history.replaceState({}, '', window.location.pathname + (q.toString()?'?'+q.toString():''));
     }
   }catch(e){}
+})();
+
+/* Scale line and brand strip: numbers come from the catalog build (floors, so they are always true) */
+(function(){
+  fetch('/data/brands-top.json').then(function(r){ return r.json(); }).then(function(d){
+    var pf = Math.floor(d.products/500)*500, bf = Math.floor(d.brands/50)*50;
+    var sb = document.getElementById('scale-bar');
+    if(sb){
+      [bf.toLocaleString()+'+ brands', pf.toLocaleString()+'+ products', 'Plain packaging', 'Discreet billing'].forEach(function(txt){
+        var s = document.createElement('span'); s.textContent = txt; sb.appendChild(s);
+      });
+      sb.hidden = false;
+    }
+    var row = document.getElementById('bs-row'), strip = document.getElementById('brand-strip');
+    if(row && strip){
+      d.top.forEach(function(b){ var a = document.createElement('a'); a.href = '/b/' + b.s + '/'; a.textContent = b.n; row.appendChild(a); });
+      var all = document.createElement('a'); all.href = '/brands/'; all.className = 'bs-all'; all.textContent = 'All brands'; row.appendChild(all);
+      strip.hidden = false;
+    }
+  }).catch(function(){});
 })();
 </script>
 </body>
