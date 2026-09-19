@@ -8768,20 +8768,6 @@ function animCounter(el,target,suffix){
   let cur=0;const step=Math.ceil(target/60);
   const t=setInterval(()=>{cur=Math.min(cur+step,target);el.textContent=cur.toLocaleString()+(suffix||'');if(cur>=target)clearInterval(t);},25);
 }
-const io2=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      animCounter(document.getElementById('cnt-members'),21600,'');
-      animCounter(document.getElementById('cnt-orders'),0,'');
-      animCounter(document.getElementById('cnt-rating'),48,'');
-      io2.disconnect();
-    }
-  });
-},{threshold:0.3});
-const sps=document.getElementById('social-proof-section');
-if(sps) io2.observe(sps);
-
-
 /* ═══════════════════════════════════════════
    [NEW] FIREBASE AUTH STATE LISTENER
    Fires on every page load. Restores session
@@ -9683,10 +9669,6 @@ function renderAcctPanel(){
     if(sus) ft.appendChild(sus.cloneNode(true));
     var footer = document.querySelector('footer');
     if(footer) ft.appendChild(footer.cloneNode(true));
-    var t = document.createElement('section');
-    t.style.cssText = 'background:#F8F5F2;padding:40px 16px';
-    t.innerHTML = '<div style="max-width:1200px;margin:0 auto"><h2 style="font-family:var(--fd);font-size:32px;font-weight:900;text-transform:uppercase;text-align:center;margin-bottom:5px">What Our Members Say</h2><p style="font-size:12px;color:#666;text-align:center;margin-bottom:22px">Verified purchases. Real reviews.</p><div id="ac-testi-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:13px"></div></div>';
-    ft.appendChild(t);
     var tb = document.createElement('section');
     tb.style.cssText = 'background:#111;padding:18px 16px';
     tb.innerHTML = '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px 28px"><span style="color:rgba(255,255,255,.8);font-size:11px;font-weight:600;text-transform:uppercase">Plain Brown Packaging</span><span style="color:rgba(255,255,255,.8);font-size:11px;font-weight:600;text-transform:uppercase">Secure Checkout</span><span style="color:rgba(255,255,255,.8);font-size:11px;font-weight:600;text-transform:uppercase">30-Day Guarantee</span><span style="color:rgba(255,255,255,.8);font-size:11px;font-weight:600;text-transform:uppercase">Privacy Protected</span><span style="color:rgba(255,255,255,.8);font-size:11px;font-weight:600;text-transform:uppercase">30-Day Returns</span></div>';
@@ -9698,7 +9680,6 @@ function renderAcctPanel(){
     var nlBtn = nl.querySelector('#nl-ac-btn');
     if(nlBtn) nlBtn.addEventListener('click', function(){ subNewsletter('nl-ac-email','nl-ac-fb'); });
     panel.appendChild(ft);
-    try{ renderTestimonialsInto('ac-testi-grid'); }catch(e){}
   })();
 
 }
@@ -9773,27 +9754,6 @@ try{ initAgeGate(); }catch(e){}
 <div id="vip-active-bar" style="display:none;background:linear-gradient(90deg,#373431,#4F4C49,#373431);background-size:200% 100%;animation:shimmer 2s linear infinite;color:#fff;text-align:center;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;position:fixed;top:56px;left:0;right:0;z-index:799">
    VIP DISCOUNT ACTIVE  -  PRICES UPDATED SITE-WIDE 
 </div>
-
-<!-- SOCIAL PROOF -->
-<section id="social-proof-section" style="background:#fff;padding:36px 16px;text-align:center;border-top:1px solid #E5E5E5">
-  <div style="max-width:900px;margin:0 auto">
-    <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#666;margin-bottom:18px">Trusted by Thousands</p>
-    <div style="display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-bottom:32px">
-      <div style="text-align:center"><div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,7vw,44px);font-weight:900;color:#373431" id="cnt-members">0</div><div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.07em;font-weight:600">Community Members</div></div>
-      <div style="text-align:center"><div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,7vw,44px);font-weight:900;color:#373431">34%</div><div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.07em;font-weight:600">VIP Savings</div></div>
-      <div style="text-align:center"><div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,7vw,44px);font-weight:900;color:#373431"><span id="cnt-rating">0</span>/50</div><div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.07em;font-weight:600">Avg. Rating</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section style="background:#F8F5F2;padding:40px 16px">
-  <div style="max-width:1200px;margin:0 auto">
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,6vw,38px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;text-align:center;margin-bottom:5px">What Our Members Say</h2>
-    <p style="font-size:12px;color:#666;text-align:center;margin-bottom:22px">Verified purchases. Real reviews.</p>
-    <div id="testimonials-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:13px"></div>
-  </div>
-</section>
 
 <!-- TRUST BAR -->
 <section style="background:#111;padding:18px 16px">
@@ -10240,15 +10200,6 @@ try{ initAgeGate(); }catch(e){}
   <p class="fc">&copy; 2026 Intimacy Supply &middot; All Rights Reserved &middot; Dharma Media &amp; Technology LLC<br>Plain Packaging Always &middot; Discreet Shipping<br><span style="font-size:9px;color:rgba(255,255,255,.25)">c/o Northwest Registered Agent, 30 N Gould St Ste N, Sheridan WY 82801</span></p>
 </footer>
 
-<!-- TESTIMONIALS -->
-<section style="background:#F8F5F2;padding:40px 16px">
-  <div style="max-width:1200px;margin:0 auto">
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,6vw,38px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;text-align:center;margin-bottom:5px">What Our Members Say</h2>
-    <p style="font-size:12px;color:#666;text-align:center;margin-bottom:22px">Verified purchases. Real reviews.</p>
-    <div id="ms-testi-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:13px"></div>
-  </div>
-</section>
-
 <!-- TRUST BAR -->
 <section style="background:#111;padding:18px 16px">
   <div style="max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;gap:16px 28px">
@@ -10417,15 +10368,6 @@ try{ initAgeGate(); }catch(e){}
   </div>
   <p class="fc">&copy; 2026 Intimacy Supply &middot; All Rights Reserved &middot; Dharma Media &amp; Technology LLC<br>Plain Packaging Always &middot; Discreet Shipping<br><span style="font-size:9px;color:rgba(255,255,255,.25)">c/o Northwest Registered Agent, 30 N Gould St Ste N, Sheridan WY 82801</span></p>
 </footer>
-
-<!-- TESTIMONIALS -->
-<section style="background:#F8F5F2;padding:40px 16px">
-  <div style="max-width:1200px;margin:0 auto">
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,6vw,38px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;text-align:center;margin-bottom:5px">What Our Members Say</h2>
-    <p style="font-size:12px;color:#666;text-align:center;margin-bottom:22px">Verified purchases. Real reviews.</p>
-    <div id="ab-testi-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:13px"></div>
-  </div>
-</section>
 
 <!-- TRUST BAR -->
 <section style="background:#111;padding:18px 16px">
