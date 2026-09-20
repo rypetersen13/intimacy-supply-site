@@ -326,6 +326,12 @@ function syncHeaderOffset(){
   }catch(e){}
 }
 window.addEventListener('load', syncHeaderOffset);
+/* Keep the offset right whenever the header changes size (fonts loading, the VIP bar showing, the phone toolbar) */
+try{
+  var _hdrWatch = document.querySelector('header');
+  if(_hdrWatch && window.ResizeObserver) new ResizeObserver(syncHeaderOffset).observe(_hdrWatch);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(syncHeaderOffset);
+}catch(e){}
 window.addEventListener('resize', syncHeaderOffset);
 window.addEventListener('resize', function(){
   var cd = document.getElementById('cd');
@@ -3755,15 +3761,10 @@ window.renderWL = renderWL;
 window.addToCart = addToCart;
 
 function showVIPBanner(){
+  /* The VIP bar lives inside the fixed header, so the page offset always comes from the real header height. */
   const bar = document.getElementById('vip-active-bar');
-  if(!bar) return;
-  if(isVIP){
-    bar.style.display = 'block';
-    document.body.style.paddingTop = (56 + bar.offsetHeight) + 'px';
-  } else {
-    bar.style.display = 'none';
-    document.body.style.paddingTop = '56px';
-  }
+  if(bar) bar.style.display = isVIP ? 'block' : 'none';
+  syncHeaderOffset();
 }
 showVIPBanner();
 

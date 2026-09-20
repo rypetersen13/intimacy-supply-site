@@ -120,3 +120,9 @@ test("return shipping is paid by the customer unless the item is defective, on e
     assert.ok(/return shipping is paid by (the customer|you)/i.test(read(f)), f + " does not say who pays return shipping");
   }
 });
+
+test("top spacing comes from the real header height (no hard-coded 56px that hides the hero)", { skip: !haveSite }, () => {
+  const js = fs.readdirSync(path.join(root, "assets")).filter(f => /^app\..*\.js$/.test(f)).map(f => read("assets/" + f)).join("\n");
+  assert.ok(!/paddingTop\s*=\s*'56px'/.test(js) && !/paddingTop\s*=\s*\(56 \+/.test(js), "the page offset is hard-coded again");
+  assert.ok(/function showVIPBanner\(\)\{[^}]*syncHeaderOffset\(\)/.test(js));
+});
