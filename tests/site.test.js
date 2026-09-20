@@ -149,6 +149,7 @@ test("option picker: sizes are labeled as sizes and the highlight follows the ch
 
 test("the Chastity cages tile opens the shop (couples > Chastity), and search prices show a dollar sign", { skip: !haveSite }, () => {
   const js = fs.readdirSync(path.join(root, "assets")).filter(f => /^app\..*\.js$/.test(f)).map(f => read("assets/" + f)).join("\n");
-  assert.ok(/sub:'Chastity'/.test(js) && !/q:'chastity'/.test(js), "the Chastity tile opens the search screen again");
+  const all = js + "\n" + read("index.html");
+  assert.ok(/sub:'Chastity'/.test(all) && !/q:'chastity'/.test(all), "the Chastity tile opens the search screen again");
   assert.ok(/sri-price">\$\$\{p\.price/.test(js), "search results lost the dollar sign");
 });
