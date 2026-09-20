@@ -146,3 +146,9 @@ test("option picker: sizes are labeled as sizes and the highlight follows the ch
   assert.ok(/function vParse/.test(js) && /data-short/.test(js) && /sizeRank/.test(js), "size labels are missing");
   assert.ok(/\.fp-th\[onclick\^="switchVariant"\]/.test(js), "photo thumbnails no longer get the active highlight");
 });
+
+test("the Chastity cages tile opens the shop (couples > Chastity), and search prices show a dollar sign", { skip: !haveSite }, () => {
+  const js = fs.readdirSync(path.join(root, "assets")).filter(f => /^app\..*\.js$/.test(f)).map(f => read("assets/" + f)).join("\n");
+  assert.ok(/sub:'Chastity'/.test(js) && !/q:'chastity'/.test(js), "the Chastity tile opens the search screen again");
+  assert.ok(/sri-price">\$\$\{p\.price/.test(js), "search results lost the dollar sign");
+});

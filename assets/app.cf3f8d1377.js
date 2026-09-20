@@ -808,7 +808,9 @@ function renderSearchResults(q){
       <div class="sri-img" style="overflow:hidden;border-radius:5px;background:#F3F0ED">${p.images && p.images[0] ? `<img src="${_escH(p.images[0])}" alt="${_escH(p.name)}" loading="lazy">` : ''}</div>
       <div>
         <div class="sri-name">${_escH(p.name)}</div>
-        <div><span class="sri-price">${p.price.toFixed(2)}</span><span class="sri-orig">${p.orig.toFixed(2)}</span></div>
+        <div>${isVIP
+          ? `<span class="sri-price">$${p.price.toFixed(2)}</span><span class="sri-orig">$${p.orig.toFixed(2)}</span>`
+          : `<span class="sri-price">$${p.price.toFixed(2)}</span><span class="sri-tag">VIP</span><span class="sri-reg">Regular $${p.orig.toFixed(2)}</span>`}</div>
       </div>
     </div>`; }).join('');
 }
@@ -970,7 +972,7 @@ var SUBCATS = {
   all:      [],
   lingerie: ['Bras','Panties','Bodysuits','Teddies','Corsets','Sets','Robes','Hosiery','Costumes'],
   toys:     ['Vibrators','Dildos','Wands','Rabbits','Bullets','Suction','Thrusting','Remote Control'],
-  couples:  ['Kits','Bondage','Games','Strap-Ons','Double','Rings','Restraints'],
+  couples:  ['Kits','Bondage','Chastity','Games','Strap-Ons','Double','Rings','Restraints'],
   wellness: ['Lubricants','Massage','Oils','Candles','Supplements','Sprays'],
   anal:     ['Plugs','Beads','Dildos','Prostate','Training Sets','Vibrating'],
 };
@@ -981,7 +983,7 @@ var SUBCAT_RX = {
   'Robes':/\brobe|kimono|chemise|negligee/i, 'Hosiery':/stocking|hosiery|thigh[- ]?high|tights|pantyhose|garter|fishnet/i, 'Costumes':/costume/i,
   'Vibrators':/vibrat/i, 'Dildos':/dildo|\bdong\b/i, 'Wands':/\bwand/i, 'Rabbits':/rabbit/i, 'Bullets':/bullet/i,
   'Suction':/suction|suck|clitoral stim/i, 'Thrusting':/thrust/i, 'Remote Control':/remote/i,
-  'Kits':/\bkit\b|\bset\b/i, 'Bondage':/bondage|\bbind|tape|rope|cuff|restrain/i, 'Games':/game|dice|cards\b|book/i, 'Strap-Ons':/strap/i,
+  'Kits':/\bkit\b|\bset\b/i, 'Chastity':/chastity|cock[- ]?cage|\bcage\b/i, 'Bondage':/bondage|\bbind|tape|rope|cuff|restrain/i, 'Games':/game|dice|cards\b|book/i, 'Strap-Ons':/strap/i,
   'Double':/double|dual|duo|twin/i, 'Rings':/\bring/i, 'Restraints':/restrain|cuff|shackle|collar/i,
   'Lubricants':/lube|lubric|glide|slick|gel\b/i, 'Massage':/massage/i, 'Oils':/\boils?\b/i, 'Candles':/candle/i,
   'Supplements':/supplement|capsule|\bpills?\b/i, 'Sprays':/spray/i,
