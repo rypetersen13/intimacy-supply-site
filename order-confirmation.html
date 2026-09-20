@@ -415,12 +415,12 @@
       `;
     }
 
-    // Fallback content shown only if no real order can be loaded (e.g. someone
-    // opens this page directly without an orderId, or the lookup fails).
+    // Shown only if the order cannot be loaded (someone opens this page directly, or the lookup fails
+    // after a few tries). It never shows made-up $0.00 prices.
     function renderFallback(){
-      renderItems([{ name: 'Your order', qty: 1, price: 0 }]);
-      renderBreakdown({ subtotal: 0, shipping: 0, tax: 0, total: 0 });
-      document.getElementById('confText').textContent = 'A receipt and welcome details are headed to your inbox now.';
+      listEl.innerHTML = '<div class="order-row"><div class="order-info"><span class="order-name">Your payment was received<span class="qty">We could not load your item list just now. Your order number is shown above.</span></span></div></div>';
+      breakdownEl.innerHTML = '';
+      document.getElementById('confText').textContent = 'CCBill will email your payment receipt. Questions? hello@intimacysupply.com';
     }
 
     const params = new URLSearchParams(window.location.search);
@@ -435,19 +435,30 @@
 
     if (orderId) {
       orderNumberEl.textContent = '#' + orderId;
+      try {
+        var _em = localStorage.getItem('is_last_email'), _flag = 'is_conf_' + orderId;
+        if (_em && !localStorage.getItem(_flag)) {
+          localStorage.setItem(_flag, '1');
+          fetch('https://a.klaviyo.com/client/events/?company_id=UFRYNs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'revision': '2023-02-22' },
+            body: JSON.stringify({ data: { type: 'event', attributes: { metric: { data: { type: 'metric', attributes: { name: 'Purchase Confirmed' } } }, profile: { data: { type: 'profile', attributes: { email: _em } } }, properties: { orderId: orderId }, time: new Date().toISOString() } } }) }).catch(function(){});
+        }
+      } catch (e) {}
       let orderKey = '';
       try { orderKey = localStorage.getItem('is_pending_key') || ''; } catch(e){}
-      fetch('/.netlify/functions/get-order?orderId=' + encodeURIComponent(orderId) + '&k=' + encodeURIComponent(orderKey))
-        .then(res => { if (!res.ok) throw new Error('lookup failed'); return res.json(); })
-        .then(data => {
-          renderItems(data.items && data.items.length ? data.items : [{ name: 'Your order', qty: 1, price: 0 }]);
-          if (data.pricing) renderBreakdown(data.pricing);
-          else renderBreakdown({ subtotal: 0, shipping: 0, tax: 0, total: 0 });
-        })
-        .catch(err => {
-          console.error('[order-confirmation] could not load order:', err);
-          renderFallback();
-        });
+      const loadOrder = (attempt) => {
+        fetch('/.netlify/functions/get-order?orderId=' + encodeURIComponent(orderId) + '&k=' + encodeURIComponent(orderKey))
+          .then(res => { if (!res.ok) throw new Error('lookup failed'); return res.json(); })
+          .then(data => {
+            renderItems(data.items && data.items.length ? data.items : [{ name: 'Your order', qty: 1, price: 0 }]);
+            if (data.pricing) renderBreakdown(data.pricing); else breakdownEl.innerHTML = '';
+          })
+          .catch(err => {
+            console.error('[order-confirmation] could not load order (try ' + attempt + '):', err);
+            if (attempt < 3) setTimeout(() => loadOrder(attempt + 1), 1500 * attempt);
+            else renderFallback();
+          });
+      };
+      loadOrder(1);
     } else {
       renderFallback();
     }
