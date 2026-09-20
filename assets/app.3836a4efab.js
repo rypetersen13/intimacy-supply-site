@@ -745,47 +745,72 @@ function openSearch(){
 }
 function closeSearch(){ document.getElementById('so').classList.remove('open'); document.body.style.overflow=''; }
 
+var _sIdx = null, _sIdxN = -1, _sLogT = null, _sSent = {}, _popular = null;
+function getSearchIndex(){
+  if(!_sIdx || _sIdxN !== PRODUCTS_ALL.length){ _sIdx = new ISSearch.Index(PRODUCTS_ALL); _sIdxN = PRODUCTS_ALL.length; }
+  return _sIdx;
+}
+function _escH(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+/* Log what people search for once they pause typing (not on every keystroke) */
+function logSearch(q, count, corrected){
+  clearTimeout(_sLogT);
+  _sLogT = setTimeout(function(){
+    try{
+      gaEvent('search', { search_term: q, results_count: count, corrected: !!corrected });
+      if(count === 0){
+        gaEvent('search_no_results', { search_term: q });
+        var key = q.toLowerCase();
+        if(!_sSent[key] && q.length >= 3){
+          _sSent[key] = 1;
+          fetch('/.netlify/functions/search-miss', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ q: q }), keepalive: true }).catch(function(){});
+        }
+      }
+    }catch(e){}
+  }, 900);
+}
+function searchFor(term){ var si = document.getElementById('search-input'); if(si) si.value = term; renderSearchResults(term); }
 function renderSearchResults(q){
   const lbl = document.getElementById('search-results-label');
   const grid = document.getElementById('search-results');
   const noR = document.getElementById('no-results');
-  let results;
+  q = (q || '').trim();
+  let results = [], corrected = false, usedQuery = q;
   if (q) {
-    const ql = q.toLowerCase().trim();
-    // Synonym/concept expansion: map search intent to gender or keyword groups
-    const forHim  = /(for him|his pleasure|male|men'?s|guys?)/.test(ql);
-    const forHer  = /(for her|her pleasure|female|women'?s|ladies)/.test(ql);
-    results = PRODUCTS_ALL.filter(function(p){
-      const hay = (p.name + ' ' + (p.brand||'') + ' ' + (p.desc||'') + ' ' + p.cat).toLowerCase();
-      if (hay.indexOf(ql) !== -1) return true;
-      if (forHim && productGender(p) === 'his')  return true;
-      if (forHer && productGender(p) === 'hers') return true;
-      return false;
-    });
+    const ql = q.toLowerCase();
+    const forHim = /(for him|his pleasure|male|men'?s|guys?)/.test(ql);
+    const forHer = /(for her|her pleasure|female|women'?s|ladies)/.test(ql);
+    const rest = ql.replace(/(for him|his pleasure|male|men'?s|guys?|for her|her pleasure|female|women'?s|ladies)/g, ' ').trim();
+    let pool = PRODUCTS_ALL;
+    if (forHim || forHer) pool = PRODUCTS_ALL.filter(function(p){ const g = productGender(p); return (forHim && g === 'his') || (forHer && g === 'hers'); });
+    if (rest) {
+      const r = ((forHim || forHer) ? new ISSearch.Index(pool) : getSearchIndex()).search(rest);
+      results = r.results; corrected = r.corrected; usedQuery = r.usedQuery;
+    } else { results = pool; }
   } else {
-    results = PRODUCTS_ALL.slice(0,6);
+    if (!_popular) _popular = PRODUCTS_ALL.slice().sort(function(a, b){ return (a.f == null ? 1e9 : a.f) - (b.f == null ? 1e9 : b.f); });
+    results = _popular;
   }
-  lbl.textContent = q ? `${results.length} Results for "${q}"` : 'Popular Products';
-  // Track what people search for + whether we had it. Zero-result searches
-  // reveal demand for products we may not carry.
-  if(q){
-    try{
-      gaEvent('search', { search_term: q, results_count: results.length });
-      if(results.length === 0) gaEvent('search_no_results', { search_term: q });
-    }catch(e){}
+  const seen = {};
+  results = results.filter(function(p){ const k = p.slug || p.name; if (seen[k] || p.inStock === false) return false; seen[k] = 1; return true; });
+  if (!q) results = results.slice(0, 6);
+  lbl.textContent = !q ? 'Popular Products' : (corrected ? `Showing ${results.length} results for "${usedQuery}" (you typed "${q}")` : `${results.length} Results for "${q}"`);
+  if (q) logSearch(q, results.length, corrected);
+  if (results.length === 0) {
+    grid.innerHTML = '';
+    noR.innerHTML = '<div>No results for &ldquo;<b>' + _escH(q) + '</b>&rdquo;. Try a shorter word or pick one:</div><div class="nr-sugg">'
+      + [['Vibrators','vibrator'],['Dildos','dildo'],['Lingerie','lingerie'],['Butt plugs','butt plug'],['Cages','chastity cage'],['Lube','lube']].map(function(x){ return '<button type="button" onclick="searchFor(\'' + x[1] + '\')">' + x[0] + '</button>'; }).join('') + '</div>';
+    noR.style.display = 'block'; return;
   }
-  if(results.length===0){ grid.innerHTML=''; noR.style.display='block'; return; }
-  noR.style.display='none';
+  noR.style.display = 'none';
   results = results.slice(0, 40);
-  grid.innerHTML = results.map(p=>`
+  grid.innerHTML = results.map(function(p){ return `
     <div class="sri" onclick="closeSearch();openPD('${p.id}')">
-      <div class="sri-img" style="overflow:hidden;border-radius:5px;background:#F3F0ED">${p.images&&p.images[0]?`<img src="${p.images[0]}" alt="${p.name}" loading="lazy">`:''}</div>
+      <div class="sri-img" style="overflow:hidden;border-radius:5px;background:#F3F0ED">${p.images && p.images[0] ? `<img src="${_escH(p.images[0])}" alt="${_escH(p.name)}" loading="lazy">` : ''}</div>
       <div>
-        <div class="sri-name">${p.name}</div>
+        <div class="sri-name">${_escH(p.name)}</div>
         <div><span class="sri-price">${p.price.toFixed(2)}</span><span class="sri-orig">${p.orig.toFixed(2)}</span></div>
       </div>
-    </div>
-  `).join('');
+    </div>`; }).join('');
 }
 
 /* search-input wired in wireEvents() above */
@@ -1782,6 +1807,7 @@ function renderQuiz(step){
       + '<input class="qfi" id="qf-pass" type="password" placeholder="Password (6 characters minimum) *" required autocomplete="new-password">'
       + '<input class="qfi" id="qf-phone" type="tel" placeholder="Phone Number (optional)" autocomplete="tel">'
       + '</div>'
+      + '<label class="qf-opt"><input type="checkbox" id="qf-mkt"> Email me offers and bag reminders (optional, unsubscribe any time)</label>'
       + '<div class="qerr-banner" id="qf-err-banner"></div>'
       + '<div class="qerr" id="qf-err">Please fill in all required fields correctly.</div>'
       + '<button class="qnb plum-btn" id="unlock-btn" onclick="submitAccount()">CREATE ACCOUNT &nbsp;&#8250;</button>'
@@ -1881,6 +1907,7 @@ function submitAccount(){
   const email = document.getElementById('qf-email').value.trim();
   const pass  = document.getElementById('qf-pass').value;
   const phone = document.getElementById('qf-phone')?.value.trim()||'';
+  const mktOptIn = !!(document.getElementById('qf-mkt') && document.getElementById('qf-mkt').checked);
   const err   = document.getElementById('qf-err');
 
   if(!name){ err.textContent='Please enter your first name.'; err.style.display='block'; return; }
@@ -1916,8 +1943,9 @@ function submitAccount(){
         dobYear:   quizData.dobYear   || '',
         source:    quizData.source    || '',
         affiliate: getAffiliateRef()  || null,
+        marketingOptIn: mktOptIn,
       };
-      return db.collection('users').doc(uid).set(profile).then(()=>profile);
+      return db.collection('users').doc(uid).set(profile).then(()=>Object.assign({ uid: uid }, profile));
     })
     .then(profile=>{
       user  = profile;
@@ -1925,6 +1953,8 @@ function submitAccount(){
       quizData = {};
       // [KLAVIYO] Identify new VIP member and fire signup event
       klaviyoIdentify(profile);
+      if(mktOptIn){ try{ subscribeKlaviyo(profile.email, 'account_signup'); }catch(e){} }
+      try{ localStorage.setItem('is_last_email', profile.email || ''); }catch(e){}
       klaviyoTrackEvent('VIP Signup', {
         email:    profile.email,
         firstName:profile.firstName,
@@ -2074,6 +2104,12 @@ function openCheckout(){
     return;
   }
   closeCart();
+  try{
+    var _cv = cart.reduce(function(s,i){ var p = PRODUCTS.find(function(x){ return String(x.id)===String(i.id); }); return p ? s + p.orig*i.qty : s; }, 0);
+    localStorage.setItem('is_last_email', (user && user.email) || '');
+    /* Feeds the "left something in your bag" email; the email itself never names products. */
+    klaviyoTrackEvent('Started Checkout', { value: +_cv.toFixed(2), itemCount: cart.reduce(function(s,i){ return s+i.qty; }, 0), resumeUrl: 'https://intimacysupply.com/?open=cart' });
+  }catch(e){}
   checkoutStep=1;
   checkoutData={};
   gaEvent('begin_checkout', { currency:'USD', items: cart.map(i=>{ const p=PRODUCTS.find(x=>String(x.id)===String(i.id)); return { item_id:p.id, item_name:p.name, price:isVIP?p.price:p.orig, quantity:i.qty }; }) });
@@ -3198,6 +3234,7 @@ filterProds('all');
 renderCart();
 renderWL();
 updateHeader();
+try{ if(/[?&]open=cart/.test(location.search)) setTimeout(function(){ if(cart.length) openCart(); }, 900); }catch(e){}
 closeAcctMenu();
 
 // Restore wishlist badge
@@ -4361,8 +4398,15 @@ function renderAcctPanel(){
   /* Orders */
   var storedOrders = JSON.parse(localStorage.getItem('is_orders') || '[]');
   if(db && user && user.uid){
-    db.collection('orders').where('userId','==',user.uid).orderBy('timestamp','desc').limit(5).get()
-      .then(function(snap){
+    /* No orderBy in the query: that needs a special database index that was never created, so the list came back empty. Sort here instead. */
+    db.collection('orders').where('userId','==',user.uid).get()
+      .then(function(snap0){
+        var _docs = snap0.docs.slice().sort(function(a, b){
+          var ta = a.data().timestamp && a.data().timestamp.toMillis ? a.data().timestamp.toMillis() : 0;
+          var tb = b.data().timestamp && b.data().timestamp.toMillis ? b.data().timestamp.toMillis() : 0;
+          return tb - ta;
+        }).slice(0, 10);
+        var snap = { empty: _docs.length === 0, docs: _docs };
         if(!snap.empty){
           var inner = document.querySelector('#ac-panel-overview .ac-orders-preview');
           if(inner){

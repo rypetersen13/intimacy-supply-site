@@ -4538,6 +4538,12 @@ button[onclick*="subNewsletter"],button#nl-ac-btn{background:#fff!important;colo
 .cart-vip-offer b{display:block;font-size:15px;margin-bottom:2px}
 .cart-vip-offer span{color:#5a4a52}
 .ch-fi.ch-err{border-color:#D4000F!important;outline:1px solid #D4000F}
+
+#no-results{padding:18px 16px;color:#555;font-size:15px;line-height:1.5}
+.nr-sugg{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+.nr-sugg button{font:inherit;font-size:14px;padding:9px 14px;border:1px solid #cfc9c2;border-radius:999px;background:#fff;color:#111;cursor:pointer}
+.qf-opt{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:#555;line-height:1.4;margin:6px 2px 12px;text-align:left}
+.qf-opt input{margin-top:3px;flex:none}
 /* tags and pills */
 .pd-off-pill,.pd-price-badge,.pd-bdg.sale,.pd-vip-badge,.pd-lto,.pd-vip-pill,.gc-pill-badge,.ac-order-status,.chpb,.ch-vip-header{background:var(--ink);color:#fff}
 .cibdg,.ch-bag-badge{background:var(--brand-red);color:#fff}
