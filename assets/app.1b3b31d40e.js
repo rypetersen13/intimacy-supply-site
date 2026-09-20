@@ -535,7 +535,7 @@ function renderCart(){
   // Bag preview advertises VIP pricing by default (matches product pages) until
   // checkout has explicitly declined it -- separate from the real opt-in check
   // used at checkout/submit below, which requires an active choice.
-  var showVIP      = isVIP || (typeof checkoutData==='undefined' || checkoutData.wantsVIP !== false);
+  var showVIP      = isVIP || (typeof checkoutData!=='undefined' && checkoutData && checkoutData.wantsVIP === true);
   var displaySub   = showVIP ? subtotalVIP : subtotalOrig;
   var vipSavings   = showVIP ? subtotalOrig - subtotalVIP : 0;
   var redeemState  = cartRedeemState();
@@ -601,7 +601,12 @@ function renderCart(){
 
   /* VIP upsell */
   var vipSection = document.getElementById('cart-vip-section');
-  if(vipSection){ vipSection.innerHTML = ''; }
+  if(vipSection){
+    var _pot = subtotalOrig - subtotalVIP;
+    vipSection.innerHTML = (!showVIP && _pot > 0.005)
+      ? '<div class="cart-vip-offer"><b>Save $' + _pot.toFixed(2) + ' with VIP</b><span>Choose VIP at checkout for up to 34% off. VIP is $39.95 a month, billed on the 6th. Skip any month or cancel any time.</span></div>'
+      : '';
+  }
 
   /* Order summary */
   var sumWrap = document.getElementById('cart-summary-wrap');
@@ -1641,6 +1646,7 @@ function addToCartVIP(){
     pendingCartAdd = { id:p.id, size:sz, color:detailColor, qty:detailQty };
   }catch(e){}
   addToCartFromDetail();
+  try{ toast('Added to your bag. Choose VIP at checkout to save.'); }catch(e){}
 }
 
 function addToCartFromDetailRedeem(){
@@ -2350,6 +2356,16 @@ function goCheckout(step){
     const city=document.getElementById('ch-city')?.value.trim();
     const state=document.getElementById('ch-state')?.value.trim();
     if(!fn||!ln||!addr||!zip||!city||!state){ toast('Please fill in all required shipping fields.'); return; }
+    var _ph = document.getElementById('ch-phone');
+    var _digits = ((_ph && _ph.value) || '').replace(/\D/g, '');
+    var _cty = (document.getElementById('ch-country')?.value.trim() || 'United States');
+    var _us = /^(united states|usa|us|u\.s\.a?\.?)$/i.test(_cty);
+    var _phoneOk = _us ? (_digits.length === 10 || (_digits.length === 11 && _digits.charAt(0) === '1')) : _digits.length >= 7;
+    if(!_phoneOk){
+      toast('Please enter a valid phone number. We need it for delivery.');
+      if(_ph){ _ph.classList.add('ch-err'); _ph.focus(); try{ _ph.scrollIntoView({block:'center'}); }catch(e){} }
+      return;
+    }
     // VIP pricing shows by default (matches the bag) unless explicitly declined.
     // The separate, always-unchecked "I authorize $39.95/month" box on the Review
     // step is the actual required consent for the recurring membership charge.

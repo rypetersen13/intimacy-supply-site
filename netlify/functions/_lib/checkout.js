@@ -30,6 +30,8 @@ async function prepareCheckout(event, mode, deps) {
   if (!order) throw new HttpError(404, "order not found");
   if (order.userId !== uid) throw new HttpError(403, "order does not belong to this account");
   if (order.paymentStatus !== "unpaid") throw new HttpError(409, "this order was already processed");
+  const phoneDigits = String((order.customer && order.customer.phone) || "").replace(/\D/g, "");
+  if (phoneDigits.length < 7) throw new HttpError(422, "a phone number is required for delivery");
 
   const user = (await d.fs.getDoc("users/" + uid)) || {};
   const isMember = user.isVIP === true;

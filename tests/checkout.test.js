@@ -21,7 +21,7 @@ function deps({ order, user, uid = "u1", authOk = true, patched }) {
   };
 }
 const ev = (b) => ({ httpMethod: "POST", headers: { host: "intimacysupply.com" }, body: JSON.stringify({ idToken: "t", orderId: ORDER, itemTotal: 0, ...b }) });
-const order = (o = {}) => ({ userId: "u1", paymentStatus: "unpaid", delivery: "standard", items: [{ productId: "A", qty: 1 }], ...o });
+const order = (o = {}) => ({ userId: "u1", paymentStatus: "unpaid", delivery: "standard", customer: { phone: "9205709365" }, items: [{ productId: "A", qty: 1 }], ...o });
 const expectStatus = async (p, status) => { await assert.rejects(p, e => e.status === status, `expected ${status}`); };
 
 process.env.CCBILL_SALT_KEY = "test-salt";
@@ -103,4 +103,10 @@ test("items on the distributor's unavailable list block checkout, and a missing 
 
 test("out-of-stock and unknown items block checkout", async () => {
   await expectStatus(prepareCheckout(ev({}), "vip", deps({ order: order({ items: [{ productId: "ZZZ", qty: 1 }] }), user: {} })), 422);
+});
+
+test("a phone number is required before payment", async () => {
+  await expectStatus(prepareCheckout(ev({}), "vip", deps({ order: order({ customer: { phone: "" } }), user: {} })), 422);
+  await expectStatus(prepareCheckout(ev({}), "vip", deps({ order: order({ customer: {} }), user: {} })), 422);
+  await expectStatus(prepareCheckout(ev({}), "vip", deps({ order: order({ customer: { phone: "12" } }), user: {} })), 422);
 });

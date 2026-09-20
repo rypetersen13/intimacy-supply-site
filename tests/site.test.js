@@ -126,3 +126,9 @@ test("top spacing comes from the real header height (no hard-coded 56px that hid
   assert.ok(!/paddingTop\s*=\s*'56px'/.test(js) && !/paddingTop\s*=\s*\(56 \+/.test(js), "the page offset is hard-coded again");
   assert.ok(/function showVIPBanner\(\)\{[^}]*syncHeaderOffset\(\)/.test(js));
 });
+
+test("the bag shows regular prices until VIP is chosen, and checkout requires a phone number", { skip: !haveSite }, () => {
+  const js = fs.readdirSync(path.join(root, "assets")).filter(f => /^app\..*\.js$/.test(f)).map(f => read("assets/" + f)).join("\n");
+  assert.ok(!/checkoutData\.wantsVIP !== false/.test(js), "the bag pre-applies VIP pricing again");
+  assert.ok(/cart-vip-offer/.test(js) && /valid phone number/.test(js));
+});
