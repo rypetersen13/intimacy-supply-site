@@ -114,6 +114,78 @@ for gk in order:
     for v in vs: v["s"] = slug
     glist.append(g)
 
+
+# ---------- featured ordering ----------
+# The default "Featured" order shows what shoppers actually buy first: vibrators, outfits for women,
+# dildos, butt plugs and chastity cages, mixed together and spread across brands, with books,
+# games, oils, cleaners and similar items at the back.
+FEAT_TYPES = [
+    ("vibrator", re.compile(r"vibrat|rabbit|\bwand\b|bullet|clitoral|g-?spot|massager", re.I)),
+    ("dildo",    re.compile(r"dildo|\bdong\b|realistic", re.I)),
+    ("plug",     re.compile(r"\bplug\b", re.I)),
+    ("cage",     re.compile(r"chastity|\bcage\b", re.I)),
+]
+FEAT_TIER2 = re.compile(r"strap-?on|harness|cock ?ring|c-?ring|stroker|masturbat|pocket pussy|prostate|nipple|restraint|cuff|paddle|ben wa|kegel", re.I)
+FEAT_HIDE = re.compile(r"\bbooks?\b|\bgames?\b|\bdvd\b|batter|cleaner|\blube\b|lubric|\boils?\b|candle|gift card|sample|storage|\bbag\b|poster|\bcards?\b|\bdice\b|magazine|\bkit\b.*(care|clean)", re.I)
+OUTFIT_BONUS = re.compile(r"babydoll|teddy|chemise|bodysuit|corset|bustier|\bset\b|dress|gown|robe|costume|catsuit|negligee|lingerie", re.I)
+PATTERN = ["vibrator", "outfit", "dildo", "vibrator", "outfit", "plug", "dildo", "outfit", "cage", "vibrator", "outfit", "plug"]
+
+def feat_type(g):
+    name = g["name"]
+    if FEAT_HIDE.search(name): return "other"
+    if g["cat"] == "lingerie": return "outfit"
+    for t, rx in FEAT_TYPES:
+        if rx.search(name): return t
+    if FEAT_TIER2.search(name): return "tier2"
+    return "other"
+
+def rank_featured(groups):
+    brand_n = {}
+    for g in groups: brand_n[g["brand"].lower()] = brand_n.get(g["brand"].lower(), 0) + 1
+    def score(g):
+        v = g["price"]; sc = 0.0
+        if 25 <= v <= 130: sc += 30
+        elif 15 <= v < 25 or 130 < v <= 220: sc += 10
+        elif v < 10: sc -= 15
+        sc += math.log(brand_n.get(g["brand"].lower(), 1) + 1) * 5
+        if len(g["variants"]) > 1: sc += 8
+        if any(x["isNew"] for x in g["variants"]): sc += 5
+        if g["type"] == "outfit" and OUTFIT_BONUS.search(g["name"]): sc += 12
+        return sc
+    live = [g for g in groups if g["inStock"]]
+    dead = [g for g in groups if not g["inStock"]]
+    for g in groups: g["type"] = feat_type(g); g["fscore"] = score(g)
+    queues = {}
+    for g in live: queues.setdefault(g["type"], []).append(g)
+    def diversify(items, gap=4):
+        items = sorted(items, key=lambda g: -g["fscore"])
+        out, recent, pool = [], [], items
+        while pool:
+            pick = next((g for g in pool if g["brand"].lower() not in recent), pool[0])
+            pool.remove(pick); out.append(pick)
+            recent.append(pick["brand"].lower())
+            if len(recent) > gap: recent.pop(0)
+        return out
+    for t in list(queues): queues[t] = diversify(queues[t])
+    order, idx = [], {t: 0 for t in queues}
+    main = set(t for t in PATTERN)
+    while any(idx.get(t, 0) < len(queues.get(t, [])) for t in main):
+        for t in PATTERN:
+            q = queues.get(t, [])
+            if idx.get(t, 0) < len(q):
+                order.append(q[idx[t]]); idx[t] += 1
+    rest = []
+    for t in queues:
+        if t not in main: rest += queues[t]
+    order += diversify(rest)
+    order += sorted(dead, key=lambda g: -g["fscore"])
+    for i, g in enumerate(order): g["rank"] = i
+    return order
+
+glist = rank_featured(glist)
+for g in glist:
+    for v in g["variants"]: v["f"] = g["rank"]
+
 # ---------- brands ----------
 brand_names, brands = {}, {}
 for g in glist:
@@ -131,7 +203,7 @@ for g in glist:
 lean = []
 for p in products:
     d = {"model": p["model"], "name": p["name"], "cat": p["cat"], "price": p["price"], "orig": p["orig"],
-         "image": p["image"], "brand": p["brand"], "b": p["b"], "s": p["s"]}
+         "image": p["image"], "brand": p["brand"], "b": p["b"], "s": p["s"], "f": p["f"]}
     if not p["inStock"]: d["inStock"] = False
     if p["isNew"]: d["isNew"] = True
     if p["rating"]: d["rating"] = p["rating"]
@@ -217,7 +289,11 @@ for g in glist:
             '<div class="thumbs">%s</div></div>'
             '<div class="pdp-info"><div class="pdp-brand">%s</div><h1>%s</h1><div id="pdp-price">%s</div>%s'
             '<a id="pdp-add" class="btn-black" href="/?product=%s">%s</a>'
-            '<p class="pdp-note">VIP members pay the VIP price. Everyone else pays the regular price. Ships in plain packaging with discreet billing. A free account is required to shop.</p>'
+            '<p class="pdp-note">VIP members pay the VIP price. Everyone else pays the regular price. Add to your bag now; a free account is created at checkout.</p>'
+            '<ul class="pdp-facts"><li><b>Plain packaging.</b> Unmarked brown box; your statement shows DHARMA*INTIMACYSUP.</li>'
+            '<li><b>Delivery.</b> Standard 6&ndash;10 business days after shipping, free over $59.97. Expedited 3&ndash;4 business days.</li>'
+            '<li><b>Returns.</b> Unopened items within 30 days of delivery; you pay return shipping. Damaged or defective: tell us within 7 days and we cover it.</li>'
+            '<li><b>Sold by</b> Dharma Media &amp; Technology LLC &middot; hello@intimacysupply.com &middot; (559) 334-0826</li></ul>'
             '<h2>Details</h2><p class="pdp-desc">%s</p>%s'
             '<p class="pdp-meta"><a href="/vip-membership">How VIP pricing works</a> &middot; <a href="/shipping-returns">Shipping &amp; returns</a></p></div></div>'
             '<h2 class="rel-h">You may also like</h2><div class="grid">%s</div>') % (

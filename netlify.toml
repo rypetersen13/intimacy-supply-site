@@ -88,3 +88,7 @@
   to = "/404.html"
   status = 404
   force = true
+
+# Review requests two weeks after payment (dry run until REVIEW_EMAILS_LIVE=1 is set in Netlify).
+[functions."send-review-requests"]
+  schedule = "0 16 * * *"

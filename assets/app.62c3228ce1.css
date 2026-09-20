@@ -4500,6 +4500,39 @@ button[onclick*="subNewsletter"],button#nl-ac-btn{background:#fff!important;colo
 /* the hero already sits above the scale line: no duplicate trust row, and a balanced 2x2 line on phones */
 #hero .tr{display:none}
 @media(max-width:600px){#scale-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;letter-spacing:.1em}}
+
+/* ── Start here tiles ── */
+#start-here[hidden]{display:none!important}
+.start-here{background:#fff;padding:34px 0 4px}
+.sh-h{font-family:var(--fd);font-size:27px;font-weight:800;text-align:center;margin:0 0 6px;text-transform:none;letter-spacing:0;color:#4A1D38}
+.sh-s{text-align:center;color:#666;font-size:14px;margin:0 16px 16px}
+.sh-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 16px 24px;max-width:1240px;margin:0 auto}
+@media(min-width:760px){.sh-grid{grid-template-columns:repeat(6,1fr)}}
+.sh-tile{display:block;background:#F6F3EE;border:none;padding:0;text-align:left;cursor:pointer;font:inherit}
+.sh-tile img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#EEE9E2}
+.sh-tile span{display:block;padding:11px 12px;font-weight:700;font-size:15px;color:#111;background:#fff;border:1px solid #E7E2DB;border-top:none}
+/* ── Filter & Sort pill and sheet ── */
+#fs-pill{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);opacity:0;pointer-events:none;transition:transform .25s,opacity .25s;z-index:90;background:#1B1B19;color:#fff;border:none;border-radius:999px;padding:14px 22px;font:700 14px var(--fb);letter-spacing:.06em;text-transform:uppercase;box-shadow:0 4px 18px rgba(0,0,0,.28);display:flex;gap:8px;align-items:center;cursor:pointer}
+#fs-pill.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+#fs-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;display:none}
+#fs-ov.open{display:block}
+#fs-sheet{position:fixed;left:0;right:0;bottom:0;max-height:86vh;background:#fff;z-index:401;display:none;flex-direction:column;border-radius:14px 14px 0 0}
+#fs-sheet.open{display:flex}
+@media(min-width:760px){#fs-sheet{left:50%;right:auto;width:520px;transform:translateX(-50%)}}
+.fs-hd{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid #E7E2DB;font-size:18px}
+.fs-hd button{background:none;border:none;font-size:28px;line-height:1;cursor:pointer;color:#111}
+.fs-body{overflow-y:auto;padding:6px 18px 12px}
+.fs-sec h3{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#777;margin:16px 0 8px;font-weight:700}
+.fs-chip{font:inherit;font-size:14px;padding:9px 14px;margin:0 8px 8px 0;border:1px solid #cfc9c2;border-radius:999px;background:#fff;color:#111;cursor:pointer}
+.fs-chip.on{background:#1B1B19;color:#fff;border-color:#1B1B19}
+.fs-ft{display:flex;gap:10px;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid #E7E2DB}
+.fs-clear{flex:none;background:#fff;border:1.5px solid #1B1B19;color:#111;font:700 14px var(--fb);padding:14px 18px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em}
+.fs-show{flex:1;background:#1B1B19;border:none;color:#fff;font:700 14px var(--fb);padding:14px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em}
+/* trust facts on the product page */
+.fp-facts p{margin:0 0 10px;line-height:1.55}
+.fp-facts b{color:#111}
+#cdb{display:none!important}
+.fs-open #sticky-vip-cta,.fs-open #fs-pill{display:none!important}
 /* tags and pills */
 .pd-off-pill,.pd-price-badge,.pd-bdg.sale,.pd-vip-badge,.pd-lto,.pd-vip-pill,.gc-pill-badge,.ac-order-status,.chpb,.ch-vip-header{background:var(--ink);color:#fff}
 .cibdg,.ch-bag-badge{background:var(--brand-red);color:#fff}

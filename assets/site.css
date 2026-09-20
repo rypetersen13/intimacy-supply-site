@@ -164,3 +164,6 @@ h1{color:#4A1D38}
 .st-paid{font-weight:700}.st-confirmed{font-weight:700;color:#1B1B19}.st-pending{color:var(--muted)}
 @media(max-width:520px){.tbl:not(.tbl-3) .tbl-h,.tbl:not(.tbl-3) .tbl-r{grid-template-columns:1fr 1fr 1fr;font-size:13px}.tbl:not(.tbl-3) .tbl-h span:nth-child(2),.tbl:not(.tbl-3) .tbl-r span:nth-child(2),.tbl:not(.tbl-3) .tbl-h span:nth-child(3),.tbl:not(.tbl-3) .tbl-r span:nth-child(3){display:none}}
 .vip-hero .btn-red,.vip-hero .btn-ghost{margin:6px 8px 6px 0}
+
+.pdp-facts{list-style:none;padding:0;margin:18px 0 6px;border-top:1px solid var(--line);font-size:14px}
+.pdp-facts li{padding:11px 0;border-bottom:1px solid var(--line);line-height:1.5}

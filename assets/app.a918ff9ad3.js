@@ -250,6 +250,7 @@ let wheelSpun = false;
 let quizStep = 1;
 
 const FREE_SHIP = 59.97;
+const SHIP_STD = 9.95;   /* standard shipping under the free-shipping threshold: one number for the label, the total and the policy text */
 
 /* ═══════════════════════════════════════════
    AFFILIATE / PARTNER TRACKING
@@ -408,12 +409,6 @@ document.addEventListener('click',()=>closeAcctMenu());
    CART
 ═══════════════════════════════════════════ */
 function addToCart(id, size, color){
-  // Require account to add to cart - Retail model
-  if(!user){
-    toast('Create your free VIP account to add items to your bag.');
-    setTimeout(()=>openQuiz('add_to_cart_gate'), 600);
-    return;
-  }
   const p = PRODUCTS.find(x=>String(x.id)===String(id)) || PRODUCTS_ALL.find(x=>String(x.id)===String(id));
   const key = id+'-'+(size||'One Size')+'-'+color;
   const ex = cart.find(x=>x.key===key);
@@ -544,7 +539,7 @@ function renderCart(){
   var promoResult  = calcPromoDiscount(chargeSub);
   var afterPromo   = Math.max(0, chargeSub - promoResult.promoAmt);
   var freeShip     = promoResult.freeShip || afterPromo >= FREE_SHIP;
-  var shipCost     = freeShip ? 0 : 9.95;
+  var shipCost     = freeShip ? 0 : SHIP_STD;
   var tax          = afterPromo * 0.0875;
   var total        = afterPromo + shipCost + tax;
   var toFreeShip   = Math.max(0, FREE_SHIP - afterPromo);
@@ -1229,23 +1224,8 @@ function hydrateProduct(p, cb){
     .catch(function(){ [PRODUCTS, PRODUCTS_ALL, PRODUCTS_ALL_MASTER].forEach(function(arr){ (arr||[]).forEach(function(q){ if(String(q.id)===String(p.id)) q.desc=''; }); }); cb(); });
 }
 function openPD(id){
-  var _hp = user && (PRODUCTS_ALL_MASTER.find(function(x){ return String(x.id)===String(id); }));
+  var _hp = PRODUCTS_ALL_MASTER.find(function(x){ return String(x.id)===String(id); });
   if(_hp && _hp.desc == null && _hp.b != null){ hydrateProduct(_hp, function(){ openPD(id); }); return; }
-  if(!user){
-    // Logged-out user tried to open a product -> gate blocked them.
-    // This is the key funnel step we were blind on.
-    try {
-      var gp = PRODUCTS_ALL.find(function(x){ return String(x.id)===String(id); });
-      gaEvent('gate_blocked', {
-        item_id: id,
-        item_name: gp ? gp.name : '',
-        item_category: gp ? gp.cat : ''
-      });
-    } catch(e){}
-    currentDetailId = id;
-    openQuiz('product_click');
-    return;
-  }
   currentDetailId=id; detailQty=1; detailColor=0; detailSize=0;
   renderPD();
   loadPDSoldCount(id);
@@ -1570,9 +1550,11 @@ function renderPD(){
       </div>
 
       <details class="fp-acc" open><summary>Details</summary><div class="fp-acc-b">${detailsBody}</div></details>
-      <details class="fp-acc"><summary>Shipping &amp; returns</summary><div class="fp-acc-b">
-        <p>Ships in plain packaging with discreet billing. Standard shipping is free (6&ndash;10 business days). Expedited is $15.95 (3&ndash;4 business days).</p>
-        <p>Unopened items can be returned within 30 days. <a href="/shipping-returns" target="_blank" rel="noopener">Full policy</a></p>
+      <details class="fp-acc" open><summary>Shipping, returns &amp; who we are</summary><div class="fp-acc-b fp-facts">
+        <p><b>Plain packaging.</b> Every order ships in an unmarked brown box, and your statement shows DHARMA*INTIMACYSUP.</p>
+        <p><b>Delivery.</b> Standard is 6&ndash;10 business days after your order ships, and free on orders over $59.97. Expedited is 3&ndash;4 business days for $15.95. Orders ship within 1&ndash;2 business days of payment.</p>
+        <p><b>Returns.</b> Unopened items can be returned within 30 days of delivery, and you pay return shipping. For damaged or defective items, contact us within 7 days and we cover it. <a href="/shipping-returns" target="_blank" rel="noopener">Full policy</a></p>
+        <p><b>Sold by</b> Dharma Media &amp; Technology LLC. Questions: hello@intimacysupply.com or (559) 334-0826.</p>
       </div></details>
 
       ${related.length ? `<h2 class="fp-h">You may also like</h2><div class="fp-grid">${relatedCards}</div>` : ''}
@@ -1652,8 +1634,7 @@ function addToCartVIP(){
     var sz=szEl?szEl.textContent:((p.sizes && p.sizes[0])||'One Size');
     pendingCartAdd = { id:p.id, size:sz, color:detailColor, qty:detailQty };
   }catch(e){}
-  if(user){ addToCartFromDetail(); }
-  else { openQuiz('pd_vip_add_to_bag'); }
+  addToCartFromDetail();
 }
 
 function addToCartFromDetailRedeem(){
@@ -1687,9 +1668,25 @@ const QUIZ = [
   {step:5,total:7,title:"Your Size Preference",sub:"For lingerie and wearables.",isSizeGrid:true,
    sizes:['XS','S','M','L','XL','XXL/1X','2X','3X','4X','5X','6X']},
   {step:6,total:7,title:"Some Quick Details",sub:"This helps us personalize your account.",isDetails:true},
-  {step:7,total:7,title:"Now Claim Your VIP Discount!",sub:"Create your account so you can start shopping with your offer.",isForm:true},
+  {step:7,total:7,title:"Create your free account",sub:"Use it to check out and track your orders. VIP is optional and chosen at checkout.",isForm:true},
 ];
 
+/* Account-only gate (the last step of the sign-up quiz), used at checkout */
+function openAccountGate(source){
+  quizData = {};
+  document.getElementById('qo').classList.add('open'); document.body.style.overflow='hidden';
+  renderQuiz(7);
+  var lbl = document.getElementById('q-step-lbl'); if(lbl) lbl.textContent = 'Create your free account';
+  var segs = document.getElementById('q-prog-segs'); if(segs) segs.style.display = 'none';
+  try{ gaEvent('account_gate', { source: source || 'checkout' }); }catch(e){}
+}
+/* After signing in or creating an account, continue to checkout if that is where they were headed */
+function resumeAfterAuth(){
+  if(window._resumeCheckoutAt && (Date.now() - window._resumeCheckoutAt) < 10*60*1000){
+    window._resumeCheckoutAt = 0;
+    setTimeout(function(){ if(cart.length) openCheckout(); }, 350);
+  }
+}
 function openQuiz(source){
   // Logged-in users already have an account - never show the signup quiz.
   if(typeof user!=='undefined' && user){
@@ -1703,7 +1700,7 @@ function openQuiz(source){
     }
     return;
   }
-  quizData={}; document.getElementById('qo').classList.add('open'); document.body.style.overflow='hidden'; renderQuiz(1);
+  quizData={}; document.getElementById('qo').classList.add('open'); document.body.style.overflow='hidden'; renderQuiz(1); var _sg=document.getElementById('q-prog-segs'); if(_sg) _sg.style.display='';
   try{ gaEvent('quiz_start', { total_steps: QUIZ.length, source: source || 'unknown' }); }catch(e){}
 }
 function shopNowCTA(){
@@ -1765,8 +1762,8 @@ function renderQuiz(step){
 
   if(d.isForm){
     body.innerHTML =
-      '<h2 class="qtit">Now Claim Your VIP Discount!</h2>'
-      + '<p class="qsub">Create your account so you can start shopping with your offer.</p>'
+      '<h2 class="qtit">Create your free account</h2>'
+      + '<p class="qsub">Use it to check out and track your orders. VIP is optional and chosen at checkout.</p>'
       + '<div class="qfib">'
       + '<input class="qfi" id="qf-name" type="text" placeholder="First Name *" required autocomplete="given-name">'
       + '<input class="qfi" id="qf-email" type="email" placeholder="Email Address *" required autocomplete="email">'
@@ -1775,7 +1772,7 @@ function renderQuiz(step){
       + '</div>'
       + '<div class="qerr-banner" id="qf-err-banner"></div>'
       + '<div class="qerr" id="qf-err">Please fill in all required fields correctly.</div>'
-      + '<button class="qnb plum-btn" id="unlock-btn" onclick="submitAccount()">UNLOCK VIP PRICING &nbsp;&#8250;</button>'
+      + '<button class="qnb plum-btn" id="unlock-btn" onclick="submitAccount()">CREATE ACCOUNT &nbsp;&#8250;</button>'
       + '<p style="text-align:center;margin-top:12px;font-size:12px;color:#888888">By creating an account you agree to our <a href="#" onclick="openLegal(&apos;terms&apos;);return false" style="color:#555555;text-decoration:underline">Terms</a> and <a href="#" onclick="openLegal(&apos;privacy&apos;);return false" style="color:#555555;text-decoration:underline">Privacy Policy</a>.</p>';
     return;
   }
@@ -1885,7 +1882,7 @@ function submitAccount(){
   btn.disabled=true;
 
   // [FIREBASE] Create Auth user then write full profile to Firestore
-  if(!auth){ toast('Sign-up unavailable  -  Firebase not configured.'); btn.innerHTML='UNLOCK VIP PRICING'; btn.disabled=false; return; }
+  if(!auth){ toast('Sign-up unavailable  -  Firebase not configured.'); btn.innerHTML='CREATE ACCOUNT'; btn.disabled=false; return; }
   auth.createUserWithEmailAndPassword(email, pass)
     .then(cred=>{
       const uid = cred.user.uid;
@@ -1926,7 +1923,7 @@ function submitAccount(){
       showQuizSuccess(name);
     })
     .catch(e=>{
-      btn.innerHTML='UNLOCK VIP PRICING &nbsp;›';
+      btn.innerHTML='CREATE ACCOUNT &nbsp;›';
       btn.disabled=false;
       const banner = document.getElementById('qf-err-banner');
       const errEl  = document.getElementById('qf-err');
@@ -1950,38 +1947,25 @@ function showQuizSuccess(name){
   document.getElementById('q-body').innerHTML =
     '<div class="qsuc">'
     + '<div class="qsuc-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'
-    + '<h2>Account Created</h2>'
-    + '<p>Finding your personalized product recommendations...</p>'
-    + '<div style="background:#F7F4F1;border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:12px;color:#666;line-height:1.65;text-align:left">'
-    + '<strong style="color:#111;display:block;margin-bottom:4px">VIP Membership Active</strong>'
-    + 'You\'ll be charged $39.95 on the 6th of each month for your Member Token. Skip anytime between the 1st&ndash;5th. Cancel anytime online.'
+    + '<h2>Account created</h2>'
+    + '<p>Your account is ready.</p>'
+    + '<div style="background:#F7F4F1;padding:14px 16px;margin-bottom:18px;font-size:13px;color:#555;line-height:1.65;text-align:left">'
+    + '<strong style="color:#111;display:block;margin-bottom:4px">VIP is optional</strong>'
+    + 'At checkout you can choose VIP for up to 34% off. VIP is $39.95 a month, billed on the 6th. Skip any month between the 1st and 5th, or cancel any time online.'
     + '</div>'
-    + '<button class="qnb plum-btn" onclick="finishOnboarding()">START SHOPPING VIP PRICES &nbsp;&#8250;</button>'
+    + '<button class="qnb plum-btn" onclick="finishOnboarding()">' + (window._resumeCheckoutAt ? 'CONTINUE TO CHECKOUT' : 'START SHOPPING') + ' &nbsp;&#8250;</button>'
     + '</div>';
   updateHeader();
   filterProds(activeCat);
   renderCart();
-  // If they were gated on a product, open it now
-  if(currentDetailId){
-    setTimeout(()=>{
-      detailQty=1; detailColor=0; detailSize=0;
-      renderPD();
-      loadPDSoldCount(currentDetailId);
-      document.getElementById('pdo').classList.add('open');
-      document.body.style.overflow='hidden';
-      trackPDViewer(currentDetailId);
-    }, 400);
-  }
   gaEvent('sign_up', { method: 'VIP Quiz' });
 }
 
 function finishOnboarding(){
   closeQuiz();
-  showVIPBanner();
-  startVIPCountdown();
-  toast('VIP discount unlocked across all products!');
+  toast('Account created. Choose VIP at checkout for up to 34% off.');
   filterProds(activeCat);
-  setTimeout(()=>openSpin(),1400);
+  resumeAfterAuth();
 }
 /* ═══════════════════════════════════════════
    [NEW] FIREBASE AUTH HELPERS
@@ -2048,6 +2032,7 @@ function doSignIn(){
       updateHeader(); filterProds('all'); renderCart(); showVIPBanner();
       closeSignInModal();
       toast('Welcome back, '+profile.firstName+'!');
+      resumeAfterAuth();
     })
     .catch(()=>renderSignInForm('Incorrect email or password. Please try again.'));
 }
@@ -2068,6 +2053,14 @@ function doPasswordReset(){
 ═══════════════════════════════════════════ */
 function openCheckout(){
   if(cart.length===0){ toast('Your bag is empty!'); return; }
+  if(!user){
+    /* Guests can browse and fill a bag; a free account is created here, right before paying */
+    closeCart();
+    window._resumeCheckoutAt = Date.now();
+    toast('Create a free account to check out. Your bag is saved.');
+    setTimeout(function(){ openAccountGate('checkout_gate'); }, 350);
+    return;
+  }
   closeCart();
   checkoutStep=1;
   checkoutData={};
@@ -2100,7 +2093,7 @@ function renderCheckout(){
   const chargeSub    = Math.max(0, displaySub - coveredValue);
   const {promoAmt,freeShip} = calcPromoDiscount(chargeSub);
   const afterPromo   = Math.max(0, chargeSub - promoAmt);
-  const shipping     = delivery==='expedited' ? 15.95 : ((freeShip||afterPromo>=FREE_SHIP) ? 0 : 9.95);
+  const shipping     = delivery==='expedited' ? 15.95 : ((freeShip||afterPromo>=FREE_SHIP) ? 0 : SHIP_STD);
   const tax          = afterPromo * 0.0875;
   const total        = afterPromo + shipping + tax;
   const pct          = Math.min((afterPromo/FREE_SHIP)*100, 100);
@@ -2281,7 +2274,7 @@ function renderCheckout(){
               <div class="ch-del-name">Standard Shipping</div>
               <div class="ch-del-sub">6&ndash;10 business days</div>
             </div>
-            <div class="ch-del-price">${afterPromo>=FREE_SHIP?'<span style="color:#1B1B19;font-weight:900">FREE</span>':'$5.95'}</div>
+            <div class="ch-del-price">${afterPromo>=FREE_SHIP?'<span style="color:#1B1B19;font-weight:900">FREE</span>':'$'+SHIP_STD.toFixed(2)}</div>
           </div>
           <div class="ch-del-opt ${delivery==='expedited'?'active':''}" onclick="selDelivery('expedited');renderCheckout()">
             <div class="ch-del-radio ${delivery==='expedited'?'active':''}"></div>
@@ -2752,7 +2745,7 @@ function submitOrder(){
   const chargeSub    = Math.max(0, displaySub - coveredValue);
   const {promoAmt, freeShip} = calcPromoDiscount(chargeSub);
   const afterPromo   = Math.max(0, chargeSub - promoAmt);
-  const shipCost     = delivery==='expedited' ? 15.95 : ((freeShip||afterPromo>=FREE_SHIP) ? 0 : 9.95);
+  const shipCost     = delivery==='expedited' ? 15.95 : ((freeShip||afterPromo>=FREE_SHIP) ? 0 : SHIP_STD);
   const tax          = afterPromo * 0.0875;
   const total        = afterPromo + shipCost + tax;
 
@@ -3173,19 +3166,8 @@ window.closeMM = closeMM;
    COUNTDOWN
 ═══════════════════════════════════════════ */
 /* startVIPCountdown - called once after account creation. Shows the bar and counts down 60 min. */
-function startVIPCountdown(){
-  const bar = document.getElementById('cdb');
-  const el  = document.getElementById('countdown');
-  if(!bar || !el) return;
-  bar.style.display = 'block';
-  let t = 60 * 60;
-  el.textContent = '60:00';
-  const iv = setInterval(()=>{
-    t--;
-    if(t <= 0){ clearInterval(iv); bar.style.display = 'none'; return; }
-    el.textContent = String(Math.floor(t/60)).padStart(2,'0') + ':' + String(t%60).padStart(2,'0');
-  }, 1000);
-}
+/* The VIP offer does not expire, so there is no countdown */
+function startVIPCountdown(){}
 
 /* ═══════════════════════════════════════════
    INIT
@@ -3528,7 +3510,7 @@ function openLegal(type){
   const content={
     privacy:`
       <h2 style="${S}">Privacy Policy</h2>
-      <p style="font-size:11px;color:#888;margin-bottom:14px">Dharma Media & Technology LLC  -  Last Updated: May 22, 2026</p>
+      <p style="font-size:11px;color:#888;margin-bottom:14px">Dharma Media & Technology LLC  -  Last Updated: September 19, 2026</p>
       <p style="${P}">Dharma Media & Technology LLC (&ldquo;Intimacy Supply,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) operates this website. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our site and make purchases, including through our VIP Membership Program.</p>
       <h3 style="${S2}">Information We Collect</h3>
       <p style="${P}"><strong>Personal Information:</strong> name, email address, phone number, shipping address, and date of birth (required to verify you are 18 or older).</p>
@@ -3552,7 +3534,7 @@ function openLegal(type){
     `,
     terms:`
       <h2 style="${S}">Terms of Service</h2>
-      <p style="font-size:11px;color:#888;margin-bottom:14px">Dharma Media & Technology LLC  -  Last Updated: May 22, 2026</p>
+      <p style="font-size:11px;color:#888;margin-bottom:14px">Dharma Media & Technology LLC  -  Last Updated: September 19, 2026</p>
       <h3 style="${S2}">1. Acceptance</h3>
       <p style="${P}">By accessing or using this website, you agree to be bound by these Terms of Service. If you do not agree, do not use the site.</p>
       <h3 style="${S2}">2. Eligibility</h3>
@@ -3569,9 +3551,9 @@ function openLegal(type){
       <h3 style="${S2}">4. Products &amp; Pricing</h3>
       <p style="${P}">All prices are in US dollars. VIP member pricing represents savings of up to 34% off our standard retail prices. We reserve the right to change pricing at any time. Product images and descriptions are representative; actual items may vary slightly.</p>
       <h3 style="${S2}">5. Shipping</h3>
-      <p style="${P}">All orders ship in plain packaging with no exterior brand identification. Your billing statement will show &ldquo;Dharma Media & Technology LLC.&rdquo; Standard: $5.95, 6&ndash;10 business days. Expedited: $15.95, 3&ndash;4 business days. Free standard shipping on orders over $59.97.</p>
+      <p style="${P}">All orders ship in plain packaging with no exterior brand identification. Your billing statement will show &ldquo;Dharma Media & Technology LLC.&rdquo; Standard: $9.95, 6&ndash;10 business days. Expedited: $15.95, 3&ndash;4 business days. Free standard shipping on orders over $59.97.</p>
       <h3 style="${S2}">6. Returns &amp; Refunds</h3>
-      <p style="${P}">Unopened products may be returned within 30 days of delivery for store credit. We do not accept returns on opened adult products for health and hygiene reasons. To initiate a return, contact hello@intimacysupply.com with your order number.</p>
+      <p style="${P}">Unopened products may be returned within 30 days of delivery for a full refund to your original payment method. We do not accept returns on opened adult products for health and hygiene reasons. To initiate a return, contact hello@intimacysupply.com with your order number. Return shipping is paid by the customer, unless the item is defective or damaged, in which case we cover it.</p>
       <h3 style="${S2}">7. Prohibited Uses</h3>
       <p style="${P}">You may not use the site if you are under 18; resell our products without written authorization; use the site for any unlawful purpose; or attempt to gain unauthorized access to any part of the site.</p>
       <h3 style="${S2}">8. Limitation of Liability</h3>
@@ -3583,16 +3565,16 @@ function openLegal(type){
     `,
     shipping:`
       <h2 style="${S}">Shipping &amp; Returns</h2>
-      <p style="font-size:11px;color:#888;margin-bottom:14px">Dharma Media &amp; Technology LLC - Last Updated: May 22, 2026</p>
+      <p style="font-size:11px;color:#888;margin-bottom:14px">Dharma Media &amp; Technology LLC - Last Updated: September 19, 2026</p>
       <h3 style="${S2}">Packaging &amp; Discretion</h3>
       <p style="${P}">All orders ship in plain, unmarked brown boxes. There is no brand name, logo, or product description on the outside of the package. Your billing statement will show <strong>DHARMA*INTIMACYSUP</strong> - never Intimacy Supply.</p>
       <h3 style="${S2}">Shipping Options</h3>
-      <p style="${P}"><strong>Standard Shipping - $5.95:</strong> 6&ndash;10 business days from the date your order ships. Free on orders over $59.97.</p>
+      <p style="${P}"><strong>Standard Shipping - $9.95:</strong> 6&ndash;10 business days from the date your order ships. Free on orders over $59.97.</p>
       <p style="${P}"><strong>Expedited Shipping - $15.95:</strong> 3&ndash;4 business days from the date your order ships.</p>
       <p style="${P}">Orders are processed within 1&ndash;2 business days after payment is verified. You will receive an email confirmation with tracking information once your order ships.</p>
       <h3 style="${S2}">Returns</h3>
-      <p style="${P}">Unopened items may be returned within 30 days of delivery for store credit equal to the purchase price. We do not accept returns on opened adult products for health and hygiene reasons. All sales on opened items are final.</p>
-      <p style="${P}">To initiate a return, email hello@intimacysupply.com with your order number and reason for return. We will provide a return shipping label within 2 business days.</p>
+      <p style="${P}">Unopened items may be returned within 30 days of delivery for a full refund to your original payment method. We do not accept returns on opened adult products for health and hygiene reasons. All sales on opened items are final unless the item is defective or damaged.</p>
+      <p style="${P}">To initiate a return, email hello@intimacysupply.com with your order number and reason for return. We will send return instructions within 2 business days. Return shipping is paid by the customer, unless the item is defective or damaged, in which case we cover it.</p>
       <h3 style="${S2}">Damaged or Defective Items</h3>
       <p style="${P}">Contact us within 7 days of delivery with photos of the damage or defect. We will replace or fully refund defective items at no cost to you. No return shipping required for defective items.</p>
       <h3 style="${S2}">Contact</h3>
@@ -3600,7 +3582,7 @@ function openLegal(type){
     `,
     refund:`
       <h2 style="${S}">Refund &amp; Cancellation Policy</h2>
-      <p style="font-size:11px;color:#888;margin-bottom:14px">Dharma Media &amp; Technology LLC - Last Updated: May 22, 2026</p>
+      <p style="font-size:11px;color:#888;margin-bottom:14px">Dharma Media &amp; Technology LLC - Last Updated: September 19, 2026</p>
       <div style="background:#F8F8F8;border:2px solid #E6E0D6;border-radius:8px;padding:14px 16px;margin-bottom:16px">
         <p style="font-size:12px;font-weight:700;color:#53504D;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Your Statement Will Show</p>
         <p style="font-family:var(--fd);font-size:18px;font-weight:900;color:#111;letter-spacing:.04em;margin-bottom:4px">DHARMA*INTIMACYSUP</p>
@@ -3618,11 +3600,11 @@ function openLegal(type){
       <h3 style="${S2}">Physical Products - Order Cancellation</h3>
       <p style="${P}">It is possible to cancel an order that has not yet shipped. Contact hello@intimacysupply.com with your order number as soon as possible and we will cancel it and issue a full refund before it leaves our facility. Unfortunately, we are unable to cancel an order that has already shipped; in that case, our standard return policy below applies once the item is delivered.</p>
       <h3 style="${S2}">Physical Products - Returns</h3>
-      <p style="${P}">Unworn, unopened items may be returned within 30 days of delivery for a full refund to your original payment method. Opened adult products may be exchanged for member credit for hygiene reasons. Contact hello@intimacysupply.com with your order number to start a return.</p>
+      <p style="${P}">Unworn, unopened items may be returned within 30 days of delivery for a full refund to your original payment method. For health and hygiene reasons, opened adult products cannot be returned unless they are defective or damaged (see below). Contact hello@intimacysupply.com with your order number to start a return. Return shipping is paid by the customer, unless the item is defective or damaged, in which case we cover it.</p>
       <h3 style="${S2}">Physical Products - Defective or Damaged Items</h3>
       <p style="${P}">Contact us within 7 days of delivery with photos. We will replace or fully refund defective items. Return shipping on defective items is covered by us.</p>
       <h3 style="${S2}">Refund Timeline</h3>
-      <p style="${P}">Approved refunds process within 5&ndash;10 business days to your original payment method. Store credit is applied to your account immediately upon return confirmation.</p>
+      <p style="${P}">Approved refunds process within 5&ndash;10 business days to your original payment method. Refunds are always issued to your original payment method.</p>
       <h3 style="${S2}">Contact</h3>
       <p style="${P}">Dharma Media &amp; Technology LLC &bull; hello@intimacysupply.com &bull; (559) 334-0826</p>
     `,
@@ -3752,7 +3734,7 @@ function openLegal(type){
     `,
     compliance:`
       <h2 style="${S}">18 U.S.C. Section 2257 Statement</h2>
-      <p style="font-size:11px;color:#888;margin-bottom:14px">Dharma Media &amp; Technology LLC - Last Updated: May 22, 2026</p>
+      <p style="font-size:11px;color:#888;margin-bottom:14px">Dharma Media &amp; Technology LLC - Last Updated: September 19, 2026</p>
       <p style="${P}">Intimacy Supply (operated by Dharma Media &amp; Technology LLC) is a retail marketplace selling adult wellness and intimacy products. This website does not produce, distribute, or host visual depictions of actual sexually explicit conduct as defined in 18 U.S.C. &sect; 2256(2).</p>
       <p style="${P}">The record-keeping requirements of 18 U.S.C. &sect; 2257 and 28 C.F.R. Part 75 do not apply to this website or its operators.</p>
       <p style="${P}">Product imagery on this website consists of commercially licensed stock photography and manufacturer-provided catalog images. These images depict product styling and are not visual depictions of sexually explicit conduct.</p>

@@ -96,3 +96,27 @@ test("wishlist buttons quote product ids and Klaviyo phones are normalized", { s
   assert.ok(!/removeWL\(\$\{id\}\)/.test(js) && !/addToCart\(\$\{id\}\);closeWL/.test(js), "wishlist buttons pass an unquoted product id");
   assert.ok(/function klaviyoPhone/.test(js) && /phone_number = ph/.test(js));
 });
+
+test("guests can browse and fill a bag; the account step happens at checkout", { skip: !haveSite }, () => {
+  const js = fs.readdirSync(path.join(root, "assets")).filter(f => /^app\..*\.js$/.test(f)).map(f => read("assets/" + f)).join("\n");
+  assert.ok(!/openQuiz\('product_click'\)/.test(js) && !/openQuiz\('add_to_cart_gate'\)/.test(js), "guests are still blocked from products or the bag");
+  assert.ok(/function openAccountGate/.test(js) && /function resumeAfterAuth/.test(js));
+  assert.ok(!/UNLOCK VIP PRICING|Claim Your VIP Discount|VIP Membership Active/.test(js), "sign-up screens still claim VIP for a free account");
+  assert.ok(!/function startVIPCountdown\(\)\{\s*const/.test(js), "the fake countdown timer is back");
+  assert.ok(/id="start-here"/.test(read("index.html")) && /id="fs-pill"/.test(read("index.html")));
+});
+
+test("return wording is the same everywhere: full refund for unopened items, no store-credit-only language", () => {
+  for (const f of ["shipping-returns/index.html", "refund-policy/index.html", "terms/index.html", "faq/index.html"]) {
+    const s = read(f);
+    assert.ok(!/store credit|member credit/i.test(s), f + " still mentions store or member credit");
+  }
+  assert.ok(/full refund to your original payment method/.test(read("shipping-returns/index.html")));
+  assert.ok(/9\.95/.test(read("shipping-returns/index.html")) && !/\$5\.95/.test(read("shipping-returns/index.html")));
+});
+
+test("return shipping is paid by the customer unless the item is defective, on every policy page", () => {
+  for (const f of ["shipping-returns/index.html", "refund-policy/index.html", "terms/index.html", "faq/index.html"]) {
+    assert.ok(/return shipping is paid by (the customer|you)/i.test(read(f)), f + " does not say who pays return shipping");
+  }
+});

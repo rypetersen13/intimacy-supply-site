@@ -25,3 +25,10 @@ Netlify > Logs > Functions > `client-error`.
 2. Netlify > Functions > `sync-stock` > Run now (or wait for the schedule). Open its log: it prints `sync-stock summary` with the feed size, how many of our products would be marked unavailable, and how many prices are below the minimum advertised price.
 3. If the numbers look right, add `SYNC_LIVE=1`, deploy, and run it again. The shop then hides unavailable products.
 4. If a bad feed ever slips through, delete the `meta/stock` document in Firestore (everything shows as available again) or set `SYNC_LIVE` back to 0.
+
+## Turn on review request emails
+`send-review-requests` runs daily and, for paid orders about two weeks old, would email the buyer a discreet "How was your order?" message (no product names, with an opt-out link and postal address). It is a dry run until you set `REVIEW_EMAILS_LIVE=1`.
+1. In Resend, verify your sending domain (add the DNS records it shows). The shared test sender cannot email customers.
+2. In Netlify add `REVIEW_FROM_EMAIL` (for example `Intimacy Supply <orders@intimacysupply.com>`) and confirm `RESEND_API_KEY` is set.
+3. Run the function once (Netlify > Functions > send-review-requests > Run now) and read the log line `send-review-requests summary`.
+4. When the numbers look right, add `REVIEW_EMAILS_LIVE=1` and deploy.
