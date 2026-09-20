@@ -1375,11 +1375,30 @@ function switchVariant(variantId) {
     var btnId = btn.getAttribute('onclick').replace("switchVariant('", '').replace("')", '');
     btn.classList.toggle('active', btnId === String(variantId));
   });
-  // Update the "Color:" label text
+  // Photo thumbnails (fp-th) get the same active state
+  var thumbBtns = document.querySelectorAll('.fp-th[onclick^="switchVariant"]');
+  thumbBtns.forEach(function(btn) {
+    var btnId = btn.getAttribute('onclick').replace("switchVariant('", '').replace("')", '');
+    btn.classList.toggle('active', btnId === String(variantId));
+  });
+  // Update the selected-option label (short form when the choices are sizes)
   var vlbl = document.getElementById('sel-variant-lbl');
-  if (vlbl) vlbl.textContent = variant.label;
+  if (vlbl) vlbl.textContent = vlbl.getAttribute('data-short') ? vParse(variant.label).rest : variant.label;
 }
 
+/* Splits a variant label like "Pink Small" into its colour word and the rest ("Small") */
+var SIZE_LIKE = /^(xxs|xs|s|m|l|xl|xxl|xxxl|2xl|3xl|4xl|1x|2x|3x|4x|5x|plus|petite|small|medium|large|x[- ]?large|xx[- ]?large|xxx[- ]?large|queen|king|one size|os|q|\d+(\.\d+)?( ?(in|inch|oz|ml|pack|pk|ct))?)$/i;
+function vParse(label){
+  var l = String(label || '').trim(), low = l.toLowerCase(), found = null;
+  var names = Object.keys(SWATCH_COLORS).sort(function(a, b){ return b.length - a.length; });
+  for (var i = 0; i < names.length; i++) { if (low.indexOf(names[i]) !== -1) { found = names[i]; break; } }
+  var rest = l;
+  if (found) rest = l.replace(new RegExp(found.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), '').replace(/[\/\-,]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return { color: found, rest: rest };
+}
+/* Sizes in the order shoppers expect: XS, S, M, L, XL, XXL, then 1X, 2X, 3X */
+var SIZE_RANK = { xxs:0, xs:1, petite:1.5, s:2, small:2, m:3, medium:3, l:4, large:4, xl:5, xlarge:5, xxl:6, xxlarge:6, '2xl':6, xxxl:7, xxxlarge:7, '3xl':7, '4xl':8, '1x':9, '2x':10, '3x':11, '4x':12, '5x':13, onesize:20, os:20, queen:21, king:22 };
+function sizeRank(r){ var k = String(r || '').toLowerCase().replace(/[- ]/g, ''); if (k in SIZE_RANK) return SIZE_RANK[k]; var n = parseFloat(k); return isNaN(n) ? 50 : 100 + n; }
 function scrollPDGallery(idx){
   const scroll = document.getElementById('pd-gallery-scroll');
   if(!scroll) return;
@@ -1475,6 +1494,26 @@ function renderPD(){
     };
     var colored = p.variants.map(function(v){ return { v:v, c:variantColor(v.label) }; });
     var colorCount = colored.filter(function(x){ return x.c; }).length;
+    // Same colour throughout and only the size changes ("Pink Small", "Pink Medium"): show sizes, not colours
+    var parsedV = p.variants.map(function(v){ return { v:v, pr:vParse(v.label) }; });
+    var colorSet = {}, restSet = {}, allSizes = true;
+    parsedV.forEach(function(x){ if (x.pr.color) colorSet[x.pr.color] = 1; restSet[x.pr.rest.toLowerCase()] = 1; if (!x.pr.rest || !SIZE_LIKE.test(x.pr.rest)) allSizes = false; });
+    var sizeMode = allSizes && Object.keys(colorSet).length <= 1 && Object.keys(restSet).length >= 2;
+    if (sizeMode) {
+      var activeV = parsedV.find(function(x){ return String(x.v.id) === String(currentDetailId); }) || parsedV[0];
+      variantSelector = `
+        <div class="pd-attr-row" style="margin-top:18px">
+          <span class="pd-attr-lbl">Size: <span id="sel-variant-lbl" data-short="1" style="color:#fff;text-transform:none;letter-spacing:normal">${activeV.pr.rest}</span></span>
+          <button class="pd-size-guide" onclick="openSizeGuide()">Size Guide &#8250;</button>
+        </div>
+        <div class="pd-sizes" style="flex-wrap:wrap;gap:6px">
+          ${parsedV.slice().sort(function(a, b){ return sizeRank(a.pr.rest) - sizeRank(b.pr.rest); }).map(function(x){ var v = x.v; return `
+            <button class="pd-sz${String(v.id)===String(currentDetailId)?' active':''}"
+              style="${!v.inStock?'opacity:.4;cursor:not-allowed':''}"
+              onclick="switchVariant('${v.id}')"
+              ${!v.inStock?'disabled':''}>${x.pr.rest}${!v.inStock?' (Out)':''}</button>`; }).join('')}
+        </div>`;
+    } else
     // If most variants are colors, show colored circles; else fall back to text option buttons
     if (colorCount >= Math.ceil(p.variants.length / 2)) {
       var activeLabel = (p.variants.find(function(v){ return String(v.id)===String(currentDetailId); }) || p.variants[0]).label;

@@ -140,3 +140,9 @@ test("the confirmation page uses the store design and shows photos, not placehol
   assert.ok(!/price: 0/.test(s) && !/\$0\.00/.test(s), "confirmation page shows placeholder prices");
   assert.ok(/noindex/.test(s));
 });
+
+test("option picker: sizes are labeled as sizes and the highlight follows the choice", { skip: !haveSite }, () => {
+  const js = fs.readdirSync(path.join(root, "assets")).filter(f => /^app\..*\.js$/.test(f)).map(f => read("assets/" + f)).join("\n");
+  assert.ok(/function vParse/.test(js) && /data-short/.test(js) && /sizeRank/.test(js), "size labels are missing");
+  assert.ok(/\.fp-th\[onclick\^="switchVariant"\]/.test(js), "photo thumbnails no longer get the active highlight");
+});
