@@ -1586,11 +1586,10 @@ function renderPD(){
       </div>
 
       <details class="fp-acc" open><summary>Details</summary><div class="fp-acc-b">${detailsBody}</div></details>
-      <details class="fp-acc" open><summary>Shipping, returns &amp; who we are</summary><div class="fp-acc-b fp-facts">
-        <p><b>Plain packaging.</b> Every order ships in an unmarked brown box, and your statement shows DHARMA*INTIMACYSUP.</p>
-        <p><b>Delivery.</b> Standard is 6&ndash;10 business days after your order ships, and free on orders over $59.97. Expedited is 3&ndash;4 business days for $15.95. Orders ship within 1&ndash;2 business days of payment.</p>
-        <p><b>Returns.</b> Unopened items can be returned within 30 days of delivery, and you pay return shipping. For damaged or defective items, contact us within 7 days and we cover it. <a href="/shipping-returns" target="_blank" rel="noopener">Full policy</a></p>
-        <p><b>Sold by</b> Dharma Media &amp; Technology LLC. Questions: hello@intimacysupply.com or (559) 334-0826.</p>
+      <details class="fp-acc" open><summary>Shipping &amp; returns</summary><div class="fp-acc-b fp-facts">
+        <p>Plain packaging and discreet billing (DHARMA*INTIMACYSUP).</p>
+        <p>Free shipping over $59.97. Standard delivery is 6&ndash;10 business days.</p>
+        <p>30-day returns on unopened items. You pay return shipping unless the item is defective. <a href="/shipping-returns" target="_blank" rel="noopener">Full policy</a></p>
       </div></details>
 
       ${related.length ? `<h2 class="fp-h">You may also like</h2><div class="fp-grid">${relatedCards}</div>` : ''}

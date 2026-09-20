@@ -290,10 +290,9 @@ for g in glist:
             '<div class="pdp-info"><div class="pdp-brand">%s</div><h1>%s</h1><div id="pdp-price">%s</div>%s'
             '<a id="pdp-add" class="btn-black" href="/?product=%s">%s</a>'
             '<p class="pdp-note">VIP members pay the VIP price. Everyone else pays the regular price. Add to your bag now; a free account is created at checkout.</p>'
-            '<ul class="pdp-facts"><li><b>Plain packaging.</b> Unmarked brown box; your statement shows DHARMA*INTIMACYSUP.</li>'
-            '<li><b>Delivery.</b> Standard 6&ndash;10 business days after shipping, free over $59.97. Expedited 3&ndash;4 business days.</li>'
-            '<li><b>Returns.</b> Unopened items within 30 days of delivery; you pay return shipping. Damaged or defective: tell us within 7 days and we cover it.</li>'
-            '<li><b>Sold by</b> Dharma Media &amp; Technology LLC &middot; hello@intimacysupply.com &middot; (559) 334-0826</li></ul>'
+            '<ul class="pdp-facts"><li>Plain packaging and discreet billing (DHARMA*INTIMACYSUP).</li>'
+            '<li>Free shipping over $59.97. Standard delivery is 6&ndash;10 business days.</li>'
+            '<li>30-day returns on unopened items. You pay return shipping unless the item is defective. <a href="/shipping-returns">Full policy</a></li></ul>'
             '<h2>Details</h2><p class="pdp-desc">%s</p>%s'
             '<p class="pdp-meta"><a href="/vip-membership">How VIP pricing works</a> &middot; <a href="/shipping-returns">Shipping &amp; returns</a></p></div></div>'
             '<h2 class="rel-h">You may also like</h2><div class="grid">%s</div>') % (

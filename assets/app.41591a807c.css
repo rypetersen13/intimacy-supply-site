@@ -4544,6 +4544,11 @@ button[onclick*="subNewsletter"],button#nl-ac-btn{background:#fff!important;colo
 .nr-sugg button{font:inherit;font-size:14px;padding:9px 14px;border:1px solid #cfc9c2;border-radius:999px;background:#fff;color:#111;cursor:pointer}
 .qf-opt{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:#555;line-height:1.4;margin:6px 2px 12px;text-align:left}
 .qf-opt input{margin-top:3px;flex:none}
+
+/* product page: bigger close button, single photo fills the width */
+.pdh{min-height:64px!important}
+.pdcl{width:52px!important;height:52px!important;font-size:38px!important;line-height:1!important;display:flex!important;align-items:center;justify-content:center;border-radius:50%!important;background:#F1EDE7!important;color:#111!important;padding:0!important;flex:none}
+.pd-gallery-slide:only-child{flex:0 0 100%!important;width:100%!important;margin-right:0!important}
 /* tags and pills */
 .pd-off-pill,.pd-price-badge,.pd-bdg.sale,.pd-vip-badge,.pd-lto,.pd-vip-pill,.gc-pill-badge,.ac-order-status,.chpb,.ch-vip-header{background:var(--ink);color:#fff}
 .cibdg,.ch-bag-badge{background:var(--brand-red);color:#fff}
