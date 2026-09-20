@@ -153,3 +153,11 @@ test("the Chastity cages tile opens the shop (couples > Chastity), and search pr
   assert.ok(/sub:'Chastity'/.test(all) && !/q:'chastity'/.test(all), "the Chastity tile opens the search screen again");
   assert.ok(/sri-price">\$\$\{p\.price/.test(js), "search results lost the dollar sign");
 });
+
+test("the admin page is the redesigned one: real order stages saved to Firestore, no local-only status changes", () => {
+  const s = read("admin.html");
+  assert.ok(/function orderStage/.test(s) && /Copy order for Eldorado/.test(s), "admin orders screen is missing");
+  assert.ok(!/function confirmOrder/.test(s) && !/function saveOrders/.test(s), "old local-only order handling is back");
+  assert.ok(/collection\('orders'\)\.doc\(orderId\)\.update/.test(s), "order changes are not saved to the database");
+  assert.ok(/noindex/.test(s) && /class="sidebar"/.test(s));
+});
