@@ -12,9 +12,24 @@
 
 const crypto = require("crypto");
 const fs = require("./_lib/firestore");
+const { siteBase } = require("./_lib/pricing");
+
+// Product photos and page links come from the public catalog, so receipts show the item even when the
+// order itself did not store a photo. Cached for a few minutes; a failure just means no photo.
+let metaCache = null, metaExp = 0;
+async function loadMeta(host, f) {
+  const now = Date.now();
+  if (metaCache && now < metaExp) return metaCache;
+  const res = await (f || fetch)(siteBase(host) + "/products.json");
+  if (!res.ok) throw new Error("catalog unavailable: " + res.status);
+  const map = new Map();
+  for (const p of await res.json()) map.set(String(p.model), { image: p.image || "", slug: p.s || "" });
+  metaCache = map; metaExp = now + 5 * 60 * 1000;
+  return map;
+}
 
 async function handle(event, deps) {
-  const d = Object.assign({ fs }, deps || {});
+  const d = Object.assign({ fs, loadMeta: (h) => loadMeta(h) }, deps || {});
   try {
     const qs = (event && event.queryStringParameters) || {};
     const orderId = qs.orderId;
@@ -31,16 +46,29 @@ async function handle(event, deps) {
       crypto.timingSafeEqual(Buffer.from(providedKey), Buffer.from(storedKey));
     if (!okKey) return { statusCode: 404, body: JSON.stringify({ error: "order not found" }) };
 
-    // Only what the page needs: never the address, email or phone.
+    let meta = new Map();
+    try { meta = await d.loadMeta((event.headers && (event.headers["x-forwarded-host"] || event.headers.host)) || ""); } catch (e) { /* photos are optional */ }
+    const c = data.customer || {};
+
+    // What the receipt needs: items, prices, where it is going and how. Never the email or phone.
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
       body: JSON.stringify({
         orderId: data.orderId,
-        items: (data.items || []).map(i => ({
-          name: i.name, size: i.size, colorName: i.colorName, qty: i.qty,
-          unitPrice: i.unitPrice, lineTotal: i.lineTotal, image: i.image || "",
-        })),
+        placedAt: data.timestamp || null,
+        delivery: data.delivery || "standard",
+        shipTo: {
+          name: [c.firstName, c.lastName].filter(Boolean).join(" "), firstName: c.firstName || "",
+          address: c.address || "", address2: c.address2 || "", city: c.city || "", state: c.state || "", zip: c.zip || "", country: c.country || "",
+        },
+        items: (data.items || []).map(i => {
+          const m = meta.get(String(i.productId)) || {};
+          return {
+            productId: i.productId, name: i.name, size: i.size, colorName: i.colorName, qty: i.qty,
+            unitPrice: i.unitPrice, lineTotal: i.lineTotal, image: m.image || i.image || "", slug: m.slug || "",
+          };
+        }),
         pricing: data.pricing || null,
         paymentStatus: data.paymentStatus || "unpaid",
         vipMember: !!data.vipMember,

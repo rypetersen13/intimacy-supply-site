@@ -1,22 +1,14 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Order confirmed | Intimacy Supply</title>
-<meta name="description" content="Your Intimacy Supply order confirmation.">
-<link rel="canonical" href="https://intimacysupply.com/order-confirmation"><meta name="theme-color" content="#4A1D38">
-<link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/site.css">
-<meta name="robots" content="noindex, nofollow"></head><body>
-<a class="skip" href="#main">Skip to content</a>
-<div class="bar">VIP members save up to 34% on everything. <a href="/vip-membership">See how it works</a></div>
-<header class="site"><div class="hd">
-<a class="logo" href="/">Intimacy Supply</a>
-<nav class="main" aria-label="Main"><a href="/">Shop</a><a href="/p/">All products</a><a href="/brands/">Brands</a><a href="/vip-membership">VIP membership</a><a href="/about">About</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></nav>
-<a class="bagbtn" href="/">Shop now</a>
-<details class="menu"><summary>Menu</summary><div><a href="/">Shop</a><a href="/p/">All products</a><a href="/brands/">Brands</a><a href="/vip-membership">VIP membership</a><a href="/about">About</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div></details>
-</div></header>
-<main id="main"><div class="conf">
+#!/usr/bin/env python3
+"""Builds order-confirmation.html in the store's design, using the shared header and footer from /privacy/.
+Run: python3 tools/build_confirmation.py"""
+import os, re, html
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+tpl = open(os.path.join(ROOT, "privacy", "index.html"), encoding="utf-8").read()
+HEAD = tpl[:tpl.index('<main id="main">')]
+TAIL = tpl[tpl.index("</main>"):]
+
+BODY = """<div class="conf">
 <div class="conf-hd">
 <div class="conf-check" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
 <div class="eyebrow">Order confirmed</div>
@@ -44,7 +36,9 @@
 </div>
 <p class="conf-actions"><a class="btn-red" href="/">Continue shopping</a></p>
 <p class="conf-help">Questions about your order? Email <a href="mailto:hello@intimacysupply.com">hello@intimacysupply.com</a> or call <a href="tel:+15593340826">(559) 334-0826</a>. <a href="/refund-policy">Cancellation &amp; refunds</a></p>
-</div><script>
+</div>"""
+
+SCRIPT = r"""<script>
 (function(){
   var listEl = document.getElementById('orderList'), totEl = document.getElementById('orderBreakdown');
   var shipEl = document.getElementById('cf-ship'), numEl = document.getElementById('cf-num');
@@ -109,12 +103,13 @@
   };
   load(1);
 })();
-</script></main>
-<footer class="site"><div class="ft">
-<div><h3>Shop</h3><a href="/">Shop all</a><a href="/p/">Product directory</a><a href="/brands/">Brands</a><a href="/vip-membership">VIP membership</a></div>
-<div><h3>Help</h3><a href="/contact">Contact us</a><a href="/faq">FAQ</a><a href="/shipping-returns">Shipping &amp; returns</a><a href="/refund-policy">Refunds &amp; cancellation</a><a href="/recognize-a-charge">Recognize a charge?</a><a href="/complaints">Complaints</a></div>
-<div><h3>Company</h3><a href="/about">About us</a><a href="/affiliate-disclosure">Affiliate disclosure</a><a href="/affiliate-terms">Affiliate program terms</a><a href="/compliance">Compliance</a></div>
-<div><h3>Legal</h3><a href="/terms">Terms of service</a><a href="/privacy">Privacy policy</a><a href="/do-not-sell">Do not sell my information</a><a href="/gdpr">GDPR notice</a><a href="/accessibility">Accessibility</a><a href="/email-preferences">Email preferences</a></div>
-</div>
-<div class="fine">&copy; 2026 Intimacy Supply &middot; Dharma Media &amp; Technology LLC &middot; c/o Northwest Registered Agent, 30 N Gould St Ste N, Sheridan, WY 82801 &middot; hello@intimacysupply.com &middot; (559) 334-0826<br>Plain packaging. Discreet billing. Adults 18+ only.</div>
-</footer></body></html>
+</script>"""
+
+h = HEAD
+h = re.sub(r"<title>.*?</title>", "<title>Order confirmed | Intimacy Supply</title>", h, 1, re.S)
+h = re.sub(r'<meta name="description" content=".*?">', '<meta name="description" content="Your Intimacy Supply order confirmation.">', h, 1)
+h = re.sub(r'<link rel="canonical" href=".*?">', '<link rel="canonical" href="https://intimacysupply.com/order-confirmation">', h, 1)
+h = h.replace("</head>", '<meta name="robots" content="noindex, nofollow"></head>', 1)
+out = h + '<main id="main">' + BODY + SCRIPT + TAIL
+open(os.path.join(ROOT, "order-confirmation.html"), "w", encoding="utf-8").write(out)
+print("order-confirmation.html:", len(out), "bytes")

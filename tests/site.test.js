@@ -132,3 +132,11 @@ test("the bag shows regular prices until VIP is chosen, and checkout requires a 
   assert.ok(!/checkoutData\.wantsVIP !== false/.test(js), "the bag pre-applies VIP pricing again");
   assert.ok(/cart-vip-offer/.test(js) && /valid phone number/.test(js));
 });
+
+test("the confirmation page uses the store design and shows photos, not placeholder prices", () => {
+  const s = read("order-confirmation.html");
+  assert.ok(/<header class="site">/.test(s) && /<footer class="site">/.test(s), "confirmation page lost the shared header or footer");
+  assert.ok(/conf-img/.test(s) && /get-order/.test(s));
+  assert.ok(!/price: 0/.test(s) && !/\$0\.00/.test(s), "confirmation page shows placeholder prices");
+  assert.ok(/noindex/.test(s));
+});

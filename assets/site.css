@@ -167,3 +167,31 @@ h1{color:#4A1D38}
 
 .pdp-facts{list-style:none;padding:0;margin:18px 0 6px;border-top:1px solid var(--line);font-size:14px}
 .pdp-facts li{padding:11px 0;border-bottom:1px solid var(--line);line-height:1.5}
+
+/* order confirmation */
+.conf{max-width:1040px;margin:0 auto;padding:0 16px 40px}
+.conf-hd{text-align:center;padding:34px 0 22px}
+.conf-check{width:56px;height:56px;border-radius:50%;background:#4A1D38;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.conf-hd .eyebrow{font:800 12px/1 var(--fb,Barlow,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:#4A1D38;margin-bottom:8px}
+.conf-hd h1{font-family:var(--fd,'Barlow Condensed',sans-serif);font-size:38px;line-height:1.05;font-weight:800;color:#111;margin:0 0 10px;text-transform:none}
+.conf-meta{font-size:15px;color:#333;margin:0 0 6px}.conf-meta .dot{margin:0 6px;color:#999}
+.conf-msg{font-size:14px;color:#666;margin:0}
+.conf-grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:860px){.conf-grid{grid-template-columns:1.4fr 1fr;align-items:start}}
+.conf-card{background:#fff;border:1px solid #E7E2DB;padding:18px 18px 16px;margin-bottom:16px}
+.conf-grid .conf-card{margin-bottom:0}.conf-side{display:grid;gap:16px}
+.conf-card h2{font-family:var(--fd,'Barlow Condensed',sans-serif);font-size:20px;font-weight:800;color:#4A1D38;margin:0 0 12px;text-transform:none}
+.conf-item{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #EFEAE3}
+.conf-item:first-child{padding-top:0}
+.conf-img{flex:none;width:88px;height:88px;background:#F6F3EE}.conf-img img{width:88px;height:88px;object-fit:cover;display:block}.conf-img .ph{display:block;width:88px;height:88px;background:#EEE9E2}
+.conf-info{flex:1;min-width:0}.conf-name{font-weight:700;font-size:15px;line-height:1.3}.conf-name a{color:#111;text-decoration:none}.conf-name a:hover{text-decoration:underline}
+.conf-det{font-size:13px;color:#777;margin-top:4px}.conf-price{font-weight:700;font-size:15px;white-space:nowrap}
+.conf-totals{padding-top:6px}.conf-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;color:#333}
+.conf-row.save{color:#4A1D38}.conf-row.total{border-top:1px solid #E7E2DB;margin-top:6px;padding-top:12px;font-size:18px;font-weight:800;color:#111}
+.conf-ship{font-size:14px;line-height:1.55;color:#333}.conf-method{margin-top:8px;color:#4A1D38;font-weight:600}
+.conf-steps{margin:0;padding-left:18px;font-size:14px;line-height:1.55;color:#333}.conf-steps li{margin-bottom:8px}
+.conf-vip{background:#F6EEF2;border-color:#E3D2DB}.conf-vip p{margin:0;font-size:13px;line-height:1.55;color:#4A3540}
+.conf-note{margin:0;font-size:14px;color:#555;line-height:1.5}
+.conf-skel{height:88px;margin-bottom:12px;background:linear-gradient(90deg,#F1EDE7,#F8F5F1,#F1EDE7);background-size:200% 100%;animation:conf-sk 1.3s infinite}
+@keyframes conf-sk{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.conf-actions{text-align:center;margin:26px 0 8px}.conf-help{text-align:center;font-size:13px;color:#777}
