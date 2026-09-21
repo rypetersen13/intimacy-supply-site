@@ -808,9 +808,11 @@ function renderSearchResults(q){
       <div class="sri-img" style="overflow:hidden;border-radius:5px;background:#F3F0ED">${p.images && p.images[0] ? `<img src="${_escH(p.images[0])}" alt="${_escH(p.name)}" loading="lazy">` : ''}</div>
       <div>
         <div class="sri-name">${_escH(p.name)}</div>
-        <div>${isVIP
-          ? `<span class="sri-price">$${p.price.toFixed(2)}</span><span class="sri-orig">$${p.orig.toFixed(2)}</span>`
-          : `<span class="sri-price">$${p.price.toFixed(2)}</span><span class="sri-tag">VIP</span><span class="sri-reg">Regular $${p.orig.toFixed(2)}</span>`}</div>
+        <div>${(p.orig - p.price < 0.5)
+          ? `<span class="sri-price">$${p.orig.toFixed(2)}</span>`
+          : (isVIP
+            ? `<span class="sri-price">$${p.price.toFixed(2)}</span><span class="sri-orig">$${p.orig.toFixed(2)}</span>`
+            : `<span class="sri-price">$${p.price.toFixed(2)}</span><span class="sri-tag">VIP</span><span class="sri-reg">Regular $${p.orig.toFixed(2)}</span>`)}</div>
       </div>
     </div>`; }).join('');
 }
@@ -1562,7 +1564,7 @@ function renderPD(){
     <div class="fp-card" onclick="openPD('${r.id}')">
       <div class="fp-card-img">${r.images && r.images[0] ? `<img src="${r.images[0]}" alt="${r.name}" loading="lazy">` : ''}</div>
       <div class="fp-card-name">${r.name}</div>
-      <div class="fp-card-p"><b>$${r.price.toFixed(2)}</b><span>VIP price</span></div>
+      <div class="fp-card-p"><b>$${r.price.toFixed(2)}</b><span>${r.orig>r.price ? 'VIP price' : 'Price'}</span></div>
       ${r.orig>r.price ? `<div class="fp-card-o"><s>$${r.orig.toFixed(2)}</s><span>Regular price</span></div>` : ''}
     </div>
   `).join('');
@@ -1617,11 +1619,14 @@ function renderPD(){
         ${p.inStock ? (isVIP ? `
           <button class="fp-red" onclick="addToCartFromDetail()" id="pd-atc">Add to bag - $${dp.price.toFixed(2)}</button>
           <button class="fp-black" onclick="addToCartFromDetailRedeem()">Redeem with ${tokensFor(dp.price)} token${tokensFor(dp.price)>1?'s':''}</button>
-        ` : `
+        ` : (hasDeal ? `
           <button class="fp-red" onclick="addToCartVIP()" id="pd-atc">Add to bag and join VIP</button>
           <p class="fp-disc">After your first order you will be charged $39.95 each month for a Member Token, unless you Skip between the 1st and the 5th. Each token covers any item up to $50. Skip or cancel anytime.</p>
           <button class="pd-retail-btn fp-line" onclick="addToCartFromDetail()">Add to bag at regular price - $${dp.orig.toFixed(2)}</button>
-        `) : `
+        ` : `
+          <button class="fp-red" onclick="addToCartFromDetail()" id="pd-atc">Add to bag - $${dp.orig.toFixed(2)}</button>
+          <p class="fp-disc">The brand sets a fixed price on this item, so VIP savings do not apply to it.</p>
+        `)) : `
           <button class="fp-black" onclick="notifyMeRestock('${pidS}','${nameS}')">${p.label==='Coming Soon'?'Notify Me at Launch':'Notify Me When Back In Stock'}</button>
         `}
       </div>

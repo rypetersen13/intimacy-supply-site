@@ -8,6 +8,8 @@ Python 3.8+, standard library only.
 """
 import json, os, re, html, math, shutil, subprocess, sys, unicodedata
 
+MAP_PRICES = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "source", "map_prices.json")))
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "tools", "source", "products.raw.json")
 OUT = sys.argv[1] if len(sys.argv) > 1 else ROOT
@@ -62,8 +64,19 @@ for i, r in enumerate(raw):
     name = clean_name(r["name"])
     price = round(float(r["price"]), 2)
     orig = round(float(r["orig"]), 2)
+    _disc = max(0.0, min(0.34, (orig - price) / orig)) if orig > 0 else 0.0   # this item's natural VIP discount, capped at the "up to 34%" ceiling
     if orig <= price:           # bad data: regular price below member price -> no discount shown
         orig = price
+    # Eldorado MAP (minimum advertised price): neither price may go below it. The VIP price sits AT the
+    # MAP floor, and the regular price is set above it so the item's usual VIP discount still applies —
+    # MAP only limits the lowest price shown, not how large a discount can be advertised above it.
+    # Source: tools/source/map_prices.json (parsed from Eldorado's "MAP and Shipping Restrictions 2026").
+    _map = MAP_PRICES.get(str(r["model"]).strip().upper())
+    if _map and price < _map - 0.005:
+        price = _map
+        orig = round(_map / (1 - (_disc if _disc > 0.01 else 0.30)), 2)
+    elif _map and orig < _map - 0.005:
+        orig = _map
     slug = slugify(name) + "-" + slugify(str(r["model"]))
     base, n = slug, 2
     while slug in used: slug = "%s-%d" % (base, n); n += 1
