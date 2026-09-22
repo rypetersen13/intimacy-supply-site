@@ -6,27 +6,27 @@ tpl = open(os.path.join(ROOT, "privacy", "index.html"), encoding="utf-8").read()
 head = tpl[:tpl.index('<main id="main">')]
 tail = tpl[tpl.index("</main>"):]
 title = "VIP membership | Intimacy Supply"
-desc = "Up to 34% off everything for $39.95 a month. Monthly $50 Member Token, skip any month, cancel any time."
+desc = "Up to 40% off everything for $39.95 a month. Monthly $50 Member Token, skip any month, cancel any time."
 head = re.sub(r"<title>.*?</title>", "<title>%s</title>" % title, head, 1, re.S)
 head = re.sub(r'<meta name="description" content=".*?">', '<meta name="description" content="%s">' % html.escape(desc, quote=True), head, 1)
 head = re.sub(r'<link rel="canonical" href=".*?">', '<link rel="canonical" href="https://intimacysupply.com/vip-membership/">', head, 1)
 
 CHECK, DASH = "&#10003;", "&ndash;"
-rows = [("Up to 34% off retail prices", CHECK, DASH),
+rows = [("Up to 40% off retail prices", CHECK, DASH),
         ("First access to new drops every month", CHECK, DASH),
         ("A $50 Member Token every month", CHECK, DASH),
         ("Plain packaging and discreet billing", CHECK, CHECK),
-        ("Price you pay", "Up to 34% off", "Regular price")]
+        ("Price you pay", "Up to 40% off", "Regular price")]
 table = "".join('<tr><th scope="row">%s</th><td class="vip">%s</td><td>%s</td></tr>' % r for r in rows)
 
 body = """<section class="vip-hero">
 <div class="vip-hero-in">
 <h1>VIP membership</h1>
-<p class="lede">Up to 34% off every order, one Member Token each month, and the freedom to skip or cancel whenever you want.</p>
+<p class="lede">Up to 40% off every order, one Member Token each month, and the freedom to skip or cancel whenever you want.</p>
 <a class="btn-red" href="/">Start shopping</a>
 <div class="facts">
 <div><b>$39.95</b><span>per month, billed on the 6th</span></div>
-<div><b>34%</b><span>off everything, applied automatically</span></div>
+<div><b>40%</b><span>off everything, applied automatically</span></div>
 <div><b>$50</b><span>toward an item with each token</span></div>
 <div><b>$0</b><span>to skip (1st&ndash;5th) or to cancel</span></div>
 </div>

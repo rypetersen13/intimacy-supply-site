@@ -18,11 +18,11 @@ PER_PAGE = 48
 CHUNK = 100
 
 CATS = {
-    "lingerie": ("Lingerie", "Lingerie, babydolls, teddies and more at up to 34% off with VIP membership."),
-    "toys": ("Vibrators & Toys", "Vibrators, massagers and toys at up to 34% off with VIP membership."),
-    "couples": ("Couples", "Products for couples and partner play at up to 34% off with VIP membership."),
-    "anal": ("Anal", "Plugs, trainers and anal play essentials at up to 34% off with VIP membership."),
-    "wellness": ("Wellness", "Lubricants, care and wellness essentials at up to 34% off with VIP membership."),
+    "lingerie": ("Lingerie", "Lingerie, babydolls, teddies and more at up to 40% off with VIP membership."),
+    "toys": ("Vibrators & Toys", "Vibrators, massagers and toys at up to 40% off with VIP membership."),
+    "couples": ("Couples", "Products for couples and partner play at up to 40% off with VIP membership."),
+    "anal": ("Anal", "Plugs, trainers and anal play essentials at up to 40% off with VIP membership."),
+    "wellness": ("Wellness", "Lubricants, care and wellness essentials at up to 40% off with VIP membership."),
 }
 
 # ---------- cleaning ----------
@@ -64,7 +64,7 @@ for i, r in enumerate(raw):
     name = clean_name(r["name"])
     price = round(float(r["price"]), 2)
     orig = round(float(r["orig"]), 2)
-    _disc = max(0.0, min(0.34, (orig - price) / orig)) if orig > 0 else 0.0   # this item's natural VIP discount, capped at the "up to 34%" ceiling
+    _disc = max(0.0, min(0.40, (orig - price) / orig)) if orig > 0 else 0.0   # this item's natural VIP discount, capped at the "up to 40%" ceiling
     if orig <= price:           # bad data: regular price below member price -> no discount shown
         orig = price
     # Eldorado MAP (minimum advertised price): neither price may go below it. The VIP price sits AT the
@@ -74,7 +74,7 @@ for i, r in enumerate(raw):
     _map = MAP_PRICES.get(str(r["model"]).strip().upper())
     if _map and price < _map - 0.005:
         price = _map
-        orig = round(_map / (1 - (_disc if _disc > 0.01 else 0.30)), 2)
+        orig = round(_map / 0.60, 2)   # flat 40% VIP discount, every time: regular = MAP / (1 - 0.40)
     elif _map and orig < _map - 0.005:
         orig = _map
     slug = slugify(name) + "-" + slugify(str(r["model"]))
@@ -362,7 +362,7 @@ for key, items in sorted(brands.items()):
         chunk = items[(pg - 1) * PER_PAGE: pg * PER_PAGE]
         path = base if pg == 1 else "%spage/%d/" % (base, pg)
         body = ('<div class="crumbs"><a href="/">Home</a> / <a href="/brands/">Brands</a> / %s</div><h1>%s</h1>'
-                '<p class="lede">Shop %s at up to 34%% off with VIP membership. Every item shows the VIP price and the regular price.</p>'
+                '<p class="lede">Shop %s at up to 40%% off with VIP membership. Every item shows the VIP price and the regular price.</p>'
                 '<div class="count">%d products%s</div><div class="grid">%s</div>%s') % (
             html.escape(name), html.escape(name), html.escape(name), len(items),
             " &middot; page %d of %d" % (pg, pages) if pages > 1 else "",

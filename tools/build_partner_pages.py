@@ -28,7 +28,7 @@ partners_body = """<section class="vip-hero">
 <div class="vip-hero-in">
 <div class="eyebrow-w">Creator partner program</div>
 <h1>Earn 5% on every order you refer</h1>
-<p class="lede">Share your link. When someone you refer places an order within 90 days, you earn 5% of the net sale. No follower minimum. Your audience shops at up to 34% off with VIP membership.</p>
+<p class="lede">Share your link. When someone you refer places an order within 90 days, you earn 5% of the net sale. No follower minimum. Your audience shops at up to 40% off with VIP membership.</p>
 <a class="btn-red" href="#apply">Apply to partner</a> <a class="btn-ghost" href="#how">How it works</a>
 <div class="facts">
 <div><b>5%</b><span>of net revenue on referred orders</span></div>
@@ -117,11 +117,11 @@ open(os.path.join(ROOT, "partners.html"), "w", encoding="utf-8").write(page(
 creator_body = """<section class="vip-hero">
 <div class="vip-hero-in">
 <div class="eyebrow-w" id="c-eyebrow">VIP offer</div>
-<h1 id="c-h1">Up to 34% off everything</h1>
-<p class="lede" id="c-sub">VIP members save up to 34% on every order, get a $50 Member Token each month, and can skip or cancel any time. Orders ship in plain packaging with discreet billing.</p>
+<h1 id="c-h1">Up to 40% off everything</h1>
+<p class="lede" id="c-sub">VIP members save up to 40% on every order, get a $50 Member Token each month, and can skip or cancel any time. Orders ship in plain packaging with discreet billing.</p>
 <a class="btn-red" id="c-cta" href="/">Shop VIP prices</a>
 <div class="facts">
-<div><b>Up to 34%</b><span>off every item, applied automatically</span></div>
+<div><b>Up to 40%</b><span>off every item, applied automatically</span></div>
 <div><b>$50</b><span>Member Token each month</span></div>
 <div><b>Plain</b><span>packaging, discreet billing</span></div>
 <div><b>Skip or cancel</b><span>any time, no fee</span></div>
@@ -151,8 +151,8 @@ creator_js = """<script>
   if (handle) {
     document.title = '@' + handle + ' shared a VIP offer | Intimacy Supply';
     el('c-eyebrow').textContent = 'Shared by @' + handle;
-    el('c-h1').textContent = 'Up to 34% off everything';
-    el('c-sub').textContent = '@' + handle + ' is a partner of Intimacy Supply. VIP members save up to 34% on every order, get a $50 Member Token each month, and can skip or cancel any time.';
+    el('c-h1').textContent = 'Up to 40% off everything';
+    el('c-sub').textContent = '@' + handle + ' is a partner of Intimacy Supply. VIP members save up to 40% on every order, get a $50 Member Token each month, and can skip or cancel any time.';
   }
   document.querySelectorAll('a[href="/"]').forEach(function(a){ a.href = '/' + q; });
   fetch('/products.json').then(function(r){ return r.json(); }).then(function(list){
@@ -172,7 +172,7 @@ creator_js = """<script>
 })();
 </script>"""
 open(os.path.join(ROOT, "creator.html"), "w", encoding="utf-8").write(page(
-    "VIP offer", "Up to 34% off everything with VIP membership at Intimacy Supply. Plain packaging and discreet billing.", "/creator.html",
+    "VIP offer", "Up to 40% off everything with VIP membership at Intimacy Supply. Plain packaging and discreet billing.", "/creator.html",
     creator_body, extra_tail=creator_js))
 
 # ---------------------------------------------------------------- dashboard.html

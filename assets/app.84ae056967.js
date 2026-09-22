@@ -604,7 +604,7 @@ function renderCart(){
   if(vipSection){
     var _pot = subtotalOrig - subtotalVIP;
     vipSection.innerHTML = (!showVIP && _pot > 0.005)
-      ? '<div class="cart-vip-offer"><b>Save $' + _pot.toFixed(2) + ' with VIP</b><span>Choose VIP at checkout for up to 34% off. VIP is $39.95 a month, billed on the 6th. Skip any month or cancel any time.</span></div>'
+      ? '<div class="cart-vip-offer"><b>Save $' + _pot.toFixed(2) + ' with VIP</b><span>Choose VIP at checkout for up to 40% off. VIP is $39.95 a month, billed on the 6th. Skip any month or cancel any time.</span></div>'
       : '';
   }
 
@@ -1739,7 +1739,7 @@ function addToCartFromDetailRedeem(){
    QUIZ / ONBOARDING
 ═══════════════════════════════════════════ */
 const QUIZ = [
-  {step:1,total:7,title:"Welcome to Intimacy Supply!",sub:"Get started to unlock up to 34% off everything. Create a login to get exclusive access to our VIP offers!",
+  {step:1,total:7,title:"Welcome to Intimacy Supply!",sub:"Get started to unlock up to 40% off everything. Create a login to get exclusive access to our VIP offers!",
    opts:[{l:"Women's Intimacy",e:''},{l:"Men's Pleasure",e:''},{l:"Couples",e:''},{l:"Here For It All",e:''}]},
   {step:2,total:7,title:"What are you shopping for?",sub:"Pick the one you shop for most. We'll personalize your feed.",
    opts:[{l:'Vibrators & Suction Toys',e:''},{l:'Lingerie & Wearables',e:''},{l:'Couples Intimacy Kits',e:''},{l:'Wellness & Massage',e:''},{l:'Anal & Prostate',e:''},{l:'Here For It All',e:''}]},
@@ -2038,7 +2038,7 @@ function showQuizSuccess(name){
     + '<p>Your account is ready.</p>'
     + '<div style="background:#F7F4F1;padding:14px 16px;margin-bottom:18px;font-size:13px;color:#555;line-height:1.65;text-align:left">'
     + '<strong style="color:#111;display:block;margin-bottom:4px">VIP is optional</strong>'
-    + 'At checkout you can choose VIP for up to 34% off. VIP is $39.95 a month, billed on the 6th. Skip any month between the 1st and 5th, or cancel any time online.'
+    + 'At checkout you can choose VIP for up to 40% off. VIP is $39.95 a month, billed on the 6th. Skip any month between the 1st and 5th, or cancel any time online.'
     + '</div>'
     + '<button class="qnb plum-btn" onclick="finishOnboarding()">' + (window._resumeCheckoutAt ? 'CONTINUE TO CHECKOUT' : 'START SHOPPING') + ' &nbsp;&#8250;</button>'
     + '</div>';
@@ -2050,7 +2050,7 @@ function showQuizSuccess(name){
 
 function finishOnboarding(){
   closeQuiz();
-  toast('Account created. Choose VIP at checkout for up to 34% off.');
+  toast('Account created. Choose VIP at checkout for up to 40% off.');
   filterProds(activeCat);
   resumeAfterAuth();
 }
@@ -3104,11 +3104,11 @@ function showOrderSuccess(orderId, total){
    SPIN WHEEL
 ═══════════════════════════════════════════ */
 const PRIZES=[
-  {label:'UP TO 34% OFF',  color:'#373431', code:null},
+  {label:'UP TO 40% OFF',  color:'#373431', code:null},
   {label:'VIP PRICING',color:'#1B1B19', code:null},
-  {label:'UP TO 34% OFF',  color:'#373431', code:null},
+  {label:'UP TO 40% OFF',  color:'#373431', code:null},
   {label:'VIP ACCESS',  color:'#1B1B19', code:null},
-  {label:'UP TO 34% OFF',  color:'#373431', code:null},
+  {label:'UP TO 40% OFF',  color:'#373431', code:null},
   {label:'VIP PRICING', color:'#1B1B19', code:null},
 ];
 
@@ -3208,7 +3208,7 @@ function onWheelClick(){
     c.style.transform='rotate('+deg+'deg)';
     lastSpinPrize = PRIZES[0]; // Always Extra 10% Off - wheel is visual entertainment only
     setTimeout(()=>{
-      toast('You won VIP pricing - up to 34% off everything! Create your account to claim it.');
+      toast('You won VIP pricing - up to 40% off everything! Create your account to claim it.');
       setTimeout(()=>{
         closeSpin();
         // If not signed in, open quiz to create account and claim prize
@@ -3653,7 +3653,7 @@ function openLegal(type){
         <p style="${P};margin-bottom:0"><strong>Refunds:</strong> We do not issue refunds on membership charges that have already processed, except where required by applicable law. If you believe a charge was made in error, contact us within 30 days at hello@intimacysupply.com.</p>
       </div>
       <h3 style="${S2}">4. Products &amp; Pricing</h3>
-      <p style="${P}">All prices are in US dollars. VIP member pricing represents savings of up to 34% off our standard retail prices. We reserve the right to change pricing at any time. Product images and descriptions are representative; actual items may vary slightly.</p>
+      <p style="${P}">All prices are in US dollars. VIP member pricing represents savings of up to 40% off our standard retail prices. We reserve the right to change pricing at any time. Product images and descriptions are representative; actual items may vary slightly.</p>
       <h3 style="${S2}">5. Shipping</h3>
       <p style="${P}">All orders ship in plain packaging with no exterior brand identification. Your billing statement will show &ldquo;Dharma Media & Technology LLC.&rdquo; Standard: $9.95, 6&ndash;10 business days. Expedited: $15.95, 3&ndash;4 business days. Free standard shipping on orders over $59.97.</p>
       <h3 style="${S2}">6. Returns &amp; Refunds</h3>
@@ -4559,7 +4559,7 @@ function renderAcctPanel(){
     + (isVIP
         ? '<div class="ac-vip-status">'
           + '<div class="ac-vip-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'
-          + '<div class="ac-vip-text"><strong>VIP Active &mdash; up to 34% off everything</strong><span>Your discount is applied automatically at checkout</span></div>'
+          + '<div class="ac-vip-text"><strong>VIP Active &mdash; up to 40% off everything</strong><span>Your discount is applied automatically at checkout</span></div>'
           + '</div>'
         : '')
 
