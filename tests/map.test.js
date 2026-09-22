@@ -63,3 +63,39 @@ test("the site's \"up to 40%\" claim is real: the highest VIP discount anywhere 
   assert.ok(max <= 0.401, "some item exceeds the advertised 40% ceiling: " + (max * 100).toFixed(1) + "%");
   assert.ok(at40 > 1000, "\"up to 40%\" would be false — only " + at40 + " items actually reach it");
 });
+
+// ---------- Real margin floor (Eldorado dealer cost) ----------
+const costFile = path.join(root, "tools", "source", "eldorado_cost.json");
+const DROPSHIP_FEE = 1.85;
+const MIN_MARGIN = 0.20;
+
+test("Eldorado real dealer cost file is present and covers most of the catalog", () => {
+  const cost = JSON.parse(fs.readFileSync(costFile, "utf8"));
+  assert.ok(Object.keys(cost).length > 15000);
+});
+
+test("every item with a known dealer cost clears at least 20% net margin after the $1.85 drop-ship fee", { skip: !fs.existsSync(catFile) }, () => {
+  const cost = JSON.parse(fs.readFileSync(costFile, "utf8"));
+  const cat = JSON.parse(fs.readFileSync(catFile, "utf8"));
+  let checked = 0;
+  for (const p of cat) {
+    const c = cost[String(p.model).trim().toUpperCase()];
+    if (c == null) continue;
+    checked++;
+    const vip = Number(p.price);
+    const margin = (vip - c - DROPSHIP_FEE) / vip;
+    assert.ok(margin >= MIN_MARGIN - 0.001, p.model + " margin is " + (margin * 100).toFixed(1) + "%, below the 20% floor (cost " + c + ", VIP " + vip + ")");
+  }
+  assert.ok(checked > 7000, "expected to check most of the catalog against real cost, checked " + checked);
+});
+
+test("no item loses money against its real dealer cost, ever", { skip: !fs.existsSync(catFile) }, () => {
+  const cost = JSON.parse(fs.readFileSync(costFile, "utf8"));
+  const cat = JSON.parse(fs.readFileSync(catFile, "utf8"));
+  for (const p of cat) {
+    const c = cost[String(p.model).trim().toUpperCase()];
+    if (c == null) continue;
+    const vip = Number(p.price);
+    assert.ok(vip - c - DROPSHIP_FEE >= -0.001, p.model + " sells below cost: VIP " + vip + " vs cost+fee " + (c + DROPSHIP_FEE));
+  }
+});

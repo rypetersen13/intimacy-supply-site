@@ -9,6 +9,12 @@ Python 3.8+, standard library only.
 import json, os, re, html, math, shutil, subprocess, sys, unicodedata
 
 MAP_PRICES = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "source", "map_prices.json")))
+ELDORADO_COST = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "source", "eldorado_cost.json")))
+# Margin floor: every priced item must clear (dealer cost + drop-ship fee) with at least this much net margin.
+# Source of the dealer cost: tools/source/eldorado_cost.csv, Eldorado's own inventory_cga0a.csv feed (their
+# "Products_price" column, described in their docs as "Your price, reflecting discounts" -- i.e. what we pay).
+DROPSHIP_FEE = 1.85
+MIN_MARGIN = 0.20
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "tools", "source", "products.raw.json")
@@ -77,6 +83,17 @@ for i, r in enumerate(raw):
         orig = round(_map / 0.60, 2)   # flat 40% VIP discount, every time: regular = MAP / (1 - 0.40)
     elif _map and orig < _map - 0.005:
         orig = _map
+    # Real margin floor: the VIP price must clear (dealer cost + drop-ship fee) with at least MIN_MARGIN
+    # net margin. This uses Eldorado's own current cost feed, not a guess. Items with no cost on file in
+    # this feed (a small minority) are left as-is -- there's nothing to check them against.
+    _cost = ELDORADO_COST.get(str(r["model"]).strip().upper())
+    if _cost is not None:
+        _floor = math.ceil(((_cost + DROPSHIP_FEE) / (1 - MIN_MARGIN)) * 100) / 100   # round UP to the cent -- never let rounding shave the margin below the floor
+        if price < _floor - 0.005:
+            price = _floor
+            orig = round(_floor / 0.60, 2)   # same flat 40% pattern as the MAP fix
+        elif orig < _floor / 0.60 - 0.005:
+            orig = round(_floor / 0.60, 2)
     slug = slugify(name) + "-" + slugify(str(r["model"]))
     base, n = slug, 2
     while slug in used: slug = "%s-%d" % (base, n); n += 1
