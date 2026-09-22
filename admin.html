@@ -951,9 +951,9 @@ function openOrderModal(orderId){
   var oid = escH(orderId);
   var actions = '';
   if(st === 'to_fulfill' || st === 'review'){
-    actions = '<div class="step-hint">Step 1. Copy the order into Eldorado, then mark it ordered.</div>' +
+    actions = '<div class="step-hint">Sent to Eldorado automatically within about 15 minutes of payment. If it has not moved after 30 minutes, send it by hand:</div>' +
       '<div class="action-bar"><button class="btn-line" onclick="copyEldorado(\'' + oid + '\')">Copy order for Eldorado</button>' +
-      '<button class="btn-dark" onclick="setOrderStatus(\'' + oid + '\',\'ordered\')">Mark as ordered</button></div>';
+      '<button class="btn-dark" onclick="setOrderStatus(\'' + oid + '\',\'ordered\')">Mark as ordered by hand</button></div>';
   } else if(st === 'ordered'){
     actions = '<div class="step-hint">Step 2. When Eldorado ships it, add the tracking number.</div>' +
       '<label class="field-label" for="trk-carrier">Carrier</label><select class="status-select" id="trk-carrier"><option>USPS</option><option>UPS</option><option>FedEx</option><option>Other</option></select>' +

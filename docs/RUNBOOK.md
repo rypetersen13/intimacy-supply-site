@@ -32,3 +32,16 @@ Netlify > Logs > Functions > `client-error`.
 2. In Netlify add `REVIEW_FROM_EMAIL` (for example `Intimacy Supply <orders@intimacysupply.com>`) and confirm `RESEND_API_KEY` is set.
 3. Run the function once (Netlify > Functions > send-review-requests > Run now) and read the log line `send-review-requests summary`.
 4. When the numbers look right, add `REVIEW_EMAILS_LIVE=1` and deploy.
+
+## Turn on automatic Eldorado fulfillment
+Two scheduled functions send paid orders to Eldorado and bring tracking back, using their Customer Integration Partner Portal (May 2026 spec). Both are dry runs until you set `ELDORADO_ORDERS_LIVE=1`.
+
+- `send-orders-to-eldorado` (every 15 min): builds one XML order file per newly-paid order and uploads it to Eldorado's `uploads` SFTP folder. Marks the order `ordered` and stamps `eldoradoSentAt`.
+- `import-eldorado-tracking` (every 30 min): reads Eldorado's `shipping_confirmation` folder, matches by our order number, marks the order `shipped` with carrier + tracking, and emails the customer.
+
+Setup:
+1. In Netlify, set `ELDORADO_SFTP_HOST`, `ELDORADO_SFTP_USER`, `ELDORADO_SFTP_PASS` (same login used for `sync-stock`).
+2. Set `ELDORADO_ACCOUNT_ID` to your Eldorado business partner # (used as `AccountId` in every order — required, orders will fail to build without it).
+3. Confirm `RESEND_API_KEY` and `REVIEW_FROM_EMAIL` are set (shared with review emails) so tracking emails can send.
+4. Run both functions once (Netlify > Functions > run now) and read the log lines `send-orders-to-eldorado summary` / `import-eldorado-tracking summary`. In dry run they log what they *would* send/update without touching anything.
+5. When the numbers look right, set `ELDORADO_ORDERS_LIVE=1` and deploy. From then on, a paid order needs no manual step — the "Copy order for Eldorado" button in admin becomes a fallback for if a file fails to send.
